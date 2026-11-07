@@ -120,6 +120,19 @@
                 :icon="['fas', grimoire.isMuted ? 'volume-mute' : 'volume-up']"
             /></em>
           </li>
+          <li class="language" @click="cycleLocale">
+            {{ $t("menu.language") }}
+            <em>
+              <span
+                v-for="locale in locales"
+                :key="locale.code"
+                :class="{ active: grimoire.locale === locale.code }"
+                :title="locale.name"
+                @click.stop="setLocale(locale.code)"
+                >{{ locale.code.toUpperCase() }}</span
+              >
+            </em>
+          </li>
         </template>
 
         <template v-if="tab === 'session'">
@@ -296,6 +309,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import { LOCALES } from "../i18n";
 
 export default {
   computed: {
@@ -311,9 +325,16 @@ export default {
   data() {
     return {
       tab: "grimoire",
+      locales: LOCALES,
     };
   },
   methods: {
+    cycleLocale() {
+      const index = this.locales.findIndex(
+        ({ code }) => code === this.grimoire.locale,
+      );
+      this.setLocale(this.locales[(index + 1) % this.locales.length].code);
+    },
     setBackground() {
       const background = prompt("Enter custom background URL");
       if (background || background === "") {
@@ -475,6 +496,7 @@ export default {
       "toggleStatic",
       "toggleMockAssignments",
       "setZoom",
+      "setLocale",
       "toggleModal",
     ]),
   },
@@ -642,6 +664,23 @@ export default {
         font-style: normal;
         margin-left: 10px;
         font-size: 80%;
+      }
+
+      &.language {
+        em span {
+          color: white;
+          opacity: 0.5;
+          margin-left: 6px;
+          transition: opacity 250ms;
+          &:hover {
+            color: red;
+            opacity: 1;
+          }
+          &.active {
+            opacity: 1;
+            font-weight: bold;
+          }
+        }
       }
     }
 

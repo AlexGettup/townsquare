@@ -1,3 +1,5 @@
+const { detectBrowserLocale } = require("../i18n");
+
 module.exports = (store) => {
   const updatePagetitle = (isPublic) =>
     (document.title = `Blood on the Clocktower ${
@@ -5,6 +7,11 @@ module.exports = (store) => {
     }`);
 
   // initialize data
+  // language: last choice on this device, otherwise the browser's language
+  store.commit(
+    "setLocale",
+    localStorage.getItem("locale") || detectBrowserLocale(),
+  );
   if (localStorage.getItem("background")) {
     store.commit("setBackground", localStorage.background);
   }
@@ -91,6 +98,9 @@ module.exports = (store) => {
           localStorage.removeItem("isGrimoire");
         }
         updatePagetitle(state.grimoire.isPublic);
+        break;
+      case "setLocale":
+        localStorage.setItem("locale", state.grimoire.locale);
         break;
       case "setBackground":
         if (payload) {

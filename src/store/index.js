@@ -8,6 +8,7 @@ import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
 import nightJSON from "../nightsheet.json";
 import jinxesJSON from "../jinxes.json";
+import { DEFAULT_LOCALE, isSupportedLocale } from "../i18n";
 
 Vue.use(Vuex);
 
@@ -130,6 +131,7 @@ export default new Vuex.Store({
       isMockAssignmentsAllowed: false,
       zoom: 0,
       background: "",
+      locale: DEFAULT_LOCALE,
     },
     modals: {
       edition: false,
@@ -234,6 +236,11 @@ export default new Vuex.Store({
   mutations: {
     setZoom: set("zoom"),
     setBackground: set("background"),
+    setLocale({ grimoire }, locale) {
+      if (isSupportedLocale(locale)) {
+        grimoire.locale = locale;
+      }
+    },
     toggleMuted: toggle("isMuted"),
     toggleMenu: toggle("isMenuOpen"),
     toggleNightOrder: toggle("isNightOrder"),
