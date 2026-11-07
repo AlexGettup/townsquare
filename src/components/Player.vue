@@ -95,6 +95,14 @@
         v-if="canWakeVoice && isAwake(player.id)"
         :title="$t('voice.awake')"
       />
+      <!-- Day: talking in a private conversation or a room -->
+      <font-awesome-icon
+        icon="comments"
+        class="voice-place"
+        v-if="voicePlace"
+        :style="{ color: placeColor(voicePlace) }"
+        :title="placeName(voicePlace)"
+      />
 
       <!-- Claimed seat icon -->
       <font-awesome-icon
@@ -195,6 +203,10 @@
           >
             <font-awesome-icon icon="hand-paper" />
             {{ $t("player.raiseHand") }}
+          </li>
+          <li @click="inviteToTalk" v-if="canInvite">
+            <font-awesome-icon icon="user-plus" />
+            {{ $t("voice.invite") }}
           </li>
           <li @click="changeAlignment" v-if="player.role.id">
             <font-awesome-icon icon="yin-yang" />
@@ -328,8 +340,11 @@
 <script>
 import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
+import peerNames from "../voice/peerNames";
+import { PLAZA, isConversation } from "../store/modules/voice";
 
 export default {
+  mixins: [peerNames],
   components: {
     Token,
   },
@@ -353,6 +368,7 @@ export default {
       "isStoryteller",
       "isAwake",
       "showSpeaking",
+      "locationOf",
     ]),
     // role with night order texts in the chosen language
     displayRole: function () {
@@ -378,6 +394,29 @@ export default {
     // storyteller at night can wake up players who are in voice chat
     canWakeVoice: function () {
       return this.isStoryteller && this.grimoire.isNight && !!this.voicePeer;
+    },
+    // day: private conversation or room this player is in (not the plaza)
+    voicePlace: function () {
+      if (!this.isConnected || this.grimoire.isNight || !this.player.id) {
+        return null;
+      }
+      const location = this.locationOf(this.player.id);
+      return location && location !== PLAZA ? location : null;
+    },
+    // day: invite this player to talk in private (or into our conversation)
+    canInvite: function () {
+      if (
+        !this.isConnected ||
+        this.grimoire.isNight ||
+        !this.voicePeer ||
+        this.isVoiceSelf
+      ) {
+        return false;
+      }
+      return !(
+        isConversation(this.voice.location) &&
+        this.locationOf(this.player.id) === this.voice.location
+      );
     },
     voiceMuted: function () {
       if (!this.isConnected) return false;
@@ -508,6 +547,10 @@ export default {
     toggleAwakeVoice() {
       this.isMenuOpen = false;
       this.$store.dispatch("voice/toggleAwake", this.player.id);
+    },
+    inviteToTalk() {
+      this.isMenuOpen = false;
+      this.$store.dispatch("voice/invite", this.player.id);
     },
     swapPlayer(player) {
       this.isMenuOpen = false;
@@ -1016,6 +1059,17 @@ li.move:not(.from) .player .overlay svg.move {
   filter: drop-shadow(0 0 4px black);
   z-index: 2;
   pointer-events: none;
+}
+
+// day: in a private conversation or room (color tells them apart)
+.player .voice-place {
+  position: absolute;
+  right: -8px;
+  // between the two-votes icon (top) and the ghost vote icon (bottom)
+  margin-top: -58%;
+  filter: drop-shadow(0 0 3px black);
+  z-index: 2;
+  pointer-events: auto;
 }
 
 // microphone turned off

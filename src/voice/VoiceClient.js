@@ -9,9 +9,11 @@
  *
  * Events (callbacks passed to the constructor):
  * - onStatus(status, error)   "connecting" | "connected" | "off" | "error"
- * - onPeers(peers)            [{ peerId, muted }] for everyone else in voice
+ * - onPeers(peers, self)      everyone else in voice, and our own entry:
+ *                             { peerId, muted, location, requesting, … }
  * - onSpeaking(peerId, bool)  voice activity, also for the local peer
  * - onForceMute()             the storyteller muted us
+ * - onEvent(message)          invite / request / declined / gather
  */
 
 const TRACK_NAME = "microphone";
@@ -22,13 +24,26 @@ const SPEAKING_THRESHOLD = 0.02; // RMS of the signal
 const SPEAKING_HOLD = 400; // ms to keep "speaking" after the last sound
 
 export default class VoiceClient {
-  constructor({ serverUrl, onStatus, onPeers, onSpeaking, onForceMute }) {
+  constructor({
+    serverUrl,
+    onStatus,
+    onPeers,
+    onSpeaking,
+    onForceMute,
+    onEvent,
+  }) {
     this.serverUrl = serverUrl.replace(/\/$/, "");
     this.onStatus = onStatus;
     this.onPeers = onPeers;
     this.onSpeaking = onSpeaking;
     this.onForceMute = onForceMute;
+    this.onEvent = onEvent;
     this._reset();
+  }
+
+  /** Send a room message (conversations, invitations…) to the server. */
+  send(message) {
+    this._sendSocket(message);
   }
 
   _reset() {
@@ -341,14 +356,23 @@ export default class VoiceClient {
     [...this.remotes.keys()].forEach((peerId) => {
       if (!others.some((peer) => peer.peerId === peerId)) this._drop(peerId);
     });
-    this.onPeers(
-      others.map(({ peerId, muted, awake, broadcast }) => ({
-        peerId,
-        muted,
-        awake: awake || [],
-        broadcast: !!broadcast,
-      })),
-    );
+    const visible = ({
+      peerId,
+      muted,
+      awake,
+      broadcast,
+      location,
+      requesting,
+    }) => ({
+      peerId,
+      muted,
+      awake: awake || [],
+      broadcast: !!broadcast,
+      location: location || "plaza",
+      requesting: requesting || null,
+    });
+    const self = peers.find((peer) => peer.peerId === this.peerId);
+    this.onPeers(others.map(visible), self ? visible(self) : null);
   }
 
   // --- voice activity detection --------------------------------------------
@@ -424,7 +448,9 @@ export default class VoiceClient {
         return;
       }
       if (message.type === "peers") this._onPeers(message.peers);
-      if (message.type === "mute") this.onForceMute();
+      else if (message.type === "mute") this.onForceMute();
+      // invitations, join requests, declines, gathering in the plaza
+      else this.onEvent(message);
     };
     socket.onclose = (event) => {
       clearInterval(this.pingTimer);

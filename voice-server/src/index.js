@@ -87,11 +87,31 @@ export default {
   },
 };
 
+const STORYTELLER = "host";
+// open rooms anyone can walk into
+const FIXED_ROOMS = ["tavern", "church", "graveyard"];
+const PLAZA = "plaza";
+const isConversation = (location) =>
+  typeof location === "string" && location.startsWith("conv-");
+// clients connected before conversations existed lack these fields
+const withDefaults = (state) => ({
+  location: PLAZA,
+  requesting: null,
+  invitedBy: [],
+  ...state,
+});
+
 /**
  * One VoiceRoom per game session. Every connected client has a WebSocket
  * whose attachment holds its voice state:
- * { peerId, sessionId, trackName, muted }
+ * { peerId, sessionId, trackName, muted, location, requesting, invitedBy }
  * plus, for the storyteller ("host"), the night state: { awake, broadcast }
+ *
+ * location: "plaza", a fixed room, or a private conversation ("conv-…").
+ * The server decides every move, so nobody can join a private conversation
+ * without an invitation or being accepted by someone inside (except the
+ * storyteller, who can go anywhere).
+ *
  * Uses the hibernation API, so an idle room costs nothing.
  */
 export class VoiceRoom {
@@ -123,17 +143,89 @@ export class VoiceRoom {
       sessionId: null,
       trackName: null,
       muted: false,
+      location: PLAZA,
+      requesting: null,
+      invitedBy: [],
     });
     return new Response(null, { status: 101, webSocket: client });
   }
 
-  // everyone currently sending audio, except an optional closing socket
+  // everyone currently sending audio, except an optional closing socket.
+  // Pending invitations stay private to the invited peer.
   peers(except) {
-    return this.ctx
-      .getWebSockets()
-      .filter((ws) => ws !== except)
+    return this.sockets(except)
       .map((ws) => ws.deserializeAttachment())
-      .filter((peer) => peer && peer.sessionId);
+      .filter((peer) => peer && peer.sessionId)
+      .map((peer) => {
+        const visible = withDefaults(peer);
+        delete visible.invitedBy;
+        return visible;
+      });
+  }
+
+  sockets(except) {
+    return this.ctx.getWebSockets().filter((ws) => ws !== except);
+  }
+
+  socketOf(peerId, except) {
+    return this.sockets(except).find(
+      (ws) => (ws.deserializeAttachment() || {}).peerId === peerId,
+    );
+  }
+
+  update(ws, changes) {
+    const state = { ...ws.deserializeAttachment(), ...changes };
+    ws.serializeAttachment(state);
+    return state;
+  }
+
+  send(ws, message) {
+    try {
+      ws.send(JSON.stringify(message));
+    } catch (e) {
+      // socket is closing
+    }
+  }
+
+  // everyone in a location (e.g. the members of a private conversation)
+  membersOf(location, except) {
+    return this.sockets(except).filter(
+      (ws) => (ws.deserializeAttachment() || {}).location === location,
+    );
+  }
+
+  moveTo(ws, location) {
+    this.update(ws, { location, requesting: null });
+  }
+
+  /**
+   * Close private conversations with a single person left (they go back to
+   * the plaza) and forget requests to join conversations that are gone.
+   */
+  cleanUp(except) {
+    const counts = {};
+    this.sockets(except).forEach((ws) => {
+      const { location } = ws.deserializeAttachment() || {};
+      if (isConversation(location))
+        counts[location] = (counts[location] || 0) + 1;
+    });
+    this.sockets(except).forEach((ws) => {
+      const {
+        location,
+        requesting,
+        invitedBy = [],
+      } = ws.deserializeAttachment() || {};
+      if (isConversation(location) && counts[location] < 2) {
+        this.moveTo(ws, PLAZA);
+      }
+      if (requesting && !(counts[requesting] >= 2)) {
+        this.update(ws, { requesting: null });
+      }
+      const stillHere = invitedBy.filter((id) => this.socketOf(id, except));
+      if (stillHere.length !== invitedBy.length) {
+        this.update(ws, { invitedBy: stillHere });
+      }
+    });
   }
 
   broadcastPeers(except) {
@@ -158,7 +250,7 @@ export class VoiceRoom {
     } catch (e) {
       return;
     }
-    const me = ws.deserializeAttachment();
+    const me = withDefaults(ws.deserializeAttachment());
     switch (message.type) {
       case "join":
         ws.serializeAttachment({
@@ -182,7 +274,7 @@ export class VoiceRoom {
       case "night":
         // storyteller only: who is awake at night, and whether they are
         // talking to everyone. Shared with all clients through the peer list.
-        if (me.peerId !== "host") break;
+        if (me.peerId !== STORYTELLER) break;
         ws.serializeAttachment({
           ...me,
           awake: (Array.isArray(message.awake) ? message.awake : [])
@@ -192,7 +284,134 @@ export class VoiceRoom {
         });
         this.broadcastPeers();
         break;
+      default:
+        if (this.handleConversation(ws, me, message)) {
+          this.cleanUp();
+          this.broadcastPeers();
+        }
     }
+  }
+
+  /**
+   * Private conversations and rooms. Returns true when locations changed.
+   */
+  handleConversation(ws, me, message) {
+    const isStoryteller = me.peerId === STORYTELLER;
+    switch (message.type) {
+      case "invite": {
+        // ask someone to talk in private (with us, or in our conversation)
+        const target = this.socketOf(String(message.to));
+        if (!target || message.to === me.peerId) return false;
+        const them = withDefaults(target.deserializeAttachment());
+        if (isConversation(me.location) && them.location === me.location) {
+          return false;
+        }
+        this.update(target, {
+          invitedBy: [
+            ...them.invitedBy.filter((id) => id !== me.peerId),
+            me.peerId,
+          ].slice(-20),
+        });
+        this.send(target, { type: "invite", from: me.peerId });
+        return false;
+      }
+      case "accept-invite": {
+        const from = String(message.from);
+        if (!me.invitedBy.includes(from)) return false;
+        this.update(ws, {
+          invitedBy: me.invitedBy.filter((id) => id !== from),
+        });
+        const inviter = this.socketOf(from);
+        if (!inviter) return true;
+        let { location } = inviter.deserializeAttachment();
+        if (!isConversation(location)) {
+          // start a new private conversation with the inviter
+          location = "conv-" + crypto.randomUUID().slice(0, 8);
+          this.moveTo(inviter, location);
+        }
+        this.moveTo(ws, location);
+        return true;
+      }
+      case "decline-invite": {
+        const from = String(message.from);
+        this.update(ws, {
+          invitedBy: me.invitedBy.filter((id) => id !== from),
+        });
+        const inviter = this.socketOf(from);
+        if (inviter) {
+          this.send(inviter, {
+            type: "declined",
+            kind: "invite",
+            by: me.peerId,
+          });
+        }
+        return false;
+      }
+      case "request": {
+        // ask the members of a private conversation to let us in
+        const location = String(message.location);
+        if (!isConversation(location) || location === me.location) {
+          return false;
+        }
+        const members = this.membersOf(location);
+        if (!members.length) return false;
+        this.update(ws, { requesting: location });
+        members.forEach((member) =>
+          this.send(member, { type: "request", from: me.peerId, location }),
+        );
+        return true;
+      }
+      case "cancel-request":
+        this.update(ws, { requesting: null });
+        return true;
+      case "accept-request":
+      case "decline-request": {
+        const requester = this.socketOf(String(message.from));
+        if (!requester || !isConversation(me.location)) return false;
+        const { requesting } = requester.deserializeAttachment();
+        if (requesting !== me.location) return false;
+        if (message.type === "accept-request") {
+          this.moveTo(requester, me.location);
+        } else {
+          this.update(requester, { requesting: null });
+          this.send(requester, {
+            type: "declined",
+            kind: "request",
+            by: me.peerId,
+          });
+        }
+        return true;
+      }
+      case "move": {
+        // plaza and fixed rooms are open to everyone; the storyteller can
+        // also walk into any private conversation
+        const location = String(message.location);
+        const allowed =
+          location === PLAZA ||
+          FIXED_ROOMS.includes(location) ||
+          (isStoryteller &&
+            isConversation(location) &&
+            this.membersOf(location).length > 0);
+        if (!allowed || location === me.location) return false;
+        this.moveTo(ws, location);
+        return true;
+      }
+      case "gather":
+        // storyteller: everyone back to the plaza (optionally with a sound)
+        if (!isStoryteller) return false;
+        this.sockets().forEach((socket) =>
+          this.update(socket, {
+            location: PLAZA,
+            requesting: null,
+            invitedBy: [],
+          }),
+        );
+        this.sockets().forEach((socket) =>
+          this.send(socket, { type: "gather", sound: !!message.sound }),
+        );
+        return true;
+    }
+    return false;
   }
 
   async webSocketClose(ws, code) {
@@ -201,10 +420,12 @@ export class VoiceRoom {
     } catch (e) {
       // already closed
     }
+    this.cleanUp(ws);
     this.broadcastPeers(ws);
   }
 
   async webSocketError(ws) {
+    this.cleanUp(ws);
     this.broadcastPeers(ws);
   }
 }

@@ -4,12 +4,20 @@
  * the actions as this.$voice.
  *
  * Who hears whom:
- * - Day: everyone hears everyone.
+ * - Day: you hear whoever is in the same place as you: the plaza, a fixed
+ *   room (tavern, church, graveyard) or a private conversation. The voice
+ *   server decides who may enter a private conversation.
  * - Night: players are isolated. The storyteller wakes players up and only
  *   hears those; awake players only hear the storyteller (not each other).
  *   With "broadcast" on, every player hears the storyteller.
  */
-const STORYTELLER = "host";
+export const STORYTELLER = "host";
+export const PLAZA = "plaza";
+export const FIXED_ROOMS = ["tavern", "church", "graveyard"];
+export const isConversation = (location) =>
+  typeof location === "string" && location.startsWith("conv-");
+
+let nextNoticeId = 1;
 
 const state = () => ({
   // voice server configured for this build (VUE_APP_VOICE_URL)
@@ -17,14 +25,21 @@ const state = () => ({
   status: "off", // off | connecting | connected | error
   error: "",
   muted: false,
-  // peerId -> { muted, awake, broadcast } for everyone else in the room
-  // (awake / broadcast are only set on the storyteller's entry)
+  // peerId -> { muted, location, requesting, awake, broadcast } for everyone
+  // else in the room (awake / broadcast are only set on the storyteller)
   peers: {},
+  // where we are, and which private conversation we asked to join
+  location: PLAZA,
+  requesting: null,
   // peerId -> true while that person is talking (includes ourselves)
   speaking: {},
   // storyteller only, the source of the night state shared with players
   awake: [],
   broadcast: false,
+  // invitations received: [{ from, at }]
+  invitations: [],
+  // short messages ("X declined your invitation"): [{ id, key, peerId }]
+  notices: [],
 });
 
 const getters = {
@@ -33,6 +48,10 @@ const getters = {
   selfPeerId: (state, getters, rootState) =>
     rootState.session.isSpectator ? rootState.session.playerId : STORYTELLER,
   isStoryteller: (state, getters) => getters.selfPeerId === STORYTELLER,
+  locationOf: (state, getters) => (peerId) => {
+    if (peerId === getters.selfPeerId) return state.location;
+    return state.peers[peerId] ? state.peers[peerId].location : null;
+  },
   // night state: our own as storyteller, otherwise the storyteller's
   night: (state, getters) => {
     if (getters.isStoryteller) {
@@ -46,19 +65,60 @@ const getters = {
   isAwake: (state, getters) => (peerId) => getters.night.awake.includes(peerId),
   /** Can we hear this peer right now? */
   canHear: (state, getters, rootState) => (peerId) => {
-    if (!rootState.grimoire.isNight) return true;
+    if (!rootState.grimoire.isNight) {
+      return getters.locationOf(peerId) === state.location;
+    }
     if (getters.isStoryteller) return getters.isAwake(peerId);
     if (peerId !== STORYTELLER) return false;
     return getters.night.broadcast || getters.isAwake(getters.selfPeerId);
   },
   /**
    * Should we show that this peer is talking? The storyteller sees everyone;
-   * players only see who they can hear, so the night stays secret.
+   * players only see who they can hear.
    */
   showSpeaking: (state, getters) => (peerId) =>
     getters.isStoryteller ||
     peerId === getters.selfPeerId ||
     getters.canHear(peerId),
+  /**
+   * Everyone in voice grouped by place:
+   * { [location]: [peerId, …] }, ourselves included.
+   */
+  places: (state, getters) => {
+    const places = {};
+    const add = (peerId, location) => {
+      (places[location] = places[location] || []).push(peerId);
+    };
+    add(getters.selfPeerId, state.location);
+    Object.entries(state.peers).forEach(([peerId, { location }]) =>
+      add(peerId, location),
+    );
+    return places;
+  },
+  // private conversations currently open, in a stable order
+  conversations: (state, getters) =>
+    Object.keys(getters.places)
+      .filter(isConversation)
+      .sort()
+      .map((location) => ({ location, members: getters.places[location] })),
+  // join requests for the conversation we are in
+  joinRequests: (state) =>
+    isConversation(state.location)
+      ? Object.entries(state.peers)
+          .filter(([, peer]) => peer.requesting === state.location)
+          .map(([peerId]) => peerId)
+      : [],
+  // invitations that still make sense (the inviter is around, and we aren't
+  // already talking with them)
+  pendingInvitations: (state, getters) =>
+    state.invitations.filter(
+      ({ from }) =>
+        state.peers[from] &&
+        !(
+          isConversation(state.location) &&
+          getters.locationOf(from) === state.location
+        ),
+    ),
 };
 
 const mutations = {
@@ -69,13 +129,21 @@ const mutations = {
   setMuted(state, muted) {
     state.muted = muted;
   },
-  setPeers(state, peers) {
+  setPeers(state, { peers, self }) {
     state.peers = Object.fromEntries(
-      peers.map(({ peerId, muted, awake, broadcast }) => [
+      peers.map(({ peerId, muted, awake, broadcast, location, requesting }) => [
         peerId,
-        { muted, awake: awake || [], broadcast: !!broadcast },
+        {
+          muted,
+          awake: awake || [],
+          broadcast: !!broadcast,
+          location: location || PLAZA,
+          requesting: requesting || null,
+        },
       ]),
     );
+    state.location = self ? self.location : PLAZA;
+    state.requesting = self ? self.requesting : null;
   },
   setSpeaking(state, { peerId, speaking }) {
     if (speaking) {
@@ -93,6 +161,26 @@ const mutations = {
     state.awake = awake;
     state.broadcast = broadcast;
   },
+  addInvitation(state, from) {
+    state.invitations = [
+      ...state.invitations.filter((invitation) => invitation.from !== from),
+      { from, at: Date.now() },
+    ];
+  },
+  removeInvitation(state, from) {
+    state.invitations = state.invitations.filter(
+      (invitation) => invitation.from !== from,
+    );
+  },
+  clearInvitations(state) {
+    state.invitations = [];
+  },
+  addNotice(state, notice) {
+    state.notices = [...state.notices, { id: nextNoticeId++, ...notice }];
+  },
+  removeNotice(state, id) {
+    state.notices = state.notices.filter((notice) => notice.id !== id);
+  },
 };
 
 const actions = {
@@ -106,7 +194,8 @@ const actions = {
       muted: state.muted,
     });
   },
-  leave() {
+  leave({ commit }) {
+    commit("clearInvitations");
     return this.$voice.leave();
   },
   toggleMute({ commit, state }) {
@@ -134,6 +223,43 @@ const actions = {
   setNight({ commit, state }, night) {
     commit("setNight", night);
     this.$voice.setNight({ awake: state.awake, broadcast: state.broadcast });
+  },
+
+  // --- private conversations and rooms --------------------------------------
+
+  /** Invite someone to talk in private (or into our conversation). */
+  invite(context, peerId) {
+    this.$voice.send({ type: "invite", to: peerId });
+  },
+  acceptInvitation({ commit }, from) {
+    commit("removeInvitation", from);
+    this.$voice.send({ type: "accept-invite", from });
+  },
+  declineInvitation({ commit }, from) {
+    commit("removeInvitation", from);
+    this.$voice.send({ type: "decline-invite", from });
+  },
+  /** Ask the members of a private conversation to let us in. */
+  requestToJoin(context, location) {
+    this.$voice.send({ type: "request", location });
+  },
+  cancelRequest() {
+    this.$voice.send({ type: "cancel-request" });
+  },
+  acceptRequest(context, from) {
+    this.$voice.send({ type: "accept-request", from });
+  },
+  declineRequest(context, from) {
+    this.$voice.send({ type: "decline-request", from });
+  },
+  /** Go to the plaza or a fixed room (the storyteller can go anywhere). */
+  moveTo(context, location) {
+    this.$voice.send({ type: "move", location });
+  },
+  /** Storyteller only: bring everyone back to the plaza. */
+  gather({ getters }, { sound = true } = {}) {
+    if (!getters.isStoryteller) return;
+    this.$voice.send({ type: "gather", sound });
   },
 };
 

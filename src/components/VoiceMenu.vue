@@ -41,6 +41,11 @@
           {{ $t("voice.leave") }}
           <em><font-awesome-icon icon="sign-out-alt" /></em>
         </li>
+        <!-- Day: storyteller brings everyone back to the plaza -->
+        <li v-if="isStoryteller && !grimoire.isNight" @click="gather">
+          {{ $t("voice.gather") }}
+          <em><font-awesome-icon icon="bell" /></em>
+        </li>
 
         <!-- Night: storyteller controls, or the player's own state -->
         <template v-if="grimoire.isNight">
@@ -247,6 +252,9 @@ export default {
     },
     toggleBroadcast() {
       this.$store.dispatch("voice/toggleBroadcast");
+    },
+    gather() {
+      this.$store.dispatch("voice/gather", { sound: true });
     },
   },
   watch: {
