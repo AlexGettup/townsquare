@@ -32,18 +32,7 @@
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
     </span>
-    <span
-      class="voice"
-      v-if="voice.isAvailable && session.sessionId"
-      :class="[
-        'status-' + voice.status,
-        { muted: voice.muted, speaking: !!voice.speaking[selfPeerId] },
-      ]"
-      @click="voiceButton"
-      :title="voiceTitle"
-    >
-      <font-awesome-icon :icon="voiceIcon" />
-    </span>
+    <VoiceMenu v-if="voice.isAvailable && session.sessionId" />
     <span
       class="reference"
       @click="toggleModal('reference')"
@@ -222,10 +211,6 @@
                   ]"
               /></em>
             </li>
-            <li v-if="isVoiceConnected" @click="leaveVoice">
-              {{ $t("voice.leave") }}
-              <em><font-awesome-icon icon="headset" /></em>
-            </li>
             <li @click="leaveSession">
               {{ $t("menu.leaveSession") }}
               <em>{{ session.sessionId }}</em>
@@ -340,10 +325,14 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
+import VoiceMenu from "./VoiceMenu";
 
 export default {
+  components: {
+    VoiceMenu,
+  },
   computed: {
     showSendCharacters: function () {
       return (
@@ -351,36 +340,8 @@ export default {
         !this.npcs.some((npc) => npc.id === "tor")
       );
     },
-    // voice chat button: join, then mute / unmute
-    voiceIcon: function () {
-      if (this.voice.status !== "connected") return "headset";
-      return this.voice.muted ? "microphone-slash" : "microphone";
-    },
-    voiceTitle: function () {
-      switch (this.voice.status) {
-        case "connecting":
-          return this.$t("voice.connecting");
-        case "connected":
-          return this.voice.muted
-            ? this.$t("voice.unmute")
-            : this.$t("voice.mute");
-        case "error": {
-          const key = `voice.errors.${this.voice.error}`;
-          const reason = this.$te(key)
-            ? this.$t(key)
-            : this.$t("voice.errors.generic");
-          return reason + " " + this.$t("voice.join");
-        }
-        default:
-          return this.$t("voice.join");
-      }
-    },
     ...mapState(["grimoire", "session", "edition", "npcs", "voice"]),
     ...mapState("players", ["players"]),
-    ...mapGetters("voice", {
-      isVoiceConnected: "isConnected",
-      selfPeerId: "selfPeerId",
-    }),
   },
   data() {
     return {
@@ -389,16 +350,6 @@ export default {
     };
   },
   methods: {
-    voiceButton() {
-      if (this.voice.status === "connected") {
-        this.$store.dispatch("voice/toggleMute");
-      } else if (this.voice.status !== "connecting") {
-        this.$store.dispatch("voice/join");
-      }
-    },
-    leaveVoice() {
-      this.$store.dispatch("voice/leave");
-    },
     cycleLocale() {
       const index = this.locales.findIndex(
         ({ code }) => code === this.grimoire.locale,
@@ -630,10 +581,9 @@ export default {
     }
   }
 
-  // character reference sheet and voice chat buttons.
+  // character reference sheet, always at hand for players.
   // Boxed like the menu cog: translucent black background, solid black border
-  span.reference,
-  span.voice {
+  span.reference {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -646,29 +596,9 @@ export default {
     background: rgba(0, 0, 0, 0.5);
     border: 3px solid black;
     border-radius: 10px;
-    transition:
-      color 250ms,
-      box-shadow 250ms;
+    transition: color 250ms;
     &:hover {
       color: red;
-    }
-  }
-
-  span.voice {
-    &.status-connecting {
-      animation: blink 1s infinite;
-    }
-    &.status-connected {
-      color: $voice-speaking;
-      &.muted {
-        color: $demon;
-      }
-      &.speaking {
-        box-shadow: 0 0 10px 3px $voice-speaking;
-      }
-    }
-    &.status-error {
-      color: $demon;
     }
   }
 }
@@ -688,9 +618,17 @@ export default {
   position: absolute;
   right: 0;
   top: 0;
+  // the empty area beside the cog must not block the buttons next to it
+  // (e.g. the voice chat menu): only the cog and the list take clicks
+  pointer-events: none;
 
   &.open {
     transform: rotate(0deg);
+  }
+
+  > svg,
+  ul {
+    pointer-events: auto;
   }
 
   > svg {

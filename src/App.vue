@@ -124,6 +124,12 @@ export default {
           if (this.session.isSpectator) return;
           this.$refs.menu.toggleNight();
           break;
+        case "m":
+          // mute / unmute the voice chat microphone
+          if (this.$store.getters["voice/isConnected"]) {
+            this.$store.dispatch("voice/toggleMute");
+          }
+          break;
         case "escape":
           this.$store.commit("toggleModal");
           break;

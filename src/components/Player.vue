@@ -238,10 +238,6 @@
               <font-awesome-icon icon="times-circle" />
               {{ $t("player.remove") }}
             </li>
-            <li @click="mutePlayerVoice" v-if="voicePeer && !voicePeer.muted">
-              <font-awesome-icon icon="microphone-slash" />
-              {{ $t("voice.mutePlayer") }}
-            </li>
             <li
               @click="updatePlayer('id', '', true)"
               v-if="player.id && session.sessionId"
@@ -483,10 +479,6 @@ export default {
     removePlayer() {
       this.isMenuOpen = false;
       this.$emit("trigger", ["removePlayer"]);
-    },
-    mutePlayerVoice() {
-      this.isMenuOpen = false;
-      this.$store.dispatch("voice/mutePeer", this.player.id);
     },
     swapPlayer(player) {
       this.isMenuOpen = false;

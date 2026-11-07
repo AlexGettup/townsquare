@@ -43,6 +43,7 @@ const faIcons = [
   "SearchPlus",
   "Seedling",
   "SignLanguage",
+  "SignOutAlt",
   "Skull",
   "Square",
   "TheaterMasks",

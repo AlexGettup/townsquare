@@ -62,12 +62,16 @@
     "sourceCode": "Código fuente"
   },
   "voice": {
+    "title": "Chat de voz",
     "join": "Unirse al chat de voz",
-    "connecting": "Conectando al chat de voz…",
-    "mute": "Silenciar micrófono",
-    "unmute": "Activar micrófono",
+    "connecting": "Conectando…",
+    "muteMicrophone": "Silenciar micrófono",
     "leave": "Salir del chat de voz",
-    "mutePlayer": "Silenciar micrófono",
+    "participants": "Participantes",
+    "storyteller": "Narrador",
+    "spectator": "Espectador",
+    "you": "tú",
+    "mutePlayer": "Haz clic para silenciar su micrófono",
     "playerMuted": "Micrófono apagado",
     "errors": {
       "generic": "Error en el chat de voz.",

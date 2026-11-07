@@ -62,12 +62,16 @@
     "sourceCode": "Source Code"
   },
   "voice": {
-    "join": "Join voice chat",
-    "connecting": "Connecting to voice chat…",
-    "mute": "Mute microphone",
-    "unmute": "Turn microphone on",
+    "title": "Voice Chat",
+    "join": "Join Voice Chat",
+    "connecting": "Connecting…",
+    "muteMicrophone": "Mute Microphone",
     "leave": "Leave Voice Chat",
-    "mutePlayer": "Mute Microphone",
+    "participants": "Participants",
+    "storyteller": "Storyteller",
+    "spectator": "Spectator",
+    "you": "you",
+    "mutePlayer": "Click to mute their microphone",
     "playerMuted": "Microphone off",
     "errors": {
       "generic": "Voice chat error.",
