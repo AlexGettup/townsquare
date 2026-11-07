@@ -4,6 +4,8 @@
  * - /rooms/<channel>/ws?peer=<peerId>  WebSocket into the VoiceRoom of a game
  *   session: tells every client who is connected to voice and which audio
  *   track to pull from Cloudflare Realtime for each of them.
+ * - /rooms/<channel>/chat?peer=<peerId>  WebSocket for the text chat of the
+ *   same game session (works without joining voice).
  * - /sfu/...  proxy to the Cloudflare Realtime SFU API, so the app secret
  *   never reaches the browser.
  *
@@ -68,7 +70,7 @@ export default {
       return withCors(new Response(null, { status: 204 }), origin);
     }
 
-    const room = url.pathname.match(/^\/rooms\/([^/]+)\/ws$/);
+    const room = url.pathname.match(/^\/rooms\/([^/]+)\/(ws|chat)$/);
     if (room) {
       if (request.headers.get("Upgrade") !== "websocket") {
         return new Response("Expected a WebSocket", { status: 426 });
@@ -93,12 +95,24 @@ const FIXED_ROOMS = ["tavern", "church", "graveyard"];
 const PLAZA = "plaza";
 const isConversation = (location) =>
   typeof location === "string" && location.startsWith("conv-");
+// text chat: longest message, and how many messages the room remembers
+const MAX_MESSAGE_LENGTH = 500;
+const CHAT_HISTORY = 500;
+const isChat = (ws) => (ws.deserializeAttachment() || {}).kind === "chat";
 // clients connected before conversations existed lack these fields
 const withDefaults = (state) => ({
   location: PLAZA,
   requesting: null,
   invitedBy: [],
   ...state,
+});
+
+const chatMessage = (row) => ({
+  id: row.id,
+  at: row.at,
+  from: row.sender,
+  channel: row.channel,
+  text: row.text,
 });
 
 /**
@@ -121,13 +135,27 @@ export class VoiceRoom {
     this.ctx.setWebSocketAutoResponse(
       new WebSocketRequestResponsePair('{"type":"ping"}', '{"type":"pong"}'),
     );
+    // chat history of this game session
+    this.sql = ctx.storage.sql;
+    this.sql.exec(
+      `CREATE TABLE IF NOT EXISTS chat (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        at INTEGER NOT NULL,
+        sender TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        text TEXT NOT NULL,
+        recipients TEXT NOT NULL
+      )`,
+    );
   }
 
   async fetch(request) {
-    const peerId = new URL(request.url).searchParams.get("peer");
+    const url = new URL(request.url);
+    const peerId = url.searchParams.get("peer");
     if (!peerId || peerId.length > 200) {
       return new Response("Missing peer", { status: 400 });
     }
+    if (url.pathname.endsWith("/chat")) return this.acceptChat(peerId);
     // a peer reconnecting (new tab, network change) replaces its old socket
     this.ctx.getWebSockets(peerId).forEach((old) => {
       try {
@@ -163,8 +191,11 @@ export class VoiceRoom {
       });
   }
 
+  // voice sockets only (text chat sockets are handled apart)
   sockets(except) {
-    return this.ctx.getWebSockets().filter((ws) => ws !== except);
+    return this.ctx
+      .getWebSockets()
+      .filter((ws) => ws !== except && !isChat(ws));
   }
 
   socketOf(peerId, except) {
@@ -233,8 +264,7 @@ export class VoiceRoom {
       type: "peers",
       peers: this.peers(except),
     });
-    this.ctx.getWebSockets().forEach((ws) => {
-      if (ws === except) return;
+    this.sockets(except).forEach((ws) => {
       try {
         ws.send(message);
       } catch (e) {
@@ -248,6 +278,10 @@ export class VoiceRoom {
     try {
       message = JSON.parse(data);
     } catch (e) {
+      return;
+    }
+    if (isChat(ws)) {
+      await this.handleChat(ws, message);
       return;
     }
     const me = withDefaults(ws.deserializeAttachment());
@@ -414,17 +448,139 @@ export class VoiceRoom {
     return false;
   }
 
+  // --- text chat ----------------------------------------------------------
+
+  acceptChat(peerId) {
+    const tag = "chat:" + peerId;
+    // the same player in a new tab replaces the old chat connection
+    this.ctx.getWebSockets(tag).forEach((old) => {
+      try {
+        old.close(4000, "Replaced by a new connection");
+      } catch (e) {
+        // already closed
+      }
+    });
+    const [client, server] = Object.values(new WebSocketPair());
+    this.ctx.acceptWebSocket(server, [tag]);
+    server.serializeAttachment({ kind: "chat", peerId });
+    return new Response(null, { status: 101, webSocket: client });
+  }
+
+  chatSockets() {
+    return this.ctx.getWebSockets().filter(isChat);
+  }
+
+  // where a peer is: their voice location, or the plaza without voice
+  locationOfPeer(peerId) {
+    const voice = this.socketOf(peerId);
+    return voice ? withDefaults(voice.deserializeAttachment()).location : PLAZA;
+  }
+
+  /**
+   * Chat messages follow the voice rules: what you write is read by whoever
+   * is in the same place (plaza, room or private conversation). Every
+   * player also has a private channel with the storyteller ("dm:<playerId>"),
+   * the only one players can use at night.
+   */
+  async handleChat(ws, message) {
+    const { peerId } = ws.deserializeAttachment();
+    const isStoryteller = peerId === STORYTELLER;
+    switch (message.type) {
+      case "hello": {
+        // history: the messages this peer received, oldest first
+        const messages = this.sql
+          .exec(`SELECT * FROM chat ORDER BY id DESC LIMIT ${CHAT_HISTORY}`)
+          .toArray()
+          .filter((row) => JSON.parse(row.recipients).includes(peerId))
+          .reverse()
+          .map(chatMessage);
+        this.send(ws, { type: "history", messages });
+        break;
+      }
+      case "phase":
+        // storyteller: day or night (players can't chat in public at night)
+        if (isStoryteller) {
+          await this.ctx.storage.put("night", !!message.night);
+        }
+        break;
+      case "chat": {
+        const text = String(message.text || "")
+          .trim()
+          .slice(0, MAX_MESSAGE_LENGTH);
+        if (!text) break;
+        let channel;
+        let recipients;
+        if (message.to !== undefined && message.to !== null) {
+          // private channel between a player and the storyteller
+          const to = String(message.to).slice(0, 200);
+          if (to === peerId) break;
+          if (!isStoryteller && to !== STORYTELLER) break;
+          const player = isStoryteller ? to : peerId;
+          channel = "dm:" + player;
+          recipients = [STORYTELLER, player];
+        } else {
+          if (!isStoryteller && (await this.ctx.storage.get("night"))) {
+            this.send(ws, { type: "chat-error", reason: "night" });
+            break;
+          }
+          channel = this.locationOfPeer(peerId);
+          recipients = [
+            ...new Set(
+              this.chatSockets()
+                .map((socket) => socket.deserializeAttachment().peerId)
+                .filter((id) => this.locationOfPeer(id) === channel),
+            ),
+          ];
+          if (!recipients.includes(peerId)) recipients.push(peerId);
+        }
+        const at = Date.now();
+        const { id } = this.sql
+          .exec(
+            `INSERT INTO chat (at, sender, channel, text, recipients)
+             VALUES (?, ?, ?, ?, ?) RETURNING id`,
+            at,
+            peerId,
+            channel,
+            text,
+            JSON.stringify(recipients),
+          )
+          .one();
+        this.sql.exec(`DELETE FROM chat WHERE id <= ?`, id - CHAT_HISTORY);
+        const out = {
+          type: "chat",
+          message: { id, at, from: peerId, channel, text },
+        };
+        this.chatSockets()
+          .filter((socket) =>
+            recipients.includes(socket.deserializeAttachment().peerId),
+          )
+          .forEach((socket) => this.send(socket, out));
+        break;
+      }
+      case "clear-chat":
+        // storyteller: start the next game with an empty chat
+        if (!isStoryteller) break;
+        this.sql.exec(`DELETE FROM chat`);
+        this.chatSockets().forEach((socket) =>
+          this.send(socket, { type: "cleared" }),
+        );
+        break;
+    }
+  }
+
   async webSocketClose(ws, code) {
     try {
       ws.close(code === 1005 ? 1000 : code, "Closed");
     } catch (e) {
       // already closed
     }
+    if (isChat(ws)) return;
     this.cleanUp(ws);
     this.broadcastPeers(ws);
   }
 
   async webSocketError(ws) {
+    if (isChat(ws)) return;
     this.cleanUp(ws);
     this.broadcastPeers(ws);
   }
