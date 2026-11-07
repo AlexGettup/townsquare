@@ -2,8 +2,10 @@ import Vue from "vue";
 import Vuex from "vuex";
 import persistence from "./persistence";
 import socket from "./socket";
+import voicePlugin from "./voice";
 import players from "./modules/players";
 import session from "./modules/session";
+import voice from "./modules/voice";
 import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
 import nightJSON from "../nightsheet.json";
@@ -118,6 +120,7 @@ export default new Vuex.Store({
   modules: {
     players,
     session,
+    voice,
   },
   state: {
     grimoire: {
@@ -445,5 +448,5 @@ export default new Vuex.Store({
       state.modals.edition = false;
     },
   },
-  plugins: [persistence, socket],
+  plugins: [persistence, socket, voicePlugin],
 });

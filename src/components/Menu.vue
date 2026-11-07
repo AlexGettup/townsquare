@@ -18,6 +18,7 @@
       :class="{
         spectator: session.isSpectator,
         reconnecting: session.isReconnecting,
+        speaking: session.isSpectator && !!voice.speaking.host,
       }"
       v-if="session.sessionId"
       @click="leaveSession"
@@ -31,6 +32,7 @@
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
     </span>
+    <VoiceMenu v-if="voice.isAvailable && session.sessionId" />
     <span
       class="reference"
       @click="toggleModal('reference')"
@@ -304,10 +306,7 @@
             </em>
           </li>
           <li>
-            <a
-              href="https://github.com/AlexGettup/townsquare"
-              target="_blank"
-            >
+            <a href="https://github.com/AlexGettup/townsquare" target="_blank">
               {{ $t("menu.sourceCode") }}
             </a>
             <em>
@@ -328,8 +327,12 @@
 <script>
 import { mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
+import VoiceMenu from "./VoiceMenu";
 
 export default {
+  components: {
+    VoiceMenu,
+  },
   computed: {
     showSendCharacters: function () {
       return (
@@ -337,7 +340,7 @@ export default {
         !this.npcs.some((npc) => npc.id === "tor")
       );
     },
-    ...mapState(["grimoire", "session", "edition", "npcs"]),
+    ...mapState(["grimoire", "session", "edition", "npcs", "voice"]),
     ...mapState("players", ["players"]),
   },
   data() {
@@ -571,6 +574,11 @@ export default {
     &.reconnecting {
       animation: blink 1s infinite;
     }
+    // the storyteller is talking on voice chat
+    &.speaking svg {
+      color: $voice-speaking;
+      filter: drop-shadow(0 0 6px $voice-speaking);
+    }
   }
 
   // character reference sheet, always at hand for players.
@@ -610,9 +618,17 @@ export default {
   position: absolute;
   right: 0;
   top: 0;
+  // the empty area beside the cog must not block the buttons next to it
+  // (e.g. the voice chat menu): only the cog and the list take clicks
+  pointer-events: none;
 
   &.open {
     transform: rotate(0deg);
+  }
+
+  > svg,
+  ul {
+    pointer-events: auto;
   }
 
   > svg {
