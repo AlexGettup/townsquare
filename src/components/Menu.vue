@@ -31,6 +31,13 @@
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
     </span>
+    <span
+      class="reference"
+      @click="toggleModal('reference')"
+      :title="$t('menu.referenceSheet') + ' [R]'"
+    >
+      <font-awesome-icon icon="address-card" />
+    </span>
     <div class="menu" :class="{ open: grimoire.isMenuOpen }">
       <font-awesome-icon icon="cog" @click="toggleMenu" />
       <ul>
@@ -266,10 +273,6 @@
         <template v-if="tab === 'help'">
           <!-- Help -->
           <li class="headline">{{ $t("menu.help") }}</li>
-          <li @click="toggleModal('reference')">
-            {{ $t("menu.referenceSheet") }}
-            <em>[R]</em>
-          </li>
           <li @click="toggleModal('nightOrder')">
             {{ $t("menu.nightOrderSheet") }}
             <em>[N]</em>
@@ -567,6 +570,27 @@ export default {
     }
     &.reconnecting {
       animation: blink 1s infinite;
+    }
+  }
+
+  // character reference sheet, always at hand for players.
+  // Boxed like the menu cog: translucent black background, solid black border
+  span.reference {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: top;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    margin-top: 0;
+    font-size: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid black;
+    border-radius: 10px;
+    transition: color 250ms;
+    &:hover {
+      color: red;
     }
   }
 }
