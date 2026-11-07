@@ -5,7 +5,7 @@
 This is an unofficial online tool to run Blood on the Clocktower games through Discord or other digital means.
 It is supposed to aid storytellers and players by allowing them to quickly set up games, run votes and much more.
 
-[You can try it online!](https://clocktower.live)
+[You can try it online!](https://alexgettup.github.io/townsquare/)
 
 If you want to learn more about how to use the app as a player, [JayBotC](https://www.youtube.com/channel/UCNZy-4Rp877XtTHaIZdWYFQ) kindly created two tutorial videos.
 
@@ -54,7 +54,7 @@ for example. The logo will be shown to your players after they have enabled cust
 ### Custom Character Support
 
 In order to add custom characters to your local Grimoire, you need to create a JSON definition for them,
-similar to what is provided in the [`roles.json`](https://github.com/bra1n/townsquare/blob/main/src/roles.json) for the 3 base editions. Here's an example of how such a character
+similar to what is provided in the [`roles.json`](https://github.com/AlexGettup/townsquare/blob/main/src/roles.json) for the 3 base editions. Here's an example of how such a character
 definition file might be written:
 
 ```json
@@ -122,4 +122,6 @@ For further details on the JSON structure, see the official app's [JSON Schema](
 This project and its website are provided free of charge and not affiliated with The Pandemonium Institute in any way.
 
 ## Credits
-* Bra1n for building the original tool
+* Bra1n (Steffen Baumgart) for building the original tool
+* nicholas-eden and contributors for maintaining the version this one is based on
+* Alex ([AlexGettup](https://github.com/AlexGettup)) for this version

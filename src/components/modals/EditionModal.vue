@@ -47,7 +47,7 @@
       <i18n path="modals.edition.homebrew" tag="span">
         <template #documentation>
           <a
-            href="https://github.com/nicholas-eden/townsquare#custom-character-support"
+            href="https://github.com/AlexGettup/townsquare#custom-character-support"
             target="_blank"
             >{{ $t("modals.edition.documentation") }}</a
           >

@@ -2,7 +2,7 @@
   "name": "townsquare",
   "version": "2.22.8",
   "description": "Blood on the Clocktower Town Square",
-  "author": "Steffen Baumgart",
+  "author": "Alex (https://github.com/AlexGettup)",
   "scripts": {
     "clone-unofficial": "npx rimraf ./tmp && git clone https://github.com/tomozbot/botc-icons.git --depth 1 ./tmp/botc-icons",
     "copy-unofficial": "npx rimraf ./src/assets/icons/unofficial/ && npx copyfiles -u 3 ./tmp/botc-icons/WEBP/**/* ./src/assets/icons/unofficial && npx copyfiles -u 3 ./tmp/botc-icons/WEBP/* ./src/assets/icons/unofficial/ && npx rimraf ./tmp",
@@ -50,6 +50,9 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com//bra1n/townsquare.git"
-  }
+    "url": "https://github.com/AlexGettup/townsquare.git"
+  },
+  "contributors": [
+    "Steffen Baumgart (original author)"
+  ]
 }

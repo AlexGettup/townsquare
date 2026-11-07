@@ -302,14 +302,14 @@
           </li>
           <li>
             <a
-              href="https://github.com/nicholas-eden/townsquare"
+              href="https://github.com/AlexGettup/townsquare"
               target="_blank"
             >
               {{ $t("menu.sourceCode") }}
             </a>
             <em>
               <a
-                href="https://github.com/nicholas-eden/townsquare"
+                href="https://github.com/AlexGettup/townsquare"
                 target="_blank"
               >
                 <font-awesome-icon :icon="['fab', 'github']" />
