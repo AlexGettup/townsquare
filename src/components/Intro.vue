@@ -17,7 +17,7 @@
       <br />
       <i18n path="intro.footer" tag="div" class="footer">
         <template #github>
-          <a href="https://github.com/nicholas-eden/townsquare" target="_blank"
+          <a href="https://github.com/AlexGettup/townsquare" target="_blank"
             >GitHub</a
           >
         </template>
