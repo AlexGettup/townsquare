@@ -4,7 +4,7 @@
     v-if="modals.roles && nonTravellers >= 5"
     @close="toggleModal('roles')"
   >
-    <h3>Select the characters for {{ nonTravellers }} players:</h3>
+    <h3>{{ $t("modals.roles.title", { count: nonTravellers }) }}</h3>
     <ul class="tokens" v-for="(teamRoles, team) in roleSelection" :key="team">
       <li class="count" :class="[team]">
         {{ teamRoles.reduce((a, { selected }) => a + selected, 0) }} /
@@ -40,7 +40,7 @@
     <label class="multiple" :class="{ checked: allowMultiple }">
       <font-awesome-icon :icon="allowMultiple ? 'check-square' : 'square'" />
       <input type="checkbox" name="allow-multiple" v-model="allowMultiple" />
-      Allow duplicate characters
+      {{ $t("modals.roles.allowDuplicates") }}
     </label>
     <div class="bottom">
       <div class="button-group">
@@ -60,8 +60,8 @@
           />
           {{
             isGardenerOrTorActive
-              ? "Assign " + selectedRoles + " characters randomly"
-              : "Mock assignment"
+              ? $t("modals.roles.assignRandomly", { count: selectedRoles })
+              : $t("modals.roles.mockAssignment")
           }}
         </div>
         <div
@@ -76,27 +76,20 @@
           }"
         >
           <font-awesome-icon icon="people-arrows" />
-          Pass out {{ selectedRoles }} characters randomly
+          {{ $t("modals.roles.passOutRandomly", { count: selectedRoles }) }}
         </div>
         <div class="button" @click="selectRandomRoles">
           <font-awesome-icon icon="random" />
-          Shuffle characters
+          {{ $t("modals.roles.shuffle") }}
         </div>
       </div>
       <div class="illegal warning" v-if="isIllegalTokenSelected">
         <font-awesome-icon icon="exclamation-triangle" />
-        <span>
-          Warning: there are characters selected cannot be sent to players! You
-          will not be able to distribute characters until these characters are
-          removed.
-        </span>
+        <span>{{ $t("modals.roles.illegalWarning") }}</span>
       </div>
       <div class="setup warning" v-if="hasSelectedSetupRoles">
         <font-awesome-icon icon="exclamation-triangle" />
-        <span>
-          Warning: there are characters selected that modify the game setup! The
-          randomizer does not account for these characters.
-        </span>
+        <span>{{ $t("modals.roles.setupWarning") }}</span>
       </div>
     </div>
   </Modal>
@@ -212,8 +205,8 @@ export default {
         return;
       }
       const popup = this.players.some((player) => !player.connected)
-        ? "WARNING: Some players have not yet taken their seats. Are you sure you want to assign and distribute characters?"
-        : "Do you want to assign and distribute characters to all players?";
+        ? this.$t("dialogs.assignAndSendWarning")
+        : this.$t("dialogs.assignAndSendConfirm");
       if (!confirm(popup)) return;
       this.assignRoles();
       this.$store.commit("session/distributeRoles", true);

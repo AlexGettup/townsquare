@@ -1,3 +1,5 @@
+import i18n from "../i18n";
+
 class LiveSession {
   constructor(store) {
     this._wss = "wss://clocktower.live:8001/";
@@ -501,11 +503,7 @@ class LiveSession {
         }
       });
       if (missing.length) {
-        alert(
-          `This session contains custom characters that can't be found. ` +
-            `Please load them before joining! ` +
-            `Missing roles: ${missing.join(", ")}`,
-        );
+        alert(i18n.t("dialogs.missingRoles", { roles: missing.join(", ") }));
         this.disconnect();
         this._store.commit("toggleModal", "edition");
       }

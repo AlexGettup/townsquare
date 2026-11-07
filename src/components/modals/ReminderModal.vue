@@ -1,6 +1,6 @@
 <template>
   <Modal v-if="isDisplayed" @close="toggleModal('reminder')">
-    <h3>Choose a reminder token:</h3>
+    <h3>{{ $t("modals.reminder.title") }}</h3>
     <ul class="reminders">
       <li
         v-for="reminder in availableReminders"
@@ -30,7 +30,7 @@
     <input
       ref="searchInput"
       class="reminder-search"
-      placeholder="Search"
+      :placeholder="$t('modals.reminder.search')"
       v-model="query"
       @keyup="keyup"
     />
@@ -156,7 +156,7 @@ export default {
       const player = this.$store.state.players.players[this.playerIndex];
       let value;
       if (reminder.imageAlt === "custom") {
-        const name = prompt("Add a custom reminder note");
+        const name = prompt(this.$t("dialogs.customNote"));
         if (!name) return;
         value = [...player.reminders, { imageAlt: "custom", name }];
       } else {

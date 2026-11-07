@@ -1,7 +1,7 @@
 <template>
   <Modal class="editions" v-if="modals.edition" @close="toggleModal('edition')">
     <div v-if="!isCustom">
-      <h3>Select an edition:</h3>
+      <h3>{{ $t("modals.edition.select") }}</h3>
       <ul class="editions">
         <li
           v-for="edition in editions"
@@ -24,47 +24,62 @@
             backgroundImage: `url(${require('../../assets/editions/custom.webp')})`,
           }"
         >
-          Custom Script / Characters
+          {{ $t("modals.edition.custom") }}
         </li>
       </ul>
     </div>
     <div class="custom" v-else>
-      <h3>Load custom script / characters</h3>
-      To write your own custom script, you need to select the characters you
-      want to play with in the official
-      <a href="https://script.bloodontheclocktower.com/" target="_blank"
-        >Script Tool</a
-      >
-      and then upload the generated JSON either directly here or provide a URL
-      to a hosted file. There are also a multitude of existing popular custom
-      scripts, many of which can be found at
-      <a href="https://botcscripts.com/?sort=num_favs" target="_blank"
-        >botcscripts.com</a
-      >.<br />
+      <h3>{{ $t("modals.edition.loadCustom") }}</h3>
+      <i18n path="modals.edition.customIntro" tag="span">
+        <template #scriptTool>
+          <a href="https://script.bloodontheclocktower.com/" target="_blank">{{
+            $t("modals.edition.scriptTool")
+          }}</a>
+        </template>
+        <template #botcScripts>
+          <a href="https://botcscripts.com/?sort=num_favs" target="_blank"
+            >botcscripts.com</a
+          >
+        </template>
+      </i18n>
       <br />
-      To play with your own homebrew characters, please read
-      <a
-        href="https://github.com/nicholas-eden/townsquare#custom-character-support"
-        target="_blank"
-        >the documentation</a
-      >
-      on how to write a custom character JSON object.
-      <b>Only load JSON files from sources that you trust!</b>
-      <h3>Some popular custom scripts:</h3>
+      <br />
+      <i18n path="modals.edition.homebrew" tag="span">
+        <template #documentation>
+          <a
+            href="https://github.com/nicholas-eden/townsquare#custom-character-support"
+            target="_blank"
+            >{{ $t("modals.edition.documentation") }}</a
+          >
+        </template>
+      </i18n>
+      <b>{{ $t("modals.edition.trustWarning") }}</b>
+      <h3>{{ $t("modals.edition.popularScripts") }}</h3>
       <ul class="scripts">
         <li
           v-for="(script, index) in customs.teensyville"
           :key="index"
           @click="parseRoles(script)"
         >
-          {{ script[0].name + " by " + script[0].author + " (Teensyville)" }}
+          {{
+            $t("modals.edition.scriptByAuthor", {
+              name: script[0].name,
+              author: script[0].author,
+            })
+          }}
+          ({{ $t("modals.edition.teensyville") }})
         </li>
         <li
           v-for="(script, index) in customs.standard"
           :key="index + customs.teensyville.length"
           @click="parseRoles(script)"
         >
-          {{ script[0].name + " by " + script[0].author }}
+          {{
+            $t("modals.edition.scriptByAuthor", {
+              name: script[0].name,
+              author: script[0].author,
+            })
+          }}
         </li>
       </ul>
       <input
@@ -75,16 +90,18 @@
       />
       <div class="button-group">
         <div class="button" @click="openUpload">
-          <font-awesome-icon icon="file-upload" /> Upload JSON
+          <font-awesome-icon icon="file-upload" />
+          {{ $t("modals.edition.uploadJson") }}
         </div>
         <div class="button" @click="promptURL">
-          <font-awesome-icon icon="link" /> Enter URL
+          <font-awesome-icon icon="link" /> {{ $t("modals.edition.enterUrl") }}
         </div>
         <div class="button" @click="readFromClipboard">
-          <font-awesome-icon icon="clipboard" /> Use JSON from Clipboard
+          <font-awesome-icon icon="clipboard" />
+          {{ $t("modals.edition.useClipboard") }}
         </div>
         <div class="button" @click="isCustom = false">
-          <font-awesome-icon icon="undo" /> Back
+          <font-awesome-icon icon="undo" /> {{ $t("modals.edition.back") }}
         </div>
       </div>
     </div>
@@ -123,7 +140,7 @@ export default {
             this.parseRoles(roles);
           } catch (e) {
             console.log(e);
-            alert("Error reading custom script: " + e.message);
+            alert(this.$t("dialogs.errorReadingScript", { error: e.message }));
           }
           this.$refs.upload.value = "";
         });
@@ -131,7 +148,7 @@ export default {
       }
     },
     promptURL() {
-      const url = prompt("Enter URL to a custom-script.json file");
+      const url = prompt(this.$t("dialogs.scriptUrl"));
       if (url) {
         this.handleURL(url);
       }
@@ -144,7 +161,7 @@ export default {
           this.parseRoles(script);
         } catch (e) {
           console.log(e);
-          alert("Error loading custom script: " + e.message);
+          alert(this.$t("dialogs.errorLoadingScript", { error: e.message }));
         }
       }
     },
@@ -155,7 +172,7 @@ export default {
         this.parseRoles(roles);
       } catch (e) {
         console.log(e);
-        alert("Error reading custom script: " + e.message);
+        alert(this.$t("dialogs.errorReadingScript", { error: e.message }));
       }
     },
     loadOfficial(edition) {

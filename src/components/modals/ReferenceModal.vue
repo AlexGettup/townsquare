@@ -8,13 +8,13 @@
       @click="toggleModal('nightOrder')"
       icon="cloud-moon"
       class="toggle"
-      title="Show Night Order"
+      :title="$t('modals.reference.showNightOrder')"
     />
     <h3>
-      Character Reference
+      {{ $t("modals.reference.title") }}
       <br />
       <font-awesome-icon icon="address-card" />
-      {{ edition.name || "Custom Script" }}
+      {{ edition.name || $t("modals.reference.customScript") }}
     </h3>
 
     <div
@@ -22,7 +22,7 @@
       v-if="edition.bootlegger && edition.bootlegger.length"
     >
       <aside>
-        <h4>Rules</h4>
+        <h4>{{ $t("modals.reference.rules") }}</h4>
       </aside>
       <ul>
         <li v-for="(rule, index) in edition.bootlegger" :key="index">
@@ -50,7 +50,7 @@
       :class="['team', team]"
     >
       <aside>
-        <h4>{{ team }}</h4>
+        <h4>{{ $te(`teams.${team}`) ? $t(`teams.${team}`) : team }}</h4>
       </aside>
       <ul>
         <li v-for="role in teamRoles" :class="[team]" :key="role.id">
@@ -76,7 +76,7 @@
 
     <div class="team jinxed" v-if="jinxed.length">
       <aside>
-        <h4>Jinxed</h4>
+        <h4>{{ $t("modals.reference.jinxed") }}</h4>
       </aside>
       <ul>
         <li v-for="(jinx, index) in jinxed" :key="index">

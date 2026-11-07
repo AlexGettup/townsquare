@@ -98,7 +98,7 @@
         class="has-vote"
         v-if="player.isDead && !player.isVoteless"
         @click="updatePlayer('isVoteless', true)"
-        title="Ghost vote"
+        :title="$t('player.ghostVote')"
       />
 
       <!-- Two votes icon -->
@@ -107,7 +107,7 @@
         class="two-votes"
         v-if="player.hasTwoVotes"
         @click="updatePlayer('hasTwoVotes', false)"
-        title="Has two votes"
+        :title="$t('player.hasTwoVotes')"
       />
 
       <!-- Overlay icons -->
@@ -128,26 +128,26 @@
         <font-awesome-icon
           icon="times-circle"
           class="cancel"
-          title="Cancel"
+          :title="$t('player.cancel')"
           @click="cancel()"
         />
         <font-awesome-icon
           icon="exchange-alt"
           class="swap"
           @click="swapPlayer(player)"
-          title="Swap seats with this player"
+          :title="$t('player.swapWithPlayer')"
         />
         <font-awesome-icon
           icon="redo-alt"
           class="move"
           @click="movePlayer(player)"
-          title="Move player to this seat"
+          :title="$t('player.moveToSeat')"
         />
         <font-awesome-icon
           icon="hand-point-right"
           class="nominate"
           @click="nominatePlayer(player)"
-          title="Nominate this player"
+          :title="$t('player.nominatePlayer')"
         />
       </div>
 
@@ -178,11 +178,11 @@
             "
           >
             <font-awesome-icon icon="hand-paper" />
-            Raise Hand
+            {{ $t("player.raiseHand") }}
           </li>
           <li @click="changeAlignment" v-if="player.role.id">
             <font-awesome-icon icon="yin-yang" />
-            Change Alignment
+            {{ $t("player.changeAlignment") }}
           </li>
           <li
             @click="changePronouns"
@@ -194,7 +194,7 @@
             "
           >
             <font-awesome-icon icon="venus-mars" />
-            Change Pronouns
+            {{ $t("player.changePronouns") }}
           </li>
           <li
             @click="changeName"
@@ -207,7 +207,7 @@
             "
           >
             <font-awesome-icon icon="user-edit" />
-            Rename
+            {{ $t("player.rename") }}
           </li>
           <template v-if="!session.isSpectator">
             <li
@@ -215,31 +215,35 @@
               v-if="session.isTwoVotesEnabled"
             >
               <font-awesome-icon icon="sign-language" class="two-votes-icon" />
-              Has Two Votes
+              {{ $t("player.hasTwoVotesMenu") }}
             </li>
             <li @click="movePlayer()" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="redo-alt" />
-              Move Player
+              {{ $t("player.movePlayer") }}
             </li>
             <li @click="swapPlayer()" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="exchange-alt" />
-              Swap Seats
+              {{ $t("player.swapSeats") }}
             </li>
             <li @click="removePlayer" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="times-circle" />
-              Remove
+              {{ $t("player.remove") }}
             </li>
             <li
               @click="updatePlayer('id', '', true)"
               v-if="player.id && session.sessionId"
             >
               <font-awesome-icon icon="chair" />
-              Empty Seat
+              {{ $t("player.emptySeat") }}
             </li>
             <template v-if="!session.nomination">
               <li @click="nominatePlayer()">
                 <font-awesome-icon icon="hand-point-right" />
-                {{ isNominating ? "Cancel Nomination" : "Nomination" }}
+                {{
+                  isNominating
+                    ? $t("player.cancelNomination")
+                    : $t("player.nomination")
+                }}
               </li>
             </template>
           </template>
@@ -255,12 +259,12 @@
                 (player.id === session.playerId && !player.connected)
               "
             >
-              Claim seat</template
+              {{ $t("player.claimSeat") }}</template
             >
             <template v-else-if="player.id === session.playerId">
-              Vacate Seat
+              {{ $t("player.vacateSeat") }}
             </template>
-            <template v-else> Seat Occupied</template>
+            <template v-else> {{ $t("player.seatOccupied") }}</template>
           </li>
         </ul>
       </transition>
@@ -374,7 +378,10 @@ export default {
     changePronouns() {
       if (this.session.isSpectator && this.player.id !== this.session.playerId)
         return;
-      const pronouns = prompt("Player pronouns", this.player.pronouns);
+      const pronouns = prompt(
+        this.$t("dialogs.playerPronouns"),
+        this.player.pronouns,
+      );
       //Only update pronouns if not null (prompt was not cancelled)
       if (pronouns !== null) {
         this.updatePlayer("pronouns", pronouns, true);
@@ -404,7 +411,9 @@ export default {
       }
     },
     changeName() {
-      const name = prompt("Player name", this.player.name) || this.player.name;
+      const name =
+        prompt(this.$t("dialogs.playerName"), this.player.name) ||
+        this.player.name;
       if (name !== null && name !== "") {
         this.updatePlayer("name", name, true);
       }
@@ -459,14 +468,14 @@ export default {
     setSeatTitle() {
       if (this.player.connected) {
         if (this.player.id === this.session.playerId) {
-          return "Your claimed seat";
+          return this.$t("player.seatYours");
         }
-        return "Seat claimed by " + this.player.name;
+        return this.$t("player.seatClaimedBy", { name: this.player.name });
       } else {
         if (this.player.id === this.session.playerId) {
-          return "Your reserved seat. Click 'Claim seat' to reconnect";
+          return this.$t("player.seatYoursReserved");
         }
-        return "Seat reserved for " + this.player.name;
+        return this.$t("player.seatReservedFor", { name: this.player.name });
       }
     },
     /**

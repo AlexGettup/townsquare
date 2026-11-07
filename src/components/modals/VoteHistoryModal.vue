@@ -8,11 +8,11 @@
       @click="clearVoteHistory"
       icon="trash-alt"
       class="clear"
-      title="Clear vote history"
+      :title="$t('modals.voteHistory.clearTitle')"
       v-if="session.isSpectator"
     />
 
-    <h3>Vote history</h3>
+    <h3>{{ $t("modals.voteHistory.title") }}</h3>
 
     <template v-if="!session.isSpectator">
       <div class="options">
@@ -23,26 +23,26 @@
               session.isVoteHistoryAllowed ? 'check-square' : 'square',
             ]"
           />
-          Accessible to players
+          {{ $t("modals.voteHistory.accessible") }}
         </div>
         <div class="option" @click="clearVoteHistory">
           <font-awesome-icon icon="trash-alt" />
-          Clear for everyone
+          {{ $t("modals.voteHistory.clearForEveryone") }}
         </div>
       </div>
     </template>
     <table>
       <thead>
         <tr>
-          <td>Time</td>
-          <td>Nominator</td>
-          <td>Nominee</td>
-          <td>Type</td>
-          <td>Votes</td>
-          <td>Majority</td>
+          <td>{{ $t("modals.voteHistory.time") }}</td>
+          <td>{{ $t("modals.voteHistory.nominator") }}</td>
+          <td>{{ $t("modals.voteHistory.nominee") }}</td>
+          <td>{{ $t("modals.voteHistory.type") }}</td>
+          <td>{{ $t("modals.voteHistory.votes") }}</td>
+          <td>{{ $t("modals.voteHistory.majority") }}</td>
           <td>
             <font-awesome-icon icon="user-friends" />
-            Voters
+            {{ $t("modals.voteHistory.voters") }}
           </td>
         </tr>
       </thead>
@@ -55,7 +55,13 @@
           </td>
           <td>{{ vote.nominator }}</td>
           <td>{{ vote.nominee }}</td>
-          <td>{{ vote.type }}</td>
+          <td>
+            {{
+              vote.type === "Exile"
+                ? $t("modals.voteHistory.exile")
+                : $t("modals.voteHistory.execution")
+            }}
+          </td>
           <td>
             {{ vote.votes.length }}
             <font-awesome-icon icon="hand-paper" />

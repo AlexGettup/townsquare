@@ -31,8 +31,10 @@
       :class="{ closed: !isBluffsOpen }"
     >
       <h3>
-        <span v-if="session.isSpectator">Other Characters</span>
-        <span v-else>Demon Bluffs</span>
+        <span v-if="session.isSpectator">{{
+          $t("townSquare.otherCharacters")
+        }}</span>
+        <span v-else>{{ $t("townSquare.demonBluffs") }}</span>
         <font-awesome-icon icon="times-circle" @click.stop="toggleBluffs" />
         <font-awesome-icon icon="plus-circle" @click.stop="toggleBluffs" />
       </h3>
@@ -53,7 +55,7 @@
       v-if="npcs.length && players.length"
     >
       <h3>
-        <span>NPCs</span>
+        <span>{{ $t("townSquare.npcs") }}</span>
         <font-awesome-icon icon="times-circle" @click.stop="toggleNpcs" />
         <font-awesome-icon icon="plus-circle" @click.stop="toggleNpcs" />
       </h3>
@@ -178,7 +180,9 @@ export default {
       if (this.session.isSpectator || this.session.lockedVote) return;
       if (
         confirm(
-          `Do you really want to remove ${this.players[playerIndex].name}?`,
+          this.$t("dialogs.removePlayer", {
+            name: this.players[playerIndex].name,
+          }),
         )
       ) {
         const { nomination } = this.session;

@@ -1,10 +1,12 @@
-const { detectBrowserLocale } = require("../i18n");
+const { default: i18n, detectBrowserLocale } = require("../i18n");
 
 module.exports = (store) => {
+  // uses the store's locale explicitly, as vue-i18n may not be synced yet
   const updatePagetitle = (isPublic) =>
-    (document.title = `Blood on the Clocktower ${
-      isPublic ? "Town Square" : "Grimoire"
-    }`);
+    (document.title = i18n.t(
+      isPublic ? "pageTitle.townSquare" : "pageTitle.grimoire",
+      store.state.grimoire.locale,
+    ));
 
   // initialize data
   // language: last choice on this device, otherwise the browser's language
@@ -35,8 +37,8 @@ module.exports = (store) => {
   }
   if (localStorage.getItem("isGrimoire")) {
     store.commit("toggleGrimoire", false);
-    updatePagetitle(false);
   }
+  updatePagetitle(store.state.grimoire.isPublic);
   if (localStorage.roles !== undefined) {
     store.commit("setCustomRoles", JSON.parse(localStorage.roles));
     store.commit("setEdition", { id: "custom" });
@@ -101,6 +103,7 @@ module.exports = (store) => {
         break;
       case "setLocale":
         localStorage.setItem("locale", state.grimoire.locale);
+        updatePagetitle(state.grimoire.isPublic);
         break;
       case "setBackground":
         if (payload) {

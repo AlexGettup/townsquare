@@ -11,17 +11,17 @@
       @click="toggleModal('reference')"
       icon="address-card"
       class="toggle"
-      title="Show Character Reference"
+      :title="$t('modals.nightOrder.showReference')"
     />
     <h3>
-      Night Order
+      {{ $t("modals.nightOrder.title") }}
       <br />
       <font-awesome-icon icon="cloud-moon" />
-      {{ edition.name || "Custom Script" }}
+      {{ edition.name || $t("modals.reference.customScript") }}
     </h3>
     <div class="night">
       <ul class="first">
-        <li class="headline">First Night</li>
+        <li class="headline">{{ $t("modals.nightOrder.firstNight") }}</li>
         <li
           v-for="role in rolesFirstNight"
           :key="role.name"
@@ -70,7 +70,7 @@
         </li>
       </ul>
       <ul class="other">
-        <li class="headline">Other Nights</li>
+        <li class="headline">{{ $t("modals.nightOrder.otherNights") }}</li>
         <li
           v-for="role in rolesOtherNight"
           :key="role.name"

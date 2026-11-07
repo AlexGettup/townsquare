@@ -11,18 +11,19 @@
               demon: alignment === 'Evil',
             }"
             @click="toggleAlignment"
-            >{{ alignment }}</span
+            >{{
+              $t(`modals.role.alignment.${alignment.toLowerCase()}`)
+            }}</span
           >
         </div>
       </li>
       <li>
         <h3>
-          Choose a new character for
           {{
             playerIndex >= 0 && players.length
-              ? players[playerIndex].name
-              : "bluffing"
-          }}:
+              ? $t("modals.role.title", { name: players[playerIndex].name })
+              : $t("modals.role.titleBluff")
+          }}
         </h3>
       </li>
     </ul>
@@ -45,20 +46,20 @@
         :class="{ townsfolk: tab === 'editionRoles' }"
         @click="tab = 'editionRoles'"
       >
-        Edition Roles
+        {{ $t("modals.role.editionRoles") }}
       </span>
       <span
         class="button"
         :class="{ townsfolk: tab === 'otherTravellers' }"
         @click="tab = 'otherTravellers'"
       >
-        Other Travellers
+        {{ $t("modals.role.otherTravellers") }}
       </span>
     </div>
     <input
       ref="searchInput"
       class="role-search"
-      placeholder="Search"
+      :placeholder="$t('modals.role.search')"
       v-model="query"
       @keyup="keyup"
     />
