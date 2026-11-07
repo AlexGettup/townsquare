@@ -88,6 +88,13 @@
         v-if="voiceMuted"
         :title="$t('voice.playerMuted')"
       />
+      <!-- Storyteller at night: this player is awake on voice chat -->
+      <font-awesome-icon
+        icon="eye"
+        class="voice-awake"
+        v-if="canWakeVoice && isAwake(player.id)"
+        :title="$t('voice.awake')"
+      />
 
       <!-- Claimed seat icon -->
       <font-awesome-icon
@@ -238,6 +245,12 @@
               <font-awesome-icon icon="times-circle" />
               {{ $t("player.remove") }}
             </li>
+            <li @click="toggleAwakeVoice" v-if="canWakeVoice">
+              <font-awesome-icon :icon="isAwake(player.id) ? 'bed' : 'eye'" />
+              {{
+                isAwake(player.id) ? $t("voice.putToSleep") : $t("voice.wakeUp")
+              }}
+            </li>
             <li
               @click="updatePlayer('id', '', true)"
               v-if="player.id && session.sessionId"
@@ -334,7 +347,13 @@ export default {
     ...mapState(["grimoire", "session", "voice"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
-    ...mapGetters("voice", ["isConnected", "selfPeerId"]),
+    ...mapGetters("voice", [
+      "isConnected",
+      "selfPeerId",
+      "isStoryteller",
+      "isAwake",
+      "showSpeaking",
+    ]),
     // role with night order texts in the chosen language
     displayRole: function () {
       return this.localizeRole(this.player.role);
@@ -351,8 +370,14 @@ export default {
       return (
         this.isConnected &&
         !!this.player.id &&
-        !!this.voice.speaking[this.player.id]
+        !!this.voice.speaking[this.player.id] &&
+        // at night players don't see who talks unless they can hear them
+        this.showSpeaking(this.player.id)
       );
+    },
+    // storyteller at night can wake up players who are in voice chat
+    canWakeVoice: function () {
+      return this.isStoryteller && this.grimoire.isNight && !!this.voicePeer;
     },
     voiceMuted: function () {
       if (!this.isConnected) return false;
@@ -479,6 +504,10 @@ export default {
     removePlayer() {
       this.isMenuOpen = false;
       this.$emit("trigger", ["removePlayer"]);
+    },
+    toggleAwakeVoice() {
+      this.isMenuOpen = false;
+      this.$store.dispatch("voice/toggleAwake", this.player.id);
     },
     swapPlayer(player) {
       this.isMenuOpen = false;
@@ -975,6 +1004,18 @@ li.move:not(.from) .player .overlay svg.move {
   to {
     opacity: 1;
   }
+}
+
+// storyteller view at night: player woken up on voice chat
+.player .voice-awake {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: -108%;
+  color: $fabled;
+  filter: drop-shadow(0 0 4px black);
+  z-index: 2;
+  pointer-events: none;
 }
 
 // microphone turned off

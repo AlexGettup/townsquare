@@ -91,6 +91,7 @@ export default {
  * One VoiceRoom per game session. Every connected client has a WebSocket
  * whose attachment holds its voice state:
  * { peerId, sessionId, trackName, muted }
+ * plus, for the storyteller ("host"), the night state: { awake, broadcast }
  * Uses the hibernation API, so an idle room costs nothing.
  */
 export class VoiceRoom {
@@ -177,6 +178,19 @@ export class VoiceRoom {
         this.ctx.getWebSockets(String(message.peerId)).forEach((target) => {
           target.send(JSON.stringify({ type: "mute", by: me.peerId }));
         });
+        break;
+      case "night":
+        // storyteller only: who is awake at night, and whether they are
+        // talking to everyone. Shared with all clients through the peer list.
+        if (me.peerId !== "host") break;
+        ws.serializeAttachment({
+          ...me,
+          awake: (Array.isArray(message.awake) ? message.awake : [])
+            .slice(0, 50)
+            .map(String),
+          broadcast: !!message.broadcast,
+        });
+        this.broadcastPeers();
         break;
     }
   }

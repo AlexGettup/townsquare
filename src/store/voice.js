@@ -18,6 +18,14 @@ export default (store) => {
   });
   store.$voice = client;
 
+  // silence locally whoever we must not hear (night rules)
+  const applyAudibility = () => {
+    const canHear = store.getters["voice/canHear"];
+    Object.keys(store.state.voice.peers).forEach((peerId) => {
+      client.setAudible(peerId, canHear(peerId));
+    });
+  };
+
   store.subscribe(({ type }) => {
     switch (type) {
       // leaving (or switching) the live session also leaves its voice room
@@ -30,7 +38,27 @@ export default (store) => {
       case "voice/setStatus":
         if (store.state.voice.status !== "connected") {
           store.commit("voice/clearSpeaking");
+        } else if (store.getters["voice/isStoryteller"]) {
+          // share the current night state with whoever is in the room
+          const { awake, broadcast } = store.state.voice;
+          client.setNight({ awake, broadcast });
         }
+        applyAudibility();
+        break;
+      case "toggleNight":
+        // dawn: everyone goes back to sleep for the next night
+        if (
+          !store.state.grimoire.isNight &&
+          store.getters["voice/isStoryteller"] &&
+          (store.state.voice.awake.length || store.state.voice.broadcast)
+        ) {
+          store.dispatch("voice/setNight", { awake: [], broadcast: false });
+        }
+        applyAudibility();
+        break;
+      case "voice/setPeers":
+      case "voice/setNight":
+        applyAudibility();
         break;
     }
   });

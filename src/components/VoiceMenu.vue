@@ -42,6 +42,48 @@
           <em><font-awesome-icon icon="sign-out-alt" /></em>
         </li>
 
+        <!-- Night: storyteller controls, or the player's own state -->
+        <template v-if="grimoire.isNight">
+          <li class="headline">{{ $t("voice.night") }}</li>
+          <template v-if="isStoryteller">
+            <li @click="toggleBroadcast">
+              {{ $t("voice.broadcast") }}
+              <em>
+                <font-awesome-icon
+                  :icon="['fas', voice.broadcast ? 'check-square' : 'square']"
+                />
+              </em>
+            </li>
+            <li class="hint">
+              <small>{{ $t("voice.wakeHint") }}</small>
+            </li>
+          </template>
+          <li
+            v-else
+            class="night-status"
+            :class="{ awake: canHearStoryteller }"
+          >
+            <font-awesome-icon
+              :icon="
+                night.broadcast
+                  ? 'bullhorn'
+                  : canHearStoryteller
+                    ? 'eye'
+                    : 'bed'
+              "
+            />
+            <small>
+              {{
+                night.broadcast
+                  ? $t("voice.storytellerBroadcasting")
+                  : canHearStoryteller
+                    ? $t("voice.youAreAwake")
+                    : $t("voice.youAreAsleep")
+              }}
+            </small>
+          </li>
+        </template>
+
         <li class="headline">{{ $t("voice.participants") }}</li>
         <li
           v-for="participant in participants"
@@ -50,13 +92,31 @@
           :class="{
             speaking: participant.speaking,
             muted: participant.muted,
-            mutable: canMute(participant),
+            awake: participant.awake,
+            wakeable: canWake(participant),
           }"
-          :title="canMute(participant) ? $t('voice.mutePlayer') : ''"
-          @click="mute(participant)"
+          :title="
+            canWake(participant)
+              ? participant.awake
+                ? $t('voice.putToSleep')
+                : $t('voice.wakeUp')
+              : ''
+          "
+          @click="wake(participant)"
         >
-          <span class="name">{{ participant.name }}</span>
-          <em>
+          <span class="name">
+            <font-awesome-icon
+              v-if="canWake(participant)"
+              :icon="participant.awake ? 'eye' : 'bed'"
+              class="night-state"
+            />
+            {{ participant.name }}
+          </span>
+          <em
+            :class="{ mutable: canMute(participant) }"
+            :title="canMute(participant) ? $t('voice.mutePlayer') : ''"
+            @click.stop="mute(participant)"
+          >
             <font-awesome-icon
               :icon="participant.muted ? 'microphone-slash' : 'microphone'"
             />
@@ -72,8 +132,8 @@ import { mapGetters, mapState } from "vuex";
 
 /**
  * Voice chat button and dropdown menu, next to the options menu.
- * Groups every voice control: join / leave, mute and the participant list
- * (where the storyteller can mute players).
+ * Groups every voice control: join / leave, mute and the participant list,
+ * where the storyteller can mute players and, at night, wake them up.
  */
 export default {
   data() {
@@ -97,7 +157,9 @@ export default {
         ([peerId, { muted }]) => ({
           peerId,
           muted,
-          speaking: !!this.voice.speaking[peerId],
+          // at night players don't see who is talking unless they hear them
+          speaking: !!this.voice.speaking[peerId] && this.showSpeaking(peerId),
+          awake: this.isAwake(peerId),
         }),
       );
       const self = {
@@ -119,9 +181,20 @@ export default {
         name: this.nameOf(participant),
       }));
     },
+    canHearStoryteller: function () {
+      return this.canHear("host");
+    },
     ...mapState(["voice", "session", "grimoire"]),
     ...mapState("players", ["players"]),
-    ...mapGetters("voice", ["isConnected", "selfPeerId"]),
+    ...mapGetters("voice", [
+      "isConnected",
+      "selfPeerId",
+      "isStoryteller",
+      "night",
+      "isAwake",
+      "canHear",
+      "showSpeaking",
+    ]),
   },
   methods: {
     nameOf({ peerId, isSelf }) {
@@ -151,14 +224,29 @@ export default {
       this.$store.dispatch("voice/toggleMute");
     },
     canMute(participant) {
-      return (
-        !this.session.isSpectator && !participant.isSelf && !participant.muted
-      );
+      return this.isStoryteller && !participant.isSelf && !participant.muted;
     },
     mute(participant) {
       if (this.canMute(participant)) {
         this.$store.dispatch("voice/mutePeer", participant.peerId);
       }
+    },
+    // storyteller at night: wake players up / put them back to sleep
+    canWake(participant) {
+      return (
+        this.isStoryteller &&
+        this.grimoire.isNight &&
+        !participant.isSelf &&
+        participant.peerId !== "host"
+      );
+    },
+    wake(participant) {
+      if (this.canWake(participant)) {
+        this.$store.dispatch("voice/toggleAwake", participant.peerId);
+      }
+    },
+    toggleBroadcast() {
+      this.$store.dispatch("voice/toggleBroadcast");
     },
   },
   watch: {
@@ -271,18 +359,30 @@ ul {
       font-size: 16px;
     }
 
-    &:not(.headline):not(.disabled):not(.error):not(.participant):hover,
-    &.participant.mutable:hover {
+    &:not(.headline):not(.disabled):not(.error):not(.participant):not(
+        .hint
+      ):not(.night-status):hover,
+    &.participant.wakeable:hover {
       cursor: pointer;
       color: red;
     }
 
-    &.disabled {
+    &.disabled,
+    &.hint {
       color: gray;
     }
 
     &.error {
       color: $demon;
+    }
+
+    &.night-status {
+      justify-content: flex-start;
+      gap: 8px;
+      color: gray;
+      &.awake {
+        color: white;
+      }
     }
 
     em {
@@ -304,6 +404,18 @@ ul {
       }
       &.muted em {
         color: $demon;
+      }
+      em.mutable:hover {
+        cursor: pointer;
+        color: red;
+      }
+      .night-state {
+        margin-right: 4px;
+        opacity: 0.5;
+      }
+      &.awake .night-state {
+        opacity: 1;
+        color: $fabled;
       }
     }
   }
