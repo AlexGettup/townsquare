@@ -18,7 +18,8 @@
       :class="{
         spectator: session.isSpectator,
         reconnecting: session.isReconnecting,
-        speaking: session.isSpectator && !!voice.speaking.host,
+        speaking:
+          session.isSpectator && !!voice.speaking.host && canHearVoice('host'),
       }"
       v-if="session.sessionId"
       @click="leaveSession"
@@ -325,7 +326,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
 import VoiceMenu from "./VoiceMenu";
 
@@ -342,6 +343,7 @@ export default {
     },
     ...mapState(["grimoire", "session", "edition", "npcs", "voice"]),
     ...mapState("players", ["players"]),
+    ...mapGetters("voice", { canHearVoice: "canHear" }),
   },
   data() {
     return {

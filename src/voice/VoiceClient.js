@@ -50,6 +50,10 @@ export default class VoiceClient {
     // mid -> MediaStream received before we knew whose it was
     this.pendingStreams = new Map();
     this.local = null;
+    // peerId -> false for people we must not hear right now (e.g. at night)
+    this.audible = new Map();
+    // storyteller only: { awake, broadcast }, resent after reconnecting
+    this.night = null;
   }
 
   get isActive() {
@@ -136,6 +140,22 @@ export default class VoiceClient {
     this._sendSocket({ type: "mute", peerId });
   }
 
+  /** Storyteller only: share who is awake at night and the broadcast mode. */
+  setNight({ awake, broadcast }) {
+    this.night = { awake, broadcast };
+    this._sendSocket({ type: "night", awake, broadcast });
+  }
+
+  /**
+   * Play or silence a peer locally. The audio keeps flowing so switching
+   * (day / night, waking someone up) is instant.
+   */
+  setAudible(peerId, audible) {
+    this.audible.set(peerId, audible);
+    const remote = this.remotes.get(peerId);
+    if (remote && remote.audio) remote.audio.muted = !audible;
+  }
+
   // --- internals -----------------------------------------------------------
 
   _fail(error) {
@@ -199,7 +219,13 @@ export default class VoiceClient {
   /** Receive the microphone of a remote peer. */
   _pull(peer) {
     const key = `${peer.sessionId}/${peer.trackName}`;
-    const remote = { key, mid: null, audio: null, analyser: null };
+    const remote = {
+      peerId: peer.peerId,
+      key,
+      mid: null,
+      audio: null,
+      analyser: null,
+    };
     this.remotes.set(peer.peerId, remote);
     return this._enqueue(async () => {
       if (!this.pc || this.remotes.get(peer.peerId) !== remote) return;
@@ -288,6 +314,7 @@ export default class VoiceClient {
   _attach(remote, stream) {
     const audio = new Audio();
     audio.autoplay = true;
+    audio.muted = this.audible.get(remote.peerId) === false;
     audio.srcObject = stream;
     audio.play().catch(() => {});
     remote.audio = audio;
@@ -314,7 +341,14 @@ export default class VoiceClient {
     [...this.remotes.keys()].forEach((peerId) => {
       if (!others.some((peer) => peer.peerId === peerId)) this._drop(peerId);
     });
-    this.onPeers(others.map(({ peerId, muted }) => ({ peerId, muted })));
+    this.onPeers(
+      others.map(({ peerId, muted, awake, broadcast }) => ({
+        peerId,
+        muted,
+        awake: awake || [],
+        broadcast: !!broadcast,
+      })),
+    );
   }
 
   // --- voice activity detection --------------------------------------------
@@ -375,6 +409,7 @@ export default class VoiceClient {
         trackName: TRACK_NAME,
         muted: this.muted,
       });
+      if (this.night) this._sendSocket({ type: "night", ...this.night });
       clearInterval(this.pingTimer);
       this.pingTimer = setInterval(
         () => this._sendSocket({ type: "ping" }),
