@@ -194,7 +194,8 @@
     },
     "reminder": {
       "title": "Elige una ficha de recordatorio:",
-      "search": "Buscar"
+      "search": "Buscar",
+      "customNote": "Nota personalizada"
     },
     "role": {
       "title": "Elige un nuevo personaje para {name}:",

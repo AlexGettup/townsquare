@@ -194,7 +194,8 @@
     },
     "reminder": {
       "title": "Choose a reminder token:",
-      "search": "Search"
+      "search": "Search",
+      "customNote": "Custom Note"
     },
     "role": {
       "title": "Choose a new character for {name}:",

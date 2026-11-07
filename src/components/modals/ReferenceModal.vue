@@ -65,8 +65,8 @@
             <span class="player" v-if="Object.keys(playersByRole).length">{{
               playersByRole[role.id] ? playersByRole[role.id].join(", ") : ""
             }}</span>
-            <span class="name">{{ role.name }}</span>
-            <span class="ability">{{ role.ability }}</span>
+            <span class="name">{{ localizeRole(role).name }}</span>
+            <span class="ability">{{ localizeRole(role).ability }}</span>
           </div>
         </li>
         <li :class="[team]"></li>
@@ -94,7 +94,8 @@
           ></span>
           <div class="role">
             <span class="name"
-              >{{ jinx.first.name }} & {{ jinx.second.name }}</span
+              >{{ localizeRole(jinx.first).name }} &
+              {{ localizeRole(jinx.second).name }}</span
             >
             <span class="ability">{{ jinx.reason }}</span>
           </div>
@@ -121,21 +122,26 @@ export default {
      */
     jinxed: function () {
       const jinxed = [];
-      const pushAllJinxes = (role, jinxes) => {
+      const pushAllJinxes = (role, jinxes, isOfficial) => {
         jinxes.forEach((reason, second) => {
-          if (this.roles.get(second)) {
+          const secondRole = this.roles.get(second);
+          if (secondRole) {
             jinxed.push({
               first: role,
-              second: this.roles.get(second),
-              reason,
+              second: secondRole,
+              // only official jinxes between official roles get translated
+              reason:
+                isOfficial && !role.isCustom && !secondRole.isCustom
+                  ? this.localizeJinx(role.id, second, reason)
+                  : reason,
             });
           }
         });
       };
       this.roles.forEach((role) => {
         if (this.jinxes.get(role.id))
-          pushAllJinxes(role, this.jinxes.get(role.id));
-        if (role.jinxes) pushAllJinxes(role, role.jinxes);
+          pushAllJinxes(role, this.jinxes.get(role.id), true);
+        if (role.jinxes) pushAllJinxes(role, role.jinxes, false);
       });
       return jinxed;
     },
@@ -162,7 +168,7 @@ export default {
       });
       return players;
     },
-    ...mapGetters(["getImage"]),
+    ...mapGetters(["getImage", "localizeRole", "localizeJinx"]),
     ...mapState(["roles", "modals", "edition", "grimoire", "jinxes"]),
     ...mapState("players", ["players"]),
   },

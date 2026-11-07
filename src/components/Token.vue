@@ -28,16 +28,16 @@
         x="66.6%"
         text-anchor="middle"
         class="label mozilla"
-        :font-size="role.name | nameToFontSize"
+        :font-size="displayRole.name | nameToFontSize"
       >
         <textPath xlink:href="#curve">
-          {{ role.name }}
+          {{ displayRole.name }}
         </textPath>
       </text>
     </svg>
     <div class="edition" :class="[`edition-${role.edition}`, role.team]"></div>
-    <div class="ability" v-if="role.ability">
-      {{ role.ability }}
+    <div class="ability" v-if="displayRole.ability">
+      {{ displayRole.ability }}
     </div>
   </div>
 </template>
@@ -58,20 +58,31 @@ export default {
     },
   },
   computed: {
+    // role with name and ability in the chosen language
+    displayRole: function () {
+      return this.localizeRole(this.role);
+    },
     reminderLeaves: function () {
       return (
         (this.role.reminders || []).length +
         (this.role.remindersGlobal || []).length
       );
     },
-    ...mapGetters(["getImage"]),
+    ...mapGetters(["getImage", "localizeRole"]),
     ...mapState(["grimoire"]),
   },
   data() {
     return {};
   },
   filters: {
-    nameToFontSize: (name) => (name && name.length > 10 ? "90%" : "110%"),
+    // names longer than 16 characters (common in translations) shrink
+    // proportionally so they still fit on the token's arc
+    nameToFontSize: (name) => {
+      const length = (name && name.length) || 0;
+      if (length <= 10) return "110%";
+      if (length <= 16) return "90%";
+      return Math.floor((90 * 16) / length) + "%";
+    },
   },
   methods: {
     setRole() {

@@ -30,7 +30,7 @@
     <ul class="tokens">
       <li
         v-for="role in displayedRoles"
-        :class="[role.team, { match: queryMatches(role.name) }]"
+        :class="[role.team, { match: queryMatches(localizeRole(role).name) }]"
         :key="role.id"
         @click="setRole(role, getAlignmentIndex(role))"
       >
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
 
@@ -99,6 +99,7 @@ export default {
         return this.availableRoles;
       else return [...this.otherTravellers.values()];
     },
+    ...mapGetters(["localizeRole"]),
     ...mapState(["modals", "roles", "session"]),
     ...mapState("players", ["players"]),
     ...mapState(["otherTravellers"]),
@@ -155,9 +156,14 @@ export default {
       return 0;
     },
     queryMatches(name) {
-      // A search query matches if, after removing all non-word characters,
-      // it is a case-insensitive prefix of the character name.
-      const simplify = (str) => str.replaceAll(/\W+/g, "").toLowerCase();
+      // A search query matches if, after removing accents and all non-word
+      // characters, it is a case-insensitive prefix of the character name.
+      const simplify = (str) =>
+        str
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .replaceAll(/\W+/g, "")
+          .toLowerCase();
       return simplify(name || "").startsWith(simplify(this.query));
     },
     keyup(event) {
@@ -170,7 +176,7 @@ export default {
       // If there's a unique match and the user presses Enter, select that role.
       if (event.key === "Enter") {
         const matchingRoles = this.displayedRoles.filter((r) =>
-          this.queryMatches(r.name),
+          this.queryMatches(this.localizeRole(r).name),
         );
         if (matchingRoles.length === 1) {
           const role = matchingRoles[0];

@@ -74,8 +74,15 @@
             "
           >
             <em>{{ nightOrder.get(role).first }}</em>
-            <span class="description" v-if="role.firstNightReminder">
-              <span v-html="formatNightReminder(role.firstNightReminder)" />
+            <span
+              class="description"
+              v-if="localizeRole(role).firstNightReminder"
+            >
+              <span
+                v-html="
+                  formatNightReminder(localizeRole(role).firstNightReminder)
+                "
+              />
             </span>
           </div>
           <div
@@ -87,8 +94,15 @@
             "
           >
             <em>{{ nightOrder.get(role).other }}</em>
-            <span class="description" v-if="role.otherNightReminder">
-              <span v-html="formatNightReminder(role.otherNightReminder)" />
+            <span
+              class="description"
+              v-if="localizeRole(role).otherNightReminder"
+            >
+              <span
+                v-html="
+                  formatNightReminder(localizeRole(role).otherNightReminder)
+                "
+              />
             </span>
           </div>
           <Token :role="role"></Token>
@@ -117,6 +131,7 @@ export default {
   },
   computed: {
     ...mapGetters({ nightOrder: "players/nightOrder" }),
+    ...mapGetters(["localizeRole"]),
     ...mapState(["grimoire", "roles", "session", "bluffs", "npcs"]),
     ...mapState("players", ["players"]),
   },

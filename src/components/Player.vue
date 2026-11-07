@@ -52,8 +52,8 @@
         "
       >
         <em>{{ nightOrder.get(player).first }}</em>
-        <span class="description" v-if="player.role.firstNightReminder">
-          <span v-html="formatNightReminder(player.role.firstNightReminder)" />
+        <span class="description" v-if="displayRole.firstNightReminder">
+          <span v-html="formatNightReminder(displayRole.firstNightReminder)" />
         </span>
       </div>
       <div
@@ -65,8 +65,8 @@
         "
       >
         <em>{{ nightOrder.get(player).other }}</em>
-        <span class="description" v-if="player.role.otherNightReminder">
-          <span v-html="formatNightReminder(player.role.otherNightReminder)" />
+        <span class="description" v-if="displayRole.otherNightReminder">
+          <span v-html="formatNightReminder(displayRole.otherNightReminder)" />
         </span>
       </div>
 
@@ -293,7 +293,7 @@
             )})`,
           }"
         ></span>
-        <span class="text">{{ reminder.name }}</span>
+        <span class="text">{{ localizeReminder(reminder) }}</span>
       </div>
     </template>
     <div class="reminder add" @click="$emit('trigger', ['openReminderModal'])">
@@ -324,7 +324,11 @@ export default {
     ...mapState("players", ["players"]),
     ...mapState(["grimoire", "session"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
-    ...mapGetters(["getImage"]),
+    ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
+    // role with night order texts in the chosen language
+    displayRole: function () {
+      return this.localizeRole(this.player.role);
+    },
     index: function () {
       return this.players.indexOf(this.player);
     },

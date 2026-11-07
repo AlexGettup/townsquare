@@ -9,6 +9,7 @@ import rolesJSON from "../roles.json";
 import nightJSON from "../nightsheet.json";
 import jinxesJSON from "../jinxes.json";
 import { DEFAULT_LOCALE, isSupportedLocale } from "../i18n";
+import { localizeJinx, localizeReminder, localizeRole } from "../i18n/game";
 
 Vue.use(Vuex);
 
@@ -232,6 +233,22 @@ export default new Vuex.Store({
       },
     clean: () => (id) => clean(id),
     rolesJSONbyId: () => rolesJSONbyId,
+    // display helpers: translate game content into the chosen language.
+    // The locale is read here (not inside the returned function) so that
+    // components re-render when the language changes.
+    localizeRole: ({ grimoire }) => {
+      const { locale } = grimoire;
+      return (role) => localizeRole(role, locale);
+    },
+    localizeReminder: ({ grimoire }) => {
+      const { locale } = grimoire;
+      return (reminder) => localizeReminder(reminder, locale);
+    },
+    localizeJinx: ({ grimoire }) => {
+      const { locale } = grimoire;
+      return (firstId, secondId, reason) =>
+        localizeJinx(firstId, secondId, reason, locale);
+    },
   },
   mutations: {
     setZoom: set("zoom"),

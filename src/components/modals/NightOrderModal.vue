@@ -229,7 +229,7 @@ export default {
           );
         });
       rolesFirstNight.sort((a, b) => a.firstNight - b.firstNight);
-      return rolesFirstNight;
+      return rolesFirstNight.map((role) => this.localizeRole(role));
     },
     rolesOtherNight: function () {
       const rolesOtherNight = [];
@@ -298,9 +298,14 @@ export default {
           );
         });
       rolesOtherNight.sort((a, b) => a.otherNight - b.otherNight);
-      return rolesOtherNight;
+      return rolesOtherNight.map((role) => this.localizeRole(role));
     },
-    ...mapGetters(["getImage", "getFirstNightOrder", "getOtherNightOrder"]),
+    ...mapGetters([
+      "getImage",
+      "getFirstNightOrder",
+      "getOtherNightOrder",
+      "localizeRole",
+    ]),
     ...mapState([
       "roles",
       "otherTravellers",

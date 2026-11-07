@@ -1,0 +1,12 @@
+{
+  "roles": {
+    "alhadikhia": {
+      "other": "El Al-Hadikhia elige a 3 jugadores. :reminder: :reminder: :reminder: En orden, despierta a cada objetivo. Asienten o niegan con la cabeza. Duérmelos antes de despertar al siguiente objetivo."
+    },
+    "minioninfo": {
+      "name": "Información de los Esbirros"
+    }
+  },
+  "reminders": {},
+  "jinxes": {}
+}

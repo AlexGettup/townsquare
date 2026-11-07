@@ -5,7 +5,7 @@
       <li
         v-for="reminder in availableReminders"
         class="reminder"
-        :class="[reminder.role, { match: queryMatches(reminder.name) }]"
+        :class="[reminder.role, { match: queryMatches(reminderLabel(reminder)) }]"
         :key="reminder.role + ' ' + reminder.name"
         @click="addReminder(reminder)"
       >
@@ -24,7 +24,7 @@
             )})`,
           }"
         ></span>
-        <span class="text">{{ reminder.name }}</span>
+        <span class="text">{{ reminderLabel(reminder) }}</span>
       </li>
     </ul>
     <input
@@ -142,7 +142,7 @@ export default {
         this.players[this.playerIndex]
       );
     },
-    ...mapGetters(["getImage"]),
+    ...mapGetters(["getImage", "localizeReminder"]),
     ...mapState(["modals", "grimoire"]),
     ...mapState("players", ["players"]),
   },
@@ -152,6 +152,14 @@ export default {
     };
   },
   methods: {
+    // text shown for a reminder in the chosen language; the reminder itself
+    // is stored in English so every player can translate it
+    reminderLabel(reminder) {
+      if (reminder.imageAlt === "custom" && !reminder.role) {
+        return this.$t("modals.reminder.customNote");
+      }
+      return this.localizeReminder(reminder);
+    },
     addReminder(reminder) {
       const player = this.$store.state.players.players[this.playerIndex];
       let value;
@@ -176,7 +184,7 @@ export default {
       // If there's a unique match and the user presses Enter, select that reminder.
       if (event.key === "Enter") {
         const matchingReminders = this.availableReminders.filter((r) =>
-          this.queryMatches(r.name),
+          this.queryMatches(this.reminderLabel(r)),
         );
         if (matchingReminders.length === 1) {
           this.addReminder(matchingReminders[0]);
@@ -184,9 +192,14 @@ export default {
       }
     },
     queryMatches(name) {
-      // A search query matches if, after removing all non-word characters,
-      // it is a case-insensitive prefix of the character name.
-      const simplify = (str) => str.replaceAll(/\W+/g, "").toLowerCase();
+      // A search query matches if, after removing accents and all non-word
+      // characters, it is a case-insensitive prefix of the character name.
+      const simplify = (str) =>
+        str
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .replaceAll(/\W+/g, "")
+          .toLowerCase();
       return simplify(name || "").startsWith(simplify(this.query));
     },
     ...mapMutations(["toggleModal"]),

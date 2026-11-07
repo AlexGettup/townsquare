@@ -11,7 +11,8 @@
     "serve": "npm run clone-unofficial && npm run copy-unofficial && npm run clone-official && npm run copy-official && vue-cli-service serve",
     "build": "npm run clone-unofficial && npm run copy-unofficial && npm run clone-official && npm run copy-official && vue-cli-service build ./src/main.js",
     "lint": "vue-cli-service lint",
-    "lint-ci": "vue-cli-service lint --no-fix --max-warnings=0"
+    "lint-ci": "vue-cli-service lint --no-fix --max-warnings=0",
+    "update-translations": "node scripts/update-translations.js"
   },
   "main": "App.vue",
   "dependencies": {
