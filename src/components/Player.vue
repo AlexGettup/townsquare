@@ -80,6 +80,15 @@
         @set-role="$emit('trigger', ['openRoleModal'])"
       />
 
+      <!-- Voice chat: ring while talking, icon while the microphone is off -->
+      <div class="voice-ring" v-if="voiceSpeaking"></div>
+      <font-awesome-icon
+        icon="microphone-slash"
+        class="voice-muted"
+        v-if="voiceMuted"
+        :title="$t('voice.playerMuted')"
+      />
+
       <!-- Claimed seat icon -->
       <font-awesome-icon
         icon="chair"
@@ -229,6 +238,10 @@
               <font-awesome-icon icon="times-circle" />
               {{ $t("player.remove") }}
             </li>
+            <li @click="mutePlayerVoice" v-if="voicePeer && !voicePeer.muted">
+              <font-awesome-icon icon="microphone-slash" />
+              {{ $t("voice.mutePlayer") }}
+            </li>
             <li
               @click="updatePlayer('id', '', true)"
               v-if="player.id && session.sessionId"
@@ -322,12 +335,33 @@ export default {
   },
   computed: {
     ...mapState("players", ["players"]),
-    ...mapState(["grimoire", "session"]),
+    ...mapState(["grimoire", "session", "voice"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
+    ...mapGetters("voice", ["isConnected", "selfPeerId"]),
     // role with night order texts in the chosen language
     displayRole: function () {
       return this.localizeRole(this.player.role);
+    },
+    // voice chat state of whoever claimed this seat
+    isVoiceSelf: function () {
+      return !!this.player.id && this.player.id === this.selfPeerId;
+    },
+    voicePeer: function () {
+      if (!this.isConnected || !this.player.id) return null;
+      return this.voice.peers[this.player.id] || null;
+    },
+    voiceSpeaking: function () {
+      return (
+        this.isConnected &&
+        !!this.player.id &&
+        !!this.voice.speaking[this.player.id]
+      );
+    },
+    voiceMuted: function () {
+      if (!this.isConnected) return false;
+      if (this.isVoiceSelf) return this.voice.muted;
+      return !!this.voicePeer && this.voicePeer.muted;
     },
     index: function () {
       return this.players.indexOf(this.player);
@@ -449,6 +483,10 @@ export default {
     removePlayer() {
       this.isMenuOpen = false;
       this.$emit("trigger", ["removePlayer"]);
+    },
+    mutePlayerVoice() {
+      this.isMenuOpen = false;
+      this.$store.dispatch("voice/mutePeer", this.player.id);
     },
     swapPlayer(player) {
       this.isMenuOpen = false;
@@ -914,6 +952,48 @@ li.move:not(.from) .player .overlay svg.move {
 
 .player.marked .marked {
   opacity: 0.5;
+}
+
+/****** Voice chat ********/
+// green ring around the token while the player talks
+.player .voice-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow:
+    0 0 0 4px $voice-speaking,
+    0 0 18px 6px $voice-speaking;
+  animation: voice-pulse 1s ease-in-out infinite alternate;
+
+  &:before {
+    content: " ";
+    display: block;
+    padding-top: 100%;
+  }
+}
+
+@keyframes voice-pulse {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// microphone turned off
+.player .voice-muted {
+  position: absolute;
+  left: -5px;
+  margin-top: -100%;
+  color: $demon;
+  filter: drop-shadow(0 0 3px black);
+  z-index: 2;
+  pointer-events: none;
 }
 
 /****** Seat icon ********/

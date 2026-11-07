@@ -61,6 +61,23 @@
     "discord": "Join Unofficial Discord",
     "sourceCode": "Source Code"
   },
+  "voice": {
+    "join": "Join voice chat",
+    "connecting": "Connecting to voice chat…",
+    "mute": "Mute microphone",
+    "unmute": "Turn microphone on",
+    "leave": "Leave Voice Chat",
+    "mutePlayer": "Mute Microphone",
+    "playerMuted": "Microphone off",
+    "errors": {
+      "generic": "Voice chat error.",
+      "NotAllowedError": "Microphone permission denied.",
+      "NotFoundError": "No microphone found.",
+      "NotReadableError": "The microphone is being used by another app.",
+      "InsecureContext": "The microphone only works over HTTPS.",
+      "Replaced": "Voice chat was opened in another tab."
+    }
+  },
   "dialogs": {
     "backgroundUrl": "Enter custom background URL",
     "hostChannel": "Enter a channel number / name for your session",

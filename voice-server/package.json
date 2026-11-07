@@ -1,0 +1,14 @@
+{
+  "name": "townsquare-voice",
+  "private": true,
+  "description": "Voice chat backend for Townsquare (Cloudflare Worker + Realtime SFU)",
+  "license": "GPL-3.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "logs": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4.158.0"
+  }
+}

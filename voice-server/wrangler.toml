@@ -1,0 +1,16 @@
+name = "townsquare-voice"
+main = "src/index.js"
+compatibility_date = "2025-10-01"
+
+[vars]
+# pages allowed to use the voice server (localhost and LAN are always allowed)
+ALLOWED_ORIGINS = "https://alexgettup.github.io"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "VoiceRoom"
+
+# SQLite-backed Durable Objects are the ones available on the free plan
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["VoiceRoom"]

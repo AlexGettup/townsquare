@@ -61,6 +61,23 @@
     "discord": "Discord no oficial",
     "sourceCode": "Código fuente"
   },
+  "voice": {
+    "join": "Unirse al chat de voz",
+    "connecting": "Conectando al chat de voz…",
+    "mute": "Silenciar micrófono",
+    "unmute": "Activar micrófono",
+    "leave": "Salir del chat de voz",
+    "mutePlayer": "Silenciar micrófono",
+    "playerMuted": "Micrófono apagado",
+    "errors": {
+      "generic": "Error en el chat de voz.",
+      "NotAllowedError": "Permiso de micrófono denegado.",
+      "NotFoundError": "No se ha encontrado ningún micrófono.",
+      "NotReadableError": "Otra aplicación está usando el micrófono.",
+      "InsecureContext": "El micrófono solo funciona con HTTPS.",
+      "Replaced": "Has abierto el chat de voz en otra pestaña."
+    }
+  },
   "dialogs": {
     "backgroundUrl": "Introduce la URL de un fondo personalizado",
     "hostChannel": "Introduce un número o nombre de canal para tu sesión",

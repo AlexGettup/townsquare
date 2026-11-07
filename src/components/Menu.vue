@@ -18,6 +18,7 @@
       :class="{
         spectator: session.isSpectator,
         reconnecting: session.isReconnecting,
+        speaking: session.isSpectator && !!voice.speaking.host,
       }"
       v-if="session.sessionId"
       @click="leaveSession"
@@ -30,6 +31,18 @@
     >
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
+    </span>
+    <span
+      class="voice"
+      v-if="voice.isAvailable && session.sessionId"
+      :class="[
+        'status-' + voice.status,
+        { muted: voice.muted, speaking: !!voice.speaking[selfPeerId] },
+      ]"
+      @click="voiceButton"
+      :title="voiceTitle"
+    >
+      <font-awesome-icon :icon="voiceIcon" />
     </span>
     <span
       class="reference"
@@ -209,6 +222,10 @@
                   ]"
               /></em>
             </li>
+            <li v-if="isVoiceConnected" @click="leaveVoice">
+              {{ $t("voice.leave") }}
+              <em><font-awesome-icon icon="headset" /></em>
+            </li>
             <li @click="leaveSession">
               {{ $t("menu.leaveSession") }}
               <em>{{ session.sessionId }}</em>
@@ -304,10 +321,7 @@
             </em>
           </li>
           <li>
-            <a
-              href="https://github.com/AlexGettup/townsquare"
-              target="_blank"
-            >
+            <a href="https://github.com/AlexGettup/townsquare" target="_blank">
               {{ $t("menu.sourceCode") }}
             </a>
             <em>
@@ -326,7 +340,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
 
 export default {
@@ -337,8 +351,36 @@ export default {
         !this.npcs.some((npc) => npc.id === "tor")
       );
     },
-    ...mapState(["grimoire", "session", "edition", "npcs"]),
+    // voice chat button: join, then mute / unmute
+    voiceIcon: function () {
+      if (this.voice.status !== "connected") return "headset";
+      return this.voice.muted ? "microphone-slash" : "microphone";
+    },
+    voiceTitle: function () {
+      switch (this.voice.status) {
+        case "connecting":
+          return this.$t("voice.connecting");
+        case "connected":
+          return this.voice.muted
+            ? this.$t("voice.unmute")
+            : this.$t("voice.mute");
+        case "error": {
+          const key = `voice.errors.${this.voice.error}`;
+          const reason = this.$te(key)
+            ? this.$t(key)
+            : this.$t("voice.errors.generic");
+          return reason + " " + this.$t("voice.join");
+        }
+        default:
+          return this.$t("voice.join");
+      }
+    },
+    ...mapState(["grimoire", "session", "edition", "npcs", "voice"]),
     ...mapState("players", ["players"]),
+    ...mapGetters("voice", {
+      isVoiceConnected: "isConnected",
+      selfPeerId: "selfPeerId",
+    }),
   },
   data() {
     return {
@@ -347,6 +389,16 @@ export default {
     };
   },
   methods: {
+    voiceButton() {
+      if (this.voice.status === "connected") {
+        this.$store.dispatch("voice/toggleMute");
+      } else if (this.voice.status !== "connecting") {
+        this.$store.dispatch("voice/join");
+      }
+    },
+    leaveVoice() {
+      this.$store.dispatch("voice/leave");
+    },
     cycleLocale() {
       const index = this.locales.findIndex(
         ({ code }) => code === this.grimoire.locale,
@@ -571,11 +623,17 @@ export default {
     &.reconnecting {
       animation: blink 1s infinite;
     }
+    // the storyteller is talking on voice chat
+    &.speaking svg {
+      color: $voice-speaking;
+      filter: drop-shadow(0 0 6px $voice-speaking);
+    }
   }
 
-  // character reference sheet, always at hand for players.
+  // character reference sheet and voice chat buttons.
   // Boxed like the menu cog: translucent black background, solid black border
-  span.reference {
+  span.reference,
+  span.voice {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -588,9 +646,29 @@ export default {
     background: rgba(0, 0, 0, 0.5);
     border: 3px solid black;
     border-radius: 10px;
-    transition: color 250ms;
+    transition:
+      color 250ms,
+      box-shadow 250ms;
     &:hover {
       color: red;
+    }
+  }
+
+  span.voice {
+    &.status-connecting {
+      animation: blink 1s infinite;
+    }
+    &.status-connected {
+      color: $voice-speaking;
+      &.muted {
+        color: $demon;
+      }
+      &.speaking {
+        box-shadow: 0 0 10px 3px $voice-speaking;
+      }
+    }
+    &.status-error {
+      color: $demon;
     }
   }
 }
