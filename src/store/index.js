@@ -130,9 +130,6 @@ export default new Vuex.Store({
       isMockAssignmentsAllowed: false,
       zoom: 0,
       background: "",
-      nightNumber: 0,
-      nightStart: null,
-      nightEnd: null,
     },
     modals: {
       edition: false,
@@ -242,7 +239,7 @@ export default new Vuex.Store({
     toggleNightOrder: toggle("isNightOrder"),
     toggleStatic: toggle("isStatic"),
     toggleMockAssignments: toggle("isMockAssignmentsAllowed"),
-    toggleNight({ grimoire, players, edition, session }, val) {
+    toggleNight({ grimoire, players }, val) {
       // Reset the hasResponded var for the next night.
       players.players.map((player) => {
         player.hasResponded = {};
@@ -255,38 +252,6 @@ export default new Vuex.Store({
         grimoire.isNight = val;
       } else {
         grimoire.isNight = !grimoire.isNight;
-      }
-
-      // Record the length of days and nights if is ST.
-      if (!session.isSpectator) {
-        return;
-      }
-      if (grimoire.isNight) {
-        grimoire.nightNumber++;
-        grimoire.nightStart = new Date();
-
-        if (grimoire.nightEnd !== null) {
-          const duration = Math.floor(
-            Math.abs(grimoire.nightStart - grimoire.nightEnd) / 1000,
-          );
-          gtag("event", "day_end", {
-            duration: duration,
-            playerCount: players.players.length,
-            nightNumber: grimoire.nightNumber,
-            edition: edition.name,
-          });
-        }
-      } else if (grimoire.nightStart !== null) {
-        grimoire.nightEnd = new Date();
-        const duration = Math.floor(
-          Math.abs(grimoire.nightEnd - grimoire.nightStart) / 1000,
-        );
-        gtag("event", "night_end", {
-          duration: duration,
-          playerCount: players.players.length,
-          nightNumber: grimoire.nightNumber,
-          edition: edition.name,
-        });
       }
     },
     toggleGrimoire: toggle("isPublic"),
@@ -438,10 +403,6 @@ export default new Vuex.Store({
       }
     },
     setEdition(state, edition) {
-      state.grimoire.nightNumber = 0;
-      state.grimoire.nightStart = null;
-      state.grimoire.nightEnd = null;
-
       if (editionJSONbyId.has(edition.id)) {
         state.edition = editionJSONbyId.get(edition.id);
         state.roles = getRolesByEdition(state.edition);

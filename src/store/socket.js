@@ -874,29 +874,12 @@ class LiveSession {
   distributeRoles() {
     if (this._isSpectator) return;
     const message = {};
-
-    gtag("event", "send_roles", {
-      edition: this._store.state.edition.name,
-      player_count: this._store.state.players.players.length,
-    });
-
     this._store.state.players.players.forEach((player, index) => {
       if (player.connected && player.role) {
         message[player.id] = [
           "player",
           { index, property: "role", value: player.role.id },
         ];
-
-        gtag("event", "send_role", {
-          edition: this._store.state.edition.name,
-          player_count: this._store.state.players.players.length,
-          role: player.role.id,
-        });
-
-        gtag("event", "send_role_" + player.role.id, {
-          edition: this._store.state.edition.name,
-          player_count: this._store.state.players.players.length,
-        });
       }
     });
     if (Object.keys(message).length) {
@@ -920,10 +903,6 @@ class LiveSession {
     ) {
       this.setVotingSpeed(this._store.state.session.votingSpeed);
       this._send("nomination", nomination);
-
-      gtag("event", "nomination", {
-        edition: this._store.state.edition.name,
-      });
     }
   }
 
@@ -952,13 +931,6 @@ class LiveSession {
       "isVoteHistoryAllowed",
       this._store.state.session.isVoteHistoryAllowed,
     );
-
-    const enabled = this._store.state.session.isVoteHistoryAllowed
-      ? "enabled"
-      : "disabled";
-    gtag("event", "vote_history_" + enabled, {
-      edition: this._store.state.edition.name,
-    });
   }
 
   /**
@@ -967,13 +939,6 @@ class LiveSession {
   setAllowSelfNaming() {
     if (this._isSpectator) return;
     this._send("allowSelfNaming", this._store.state.session.allowSelfNaming);
-
-    const enabled = this._store.state.session.allowSelfNaming
-      ? "enabled"
-      : "disabled";
-    gtag("event", "self_naming_" + enabled, {
-      edition: this._store.state.edition.name,
-    });
   }
 
   /**
@@ -985,13 +950,6 @@ class LiveSession {
       "isVoteWatchingAllowed",
       this._store.state.session.isVoteWatchingAllowed,
     );
-
-    const enabled = this._store.state.session.isVoteWatchingAllowed
-      ? "enabled"
-      : "disabled";
-    gtag("event", "vote_watching_" + enabled, {
-      edition: this._store.state.edition.name,
-    });
   }
 
   /**
