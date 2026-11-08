@@ -20,7 +20,7 @@
         maxlength="300"
         :placeholder="$t('cards.text')"
         @keyup.stop
-        @keydown.stop
+        @keydown.stop="onKeydown"
       />
     </section>
 
@@ -160,6 +160,12 @@ export default {
       Object.assign(this, this.emptyCard());
     },
   },
+  mounted() {
+    window.addEventListener("keydown", this.onKeydown);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.onKeydown);
+  },
   methods: {
     emptyCard() {
       return {
@@ -170,6 +176,12 @@ export default {
         number: null,
         answer: null,
       };
+    },
+    // Enter sends the card, anywhere in the window
+    onKeydown(event) {
+      if (!this.playerId || event.key !== "Enter" || event.isComposing) return;
+      event.preventDefault();
+      this.send();
     },
     toggle(list, value) {
       const index = list.indexOf(value);

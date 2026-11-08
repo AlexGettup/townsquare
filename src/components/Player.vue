@@ -1164,7 +1164,7 @@ li.move:not(.from) .player .overlay svg.move {
     color: lightgray;
   }
   &.seen {
-    color: $townsfolk;
+    color: $fabled;
   }
 }
 
