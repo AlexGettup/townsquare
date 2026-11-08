@@ -9,8 +9,8 @@
     width: 30px;
     height: 30px;
   }
-  .npcs .night-order.first span {
-    left: 30px;
+  .npcs .night-order.other span {
+    right: 30px;
   }
 }
 
@@ -27,8 +27,8 @@
     width: 20px;
     height: 20px;
   }
-  .npcs .night-order.first span {
-    left: 20px;
+  .npcs .night-order.other span {
+    right: 20px;
   }
   #townsquare {
     padding: 10px;
@@ -49,6 +49,10 @@
     &:before {
       bottom: 0;
     }
+  }
+  // night order descriptions must fit next to a token on a phone
+  .night-order .description {
+    width: 55vw;
   }
 }
 

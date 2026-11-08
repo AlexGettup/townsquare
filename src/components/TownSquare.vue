@@ -396,9 +396,41 @@ export default {
             left: 100%;
           }
         }
+        // small screens: no room on the right, so "other nights" opens
+        // to the left too
+        @media screen and (max-width: 991.98px) {
+          .night-order.other .description {
+            left: auto;
+            right: 120%;
+            &:after {
+              right: auto;
+              left: 100%;
+              margin-right: 0;
+              margin-left: 3px;
+              border-right-color: transparent;
+              border-left-color: $demon;
+            }
+          }
+        }
       } @else {
         // second half of players
         z-index: $i - 1;
+        // small screens: no room on the left, so "first night" opens to
+        // the right too
+        @media screen and (max-width: 991.98px) {
+          .night-order.first .description {
+            right: auto;
+            left: 120%;
+            &:after {
+              left: auto;
+              right: 100%;
+              margin-left: 0;
+              margin-right: 3px;
+              border-left-color: transparent;
+              border-right-color: $townsfolk;
+            }
+          }
+        }
       }
 
       > * {
