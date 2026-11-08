@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.8.0",
+    "date": "2026-11-08",
+    "title": {
+      "en": "Nomination marks and an easier player menu",
+      "es": "Marcas de nominación y un menú del jugador más cómodo"
+    },
+    "en": [
+      "Nomination marks: after a nomination, whoever nominated gets a blue pointing hand in the bottom left corner of their token and the nominee a red gavel in the bottom right; they are cleared when night or day starts",
+      "On phones and tablets, one tap anywhere on a token opens the player menu; the Storyteller marks a death with a double tap, so the shroud is no longer hit by mistake",
+      "Storyteller: the player menu shows first what each phase uses most (at night, wake up and send info; by day, nominate and invite to talk), adds \"Mark as Dead / Revive\" and \"Add Reminder\", shows the current alignment, and keeps the seat setup (rename, move, swap, remove…) in a \"Seat\" submenu",
+      "Players: \"Claim seat\" comes first on an empty seat, and reminders can be added from the player menu"
+    ],
+    "es": [
+      "Marcas de nominación: tras una nominación, quien nomina lleva una mano azul en la esquina inferior izquierda de su token y el nominado un mazo rojo en la inferior derecha; se borran al empezar la noche o el día",
+      "En móviles y tablets, un toque en cualquier parte del token abre el menú del jugador; el Narrador marca una muerte con doble toque, así que ya no se pulsa el sudario sin querer",
+      "Narrador: el menú del jugador muestra primero lo más usado en cada fase (de noche, despertar y enviar información; de día, nominar e invitar a hablar), añade «Marcar muerto / Revivir» y «Añadir recordatorio», muestra el alineamiento actual y agrupa la preparación del asiento (renombrar, mover, intercambiar, eliminar…) en el submenú «Asiento»",
+      "Jugadores: «Reclamar asiento» va primero en un asiento vacío, y se pueden añadir recordatorios desde el menú del jugador"
+    ]
+  },
+  {
     "version": "3.7.0",
     "date": "2026-11-08",
     "title": {

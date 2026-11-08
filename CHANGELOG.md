@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.8.0
+- Nomination marks: after a nomination, the nominator gets a blue pointing hand in the bottom left corner of their token and the nominee a red gavel in the bottom right; they are cleared when night or day starts
+- Touch screens: one tap anywhere on a token opens the player menu, and the storyteller toggles death with a double tap (the shroud was easy to hit by mistake)
+- Reorganized player menu: for the storyteller, the actions each phase uses most come first (night: wake up and send info; day: nominate and invite), with new "Mark as Dead / Revive" and "Add Reminder" entries, the alignment showing its current value, and the seat setup (rename, pronouns, two votes, move, swap, empty seat, remove) in a "Seat" submenu
+- Players: "Claim seat" comes first on an empty seat, reminders can be added from the menu, and the disabled "Seat Occupied" entry is gone
+
 ### Version 3.7.0
 - "What's New" in the menu: the changes of each version, in English or Spanish
 - New Settings tab in the menu with the personal preferences (zoom, background, art, animations, sounds, language); the Grimoire tab keeps the game
