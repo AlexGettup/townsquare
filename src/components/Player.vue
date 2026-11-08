@@ -213,8 +213,24 @@
         }}</span>
       </div>
 
-      <transition name="fold">
-        <ul class="menu" v-if="isMenuOpen">
+      <!-- the player menu: next to the token, or at the bottom of the screen
+           on touch screens (bigger, easier to tap) -->
+      <component :is="isTouch ? 'BottomSheet' : 'transition'" name="fold">
+        <ul
+          class="menu"
+          v-if="isMenuOpen"
+          ref="menu"
+          :class="{ arming: isArming }"
+        >
+          <li class="sheet-header" v-if="isTouch">
+            <strong>{{ player.name }}</strong>
+            <span v-if="player.role.id">{{ displayRole.name }}</span>
+            <font-awesome-icon
+              icon="times"
+              class="close"
+              @click="isMenuOpen = false"
+            />
+          </li>
           <!-- Storyteller: setting up the seat, behind "Seat ▸" -->
           <template v-if="isSeatMenu">
             <li class="back" @click="isSeatMenu = false">
@@ -356,7 +372,7 @@
             </li>
           </template>
         </ul>
-      </transition>
+      </component>
     </div>
 
     <template v-if="player.reminders">
@@ -394,6 +410,7 @@
 
 <script>
 import { isTouchScreen } from "../touch";
+import BottomSheet from "./BottomSheet";
 import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
@@ -402,6 +419,7 @@ import { PLAZA, isConversation } from "../store/modules/voice";
 export default {
   mixins: [peerNames],
   components: {
+    BottomSheet,
     Token,
   },
   props: {
@@ -552,6 +570,10 @@ export default {
   data() {
     return {
       isMenuOpen: false,
+      // touch screens: the menu is a panel at the bottom of the screen
+      isTouch: isTouchScreen(),
+      // touch screens: a double tap may still come, the panel ignores taps
+      isArming: false,
       // storyteller: the "Seat" submenu of the player menu is showing
       isSeatMenu: false,
       isSwap: false,
@@ -605,6 +627,7 @@ export default {
         // second tap: a double tap, undo the menu of the first tap
         clearTimeout(this.tapTimer);
         this.tapTimer = null;
+        this.isArming = false;
         this.isMenuOpen = this.menuBeforeTap;
         this.toggleStatus();
         return;
@@ -612,12 +635,17 @@ export default {
       // first tap: the menu reacts at once, a second tap may still follow
       this.menuBeforeTap = this.isMenuOpen;
       this.isMenuOpen = !this.isMenuOpen;
+      this.isArming = true;
       this.tapTimer = setTimeout(() => {
         this.tapTimer = null;
+        this.isArming = false;
       }, 300);
     },
     closeMenuOnOutsideClick(event) {
       const player = this.$refs.player;
+      // the bottom panel (touch screens) is outside the player element
+      const menu = this.$refs.menu;
+      if (menu && menu.contains(event.target)) return;
       if (player && !player.contains(event.target)) {
         this.isMenuOpen = false;
       }
