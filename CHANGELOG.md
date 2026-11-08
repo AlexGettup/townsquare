@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.10.0
+- "Your vote" panel for players at the bottom of the screen during a nomination: the question ("Execute Ana?", or "Exile" for travellers), big Yes / No buttons that light up with the current choice, the vote shown in words, how many seats the clock hand is from you, when your vote is locked, and why you can't vote (no seat, disconnected, ghost vote already used); dead players are told that voting yes uses their ghost vote. The Hand UP / Hand DOWN buttons in the middle of the circle are gone
+- Alerts for players: a notice, a sound (unless muted), vibration on phones and a mark in the tab title (while in the background) when the storyteller wakes you up at night; info cards also mark the tab title
+
 ### Version 3.9.0
 - Touch screens: the player menu opens as a panel at the bottom of the screen, with the player's name and character on top, bigger rows that are easier to tap, and the "Seat" submenu as a second page; a double tap on a token still toggles death without pressing anything in the panel
 - Touch screens: the add reminder and change character windows no longer open the keyboard (the search box is rarely needed)

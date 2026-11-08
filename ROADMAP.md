@@ -21,6 +21,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   player menu
 - **3.9.0** Player menu as a bottom panel on touch screens; no keyboard when picking a
   reminder or character
+- **3.10.0** "Your vote" panel for players; alerts when woken up and for info cards
 
 ## Planned
 
@@ -109,7 +110,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
 | 5 | Game diary | ●●●○○ | ●●●●○ | ●●●○○ | Medium |
 | 6 | Claims on the reference sheet | ●●○○○ | ●●●○○ | ●●○○○ | Medium |
 
-1. [ ] **Alerts**: a short notice on screen ("The Storyteller woke you up", "New information",
+1. [x] **Alerts**: a short notice on screen ("The Storyteller woke you up", "New information",
    "Vote on Ana!", "Your turn to vote") and a sound unless muted, when you are woken up,
    receive an info card, a nomination starts or the vote reaches you. Phones also vibrate
    (not iPhones: their browser doesn't support it); on a computer, the tab title can flag it
