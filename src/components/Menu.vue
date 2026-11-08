@@ -33,7 +33,6 @@
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
     </span>
-    <VoiceMenu v-if="voice.isAvailable && session.sessionId" />
     <span
       class="reference"
       @click="toggleModal('reference')"
@@ -328,12 +327,8 @@
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
-import VoiceMenu from "./VoiceMenu";
 
 export default {
-  components: {
-    VoiceMenu,
-  },
   computed: {
     showSendCharacters: function () {
       return (

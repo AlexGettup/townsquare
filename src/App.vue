@@ -39,7 +39,7 @@
     <VoteHistoryModal />
     <GameStateModal />
     <Gradients />
-    <VoiceConversations />
+    <VoiceCorner />
     <VoicePrompts />
     <ChatPanel />
     <span id="version">v{{ version }}</span>
@@ -62,13 +62,13 @@ import NightOrderModal from "./components/modals/NightOrderModal";
 import NpcModal from "@/components/modals/NpcModal";
 import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import GameStateModal from "@/components/modals/GameStateModal";
-import VoiceConversations from "@/components/VoiceConversations";
+import VoiceCorner from "@/components/VoiceCorner";
 import VoicePrompts from "@/components/VoicePrompts";
 import ChatPanel from "@/components/ChatPanel";
 
 export default {
   components: {
-    VoiceConversations,
+    VoiceCorner,
     VoicePrompts,
     ChatPanel,
     GameStateModal,

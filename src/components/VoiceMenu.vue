@@ -273,8 +273,9 @@ export default {
   display: inline-block;
   position: relative;
   vertical-align: top;
-  margin-left: 10px;
   text-align: left;
+  // the dropdown opens over the conversations panel below
+  z-index: 2;
 }
 
 // boxed like the options cog
@@ -325,11 +326,11 @@ export default {
   }
 }
 
-// dropdown, unfolding like the options menu
+// dropdown, unfolding like the options menu (mirrored: we are on the left)
 ul {
   position: absolute;
   top: 43px;
-  right: 0;
+  left: 0;
   width: 220px;
   display: flex;
   flex-direction: column;
@@ -339,9 +340,9 @@ ul {
   overflow: hidden;
   box-shadow: 0 0 10px black;
   border: 3px solid black;
-  border-radius: 10px 0 10px 10px;
-  transform-origin: 100% 0;
-  transform: rotate(-90deg);
+  border-radius: 0 10px 10px 10px;
+  transform-origin: 0 0;
+  transform: rotate(90deg);
   opacity: 0;
   pointer-events: none;
   transition:

@@ -131,19 +131,16 @@ export default {
 <style scoped lang="scss">
 @import "../vars.scss";
 
-// same look as the demon bluffs / NPC panels
+// same look as the demon bluffs / NPC panels; placed below the voice
+// button by VoiceCorner
 .conversations {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+  z-index: 1;
   width: 260px;
   max-width: 40vw;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   border: 3px solid black;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
-  z-index: 50;
   transition: all 200ms ease-in-out;
 
   h3 {

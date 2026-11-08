@@ -396,9 +396,41 @@ export default {
             left: 100%;
           }
         }
+        // small screens: no room on the right, so "other nights" opens
+        // to the left too
+        @media screen and (max-width: 991.98px) {
+          .night-order.other .description {
+            left: auto;
+            right: 120%;
+            &:after {
+              right: auto;
+              left: 100%;
+              margin-right: 0;
+              margin-left: 3px;
+              border-right-color: transparent;
+              border-left-color: $demon;
+            }
+          }
+        }
       } @else {
         // second half of players
         z-index: $i - 1;
+        // small screens: no room on the left, so "first night" opens to
+        // the right too
+        @media screen and (max-width: 991.98px) {
+          .night-order.first .description {
+            right: auto;
+            left: 120%;
+            &:after {
+              left: auto;
+              right: 100%;
+              margin-left: 0;
+              margin-right: 3px;
+              border-left-color: transparent;
+              border-right-color: $townsfolk;
+            }
+          }
+        }
       }
 
       > * {
@@ -444,11 +476,14 @@ export default {
   position: absolute;
   &.bluffs {
     bottom: 10px;
+    left: 10px;
   }
+  // top right, below the menu (the top left corner is for voice chat)
   &.npcs {
-    top: 10px;
+    top: 55px;
+    right: 10px;
+    transform-origin: top right;
   }
-  left: 10px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   border: 3px solid black;
@@ -539,6 +574,18 @@ export default {
 #townsquare.public > .bluffs {
   opacity: 0;
   transform: scale(0.1);
+}
+
+// the NPC panel sits on the right edge: show the ability tooltip on the left
+.npcs ul li .token .ability {
+  right: 120%;
+  left: auto;
+  &:before {
+    border-right-color: transparent;
+    border-left-color: black;
+    right: auto;
+    left: 100%;
+  }
 }
 
 .npcs ul li .token:before {
@@ -687,18 +734,19 @@ export default {
     opacity: 1;
   }
 
-  // adjustment for npcs
-  .npcs &.first {
+  // adjustment for npcs: they sit on the right edge, so the "other nights"
+  // description opens to the left
+  .npcs &.other {
     .description {
-      right: auto;
-      left: 40px;
+      left: auto;
+      right: 40px;
       &:after {
-        left: auto;
-        right: 100%;
-        margin-left: 0;
-        margin-right: 3px;
-        border-left-color: transparent;
-        border-right-color: $townsfolk;
+        right: auto;
+        left: 100%;
+        margin-right: 0;
+        margin-left: 3px;
+        border-right-color: transparent;
+        border-left-color: $demon;
       }
     }
   }
