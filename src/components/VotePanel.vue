@@ -24,7 +24,7 @@
           @click="vote(1)"
         >
           <font-awesome-icon icon="hand-paper" />
-          {{ $t("vote.yes") }}
+          {{ me.player.hasTwoVotes ? $t("vote.yesOnce") : $t("vote.yes") }}
         </button>
         <button
           class="choice yes"
@@ -33,7 +33,8 @@
           :disabled="isLocked"
           @click="vote(2)"
         >
-          ×2
+          <font-awesome-icon icon="sign-language" />
+          {{ $t("vote.yesTwice") }}
         </button>
         <button
           class="choice no"
@@ -50,6 +51,9 @@
         <strong :class="myVote ? 'yes' : 'no'">{{ myVoteName }}</strong>
       </p>
       <p class="status" v-if="status">{{ status }}</p>
+      <p class="hint" v-if="me.player.hasTwoVotes && !isLocked">
+        {{ $t("vote.twoVotesHint") }}
+      </p>
       <p class="hint" v-if="me.player.isDead && !isLocked">
         {{ $t("vote.ghostVoteHint") }}
       </p>

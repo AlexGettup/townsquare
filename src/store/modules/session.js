@@ -30,7 +30,6 @@ const state = () => ({
   markedPlayer: -1,
   isVoteHistoryAllowed: true,
   isVoteWatchingAllowed: true,
-  isTwoVotesEnabled: false,
   isRolesDistributed: false,
   messages: [],
 });
@@ -58,7 +57,6 @@ const mutations = {
   setAllowSelfNaming: set("allowSelfNaming"),
   setVoteHistoryAllowed: set("isVoteHistoryAllowed"),
   setVoteWatchingAllowed: set("isVoteWatchingAllowed"),
-  setTwoVotesEnabled: set("isTwoVotesEnabled"),
   claimSeat: set("claimedSeat"),
   distributeRoles: set("isRolesDistributed"),
   setSessionId(state, sessionId) {
@@ -88,9 +86,14 @@ const mutations = {
     if (!state.nomination || state.lockedVote <= players.length) return;
     const isExile = players[state.nomination[1]].role.team === "traveller";
     const votes = [];
+    let count = 0;
     for (var i = 0; i < players.length; i++) {
-      for (var j = 0; j < state.votes[i]; j++) {
-        votes.push(players[i].name);
+      const vote = state.votes[i] === true ? 1 : state.votes[i] || 0;
+      const weight = players[i].voteWeight || 1;
+      count += vote * weight;
+      // a Thief's target counts against: listed with a minus sign
+      for (var j = 0; j < vote * Math.abs(weight); j++) {
+        votes.push(weight < 0 ? "−" + players[i].name : players[i].name);
       }
     }
 
@@ -103,6 +106,7 @@ const mutations = {
         players.filter((player) => !player.isDead || isExile).length / 2,
       ),
       votes: votes,
+      count: count,
     });
   },
   clearVoteHistory(state) {

@@ -293,6 +293,13 @@ export default new Vuex.Store({
           // only touch set marks: assigning a missing key would not be reactive
           if (player.hasNominated) player.hasNominated = false;
           if (player.wasNominated) player.wasNominated = false;
+          if (
+            grimoire.isNight &&
+            player.voteWeight &&
+            player.voteWeight !== 1
+          ) {
+            player.voteWeight = 1;
+          }
         });
       }
     },

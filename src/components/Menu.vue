@@ -247,16 +247,6 @@
                   ]"
               /></em>
             </li>
-            <li v-if="!session.isSpectator" @click="setTwoVotes">
-              {{ $t("menu.votingTwice") }}
-              <em
-                ><font-awesome-icon
-                  :icon="[
-                    'fas',
-                    session.isTwoVotesEnabled ? 'check-square' : 'square',
-                  ]"
-              /></em>
-            </li>
             <li @click="leaveSession">
               {{ $t("menu.leaveSession") }}
               <em><font-awesome-icon icon="sign-out-alt" /></em>
@@ -508,26 +498,6 @@ export default {
         "session/setAllowSelfNaming",
         !this.session.allowSelfNaming,
       );
-    },
-    setTwoVotes() {
-      if (this.session.isSpectator) return;
-      this.$store.commit(
-        "session/setTwoVotesEnabled",
-        !this.session.isTwoVotesEnabled,
-      );
-
-      if (!this.session.isTwoVotesEnabled) {
-        // Disable two votes for all players
-        this.players.forEach((player) => {
-          if (player.hasTwoVotes) {
-            this.$store.commit("players/update", {
-              player: player,
-              property: "hasTwoVotes",
-              value: false,
-            });
-          }
-        });
-      }
     },
     setVoteWatching() {
       if (this.session.isSpectator) return;

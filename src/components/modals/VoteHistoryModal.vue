@@ -63,7 +63,7 @@
             }}
           </td>
           <td>
-            {{ vote.votes.length }}
+            {{ countOf(vote) }}
             <font-awesome-icon icon="hand-paper" />
           </td>
           <td>
@@ -71,7 +71,7 @@
             <font-awesome-icon
               :icon="[
                 'fas',
-                vote.votes.length >= vote.majority ? 'check-square' : 'square',
+                countOf(vote) >= vote.majority ? 'check-square' : 'square',
               ]"
             />
           </td>
@@ -96,6 +96,10 @@ export default {
     ...mapState(["session", "modals"]),
   },
   methods: {
+    // votes after Bureaucrat / Thief (older entries: one per hand)
+    countOf(vote) {
+      return vote.count !== undefined ? vote.count : vote.votes.length;
+    },
     clearVoteHistory() {
       this.$store.commit("session/clearVoteHistory");
     },

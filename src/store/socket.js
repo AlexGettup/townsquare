@@ -569,7 +569,8 @@ class LiveSession {
       this._isSpectator ||
       property === "reminders" ||
       property === "hasResponded" ||
-      property === "alignmentIndex"
+      property === "alignmentIndex" ||
+      property === "voteWeight"
     )
       return;
     const index = this._store.state.players.players.indexOf(player);

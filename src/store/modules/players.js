@@ -9,6 +9,8 @@ const NEWPLAYER = {
   reminders: [],
   isVoteless: false,
   hasTwoVotes: false,
+  // storyteller only, never sent to players: 3 (Bureaucrat), -1 (Thief)
+  voteWeight: 1,
   hasResponded: {},
   isDead: false,
   handRaised: false,

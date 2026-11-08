@@ -157,6 +157,17 @@
         :title="$t('player.hasTwoVotes')"
       />
 
+      <!-- Vote weight (storyteller only): Bureaucrat x3, Thief -1 -->
+      <span
+        class="vote-weight"
+        v-if="
+          !session.isSpectator && player.voteWeight && player.voteWeight !== 1
+        "
+        @click="setVoteValue(1)"
+        :title="$t('player.voteValue', { value: voteValueName })"
+        >{{ player.voteWeight > 0 ? "×3" : "−1" }}</span
+      >
+
       <!-- Overlay icons -->
       <div class="overlay">
         <font-awesome-icon icon="hand-paper" class="hand" />
@@ -245,12 +256,9 @@
               <font-awesome-icon icon="venus-mars" />
               {{ $t("player.changePronouns") }}
             </li>
-            <li
-              @click="updatePlayer('hasTwoVotes', !player.hasTwoVotes, true)"
-              v-if="session.isTwoVotesEnabled"
-            >
+            <li @click="cycleVoteValue">
               <font-awesome-icon icon="sign-language" class="two-votes-icon" />
-              {{ $t("player.hasTwoVotesMenu") }}
+              {{ $t("player.voteValue", { value: voteValueName }) }}
             </li>
             <li @click="movePlayer()" :class="{ disabled: session.lockedVote }">
               <font-awesome-icon icon="redo-alt" />
@@ -448,6 +456,21 @@ export default {
     cardStatus: function () {
       if (this.session.isSpectator || !this.player.id) return null;
       return this.$store.getters["chat/cardStatusOf"](this.player.id);
+    },
+    // storyteller: how this player's vote counts (1, 2 Banshee, 3, -1)
+    voteValue: function () {
+      if (this.player.hasTwoVotes) return 2;
+      return this.player.voteWeight || 1;
+    },
+    voteValueName: function () {
+      const role = { 2: "banshee", 3: "bureaucrat", "-1": "thief" }[
+        this.voteValue
+      ];
+      const value = this.voteValue < 0 ? "−1" : "×" + this.voteValue;
+      if (!role) return value;
+      const json = this.$store.getters.rolesJSONbyId.get(role);
+      const name = json ? this.$store.getters.localizeRole(json).name : role;
+      return value + " · " + name;
     },
     // players: this seat is theirs
     isOwnSeat: function () {
@@ -734,6 +757,24 @@ export default {
       });
       if (closeMenu) {
         this.isMenuOpen = false;
+      }
+    },
+    // vote value from the "Seat" submenu: x1 → x2 → x3 → -1 → x1
+    cycleVoteValue() {
+      const values = [1, 2, 3, -1];
+      const next = values[(values.indexOf(this.voteValue) + 1) % values.length];
+      this.setVoteValue(next);
+    },
+    setVoteValue(value) {
+      // x2 (Banshee) is public: players see it and choose 1 or 2 votes
+      const hasTwoVotes = value === 2;
+      if (!!this.player.hasTwoVotes !== hasTwoVotes) {
+        this.updatePlayer("hasTwoVotes", hasTwoVotes);
+      }
+      // x3 and -1 stay with the storyteller (they count it, players don't know)
+      const weight = value === 3 || value === -1 ? value : 1;
+      if ((this.player.voteWeight || 1) !== weight) {
+        this.updatePlayer("voteWeight", weight);
       }
     },
     // explicit death toggle in the menu (a double tap does it on touch screens)
@@ -1158,6 +1199,21 @@ li.move:not(.from) .player .overlay svg.move {
     opacity: 0;
     pointer-events: none;
   }
+}
+
+/****** Vote weight (Bureaucrat, Thief) ********/
+.player .vote-weight {
+  position: absolute;
+  margin-top: -100%;
+  right: -5px;
+  z-index: 2;
+  font-weight: bold;
+  font-size: 110%;
+  color: #fff;
+  text-shadow:
+    0 0 3px black,
+    0 0 3px black;
+  cursor: pointer;
 }
 
 /****** Session seat glow *****/
