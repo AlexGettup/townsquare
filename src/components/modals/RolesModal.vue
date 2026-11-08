@@ -44,9 +44,10 @@
     </label>
     <div class="bottom">
       <div class="button-group">
+        <!-- deal the characters in the grimoire only, without sending them
+             (to try a setup, or to hand out physical tokens) -->
         <div
           class="button"
-          v-if="isGardenerOrTorActive || grimoire.isMockAssignmentsAllowed"
           @click="assignRoles"
           :class="{
             disabled:

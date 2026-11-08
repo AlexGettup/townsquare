@@ -283,28 +283,6 @@
             {{ $t("menu.gameStateJson") }}
             <em><font-awesome-icon icon="file-code" /></em>
           </li>
-          <li @click="toggleMockAssignments">
-            {{ $t("menu.mockAssignments") }}
-            <em
-              ><font-awesome-icon
-                :icon="[
-                  'fas',
-                  grimoire.isMockAssignmentsAllowed ? 'check-square' : 'square',
-                ]"
-            /></em>
-          </li>
-          <li>
-            <small>
-              <a href="https://discord.gg/botc" target="_blank">
-                {{ $t("menu.discord") }}
-              </a>
-            </small>
-            <em>
-              <a href="https://discord.gg/botc" target="_blank">
-                <font-awesome-icon :icon="['fab', 'discord']" />
-              </a>
-            </em>
-          </li>
           <li @click="toggleModal('changelog')">
             {{ $t("menu.whatsNew") }}
             <em><font-awesome-icon icon="newspaper" /></em>
@@ -516,7 +494,6 @@ export default {
       "toggleMuted",
       "toggleNightOrder",
       "toggleStatic",
-      "toggleMockAssignments",
       "setZoom",
       "setLocale",
       "toggleModal",
