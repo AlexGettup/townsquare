@@ -124,6 +124,32 @@
     "clearConfirm": "Clear the chat history for everyone?",
     "privateConversation": "Private conversation"
   },
+  "cards": {
+    "send": "Send Information",
+    "title": "Information for {name}",
+    "card": "Information",
+    "phrase": "Phrase",
+    "text": "Text (optional)",
+    "characters": "Characters",
+    "players": "Players",
+    "number": "Number",
+    "answer": "Yes / No",
+    "none": "—",
+    "yes": "Yes",
+    "no": "No",
+    "sendButton": "Send",
+    "gotIt": "Got It",
+    "phrases": {
+      "youAre": "You are",
+      "thisIsTheDemon": "This is the Demon",
+      "theseAreYourMinions": "These are your Minions",
+      "notInPlay": "These characters are not in play",
+      "thisPlayerIs": "This player is",
+      "characterSelectedYou": "This character selected you",
+      "youLearn": "You learn",
+      "useAbility": "Do you want to use your ability?"
+    }
+  },
   "dialogs": {
     "backgroundUrl": "Enter custom background URL",
     "hostChannel": "Enter a channel number / name for your session",

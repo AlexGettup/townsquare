@@ -23,6 +23,10 @@ const state = () => ({
   unread: {},
   // last error from the server ("night"), shown for a few seconds
   error: "",
+  // info card on screen (a chat message with a card)
+  shownCard: null,
+  // storyteller: player ID we are writing an info card for
+  composingFor: null,
 });
 
 const getters = {
@@ -80,6 +84,15 @@ const mutations = {
   setError(state, error) {
     state.error = error;
   },
+  showCard(state, message) {
+    state.shownCard = message;
+  },
+  hideCard(state) {
+    state.shownCard = null;
+  },
+  composeCard(state, playerId) {
+    state.composingFor = playerId;
+  },
 };
 
 const actions = {
@@ -93,6 +106,11 @@ const actions = {
     } else {
       this.$chat.sendMessage(text, STORYTELLER);
     }
+  },
+  /** Storyteller only: send an info card to a player. */
+  sendCard({ rootGetters }, { to, card }) {
+    if (rootGetters["voice/selfPeerId"] !== STORYTELLER || !to) return;
+    this.$chat.sendCard(to, card);
   },
   /** Storyteller only: empty the chat for everyone. */
   clear({ rootGetters }) {

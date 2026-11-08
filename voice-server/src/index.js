@@ -108,6 +108,39 @@ const isConversation = (location) =>
 const MAX_MESSAGE_LENGTH = 500;
 const CHAT_HISTORY = 500;
 const isChat = (ws) => (ws.deserializeAttachment() || {}).kind === "chat";
+
+const shortString = (value, max) => String(value || "").slice(0, max);
+const listOf = (value, max, length) =>
+  (Array.isArray(value) ? value : [])
+    .slice(0, max)
+    .map((item) => shortString(item, length))
+    .filter(Boolean);
+
+/**
+ * Info card from the storyteller: a preset phrase and/or text, characters
+ * (role IDs), players (names) and a number or yes/no. Returns null if empty.
+ */
+const cleanCard = (card) => {
+  if (!card || typeof card !== "object") return null;
+  const clean = {
+    phrase: shortString(card.phrase, 40) || null,
+    text: shortString(card.text, 300).trim() || null,
+    roles: listOf(card.roles, 12, 60),
+    players: listOf(card.players, 20, 60),
+    number: Number.isInteger(card.number)
+      ? Math.max(0, Math.min(99, card.number))
+      : null,
+    answer: card.answer === "yes" || card.answer === "no" ? card.answer : null,
+  };
+  const empty =
+    !clean.phrase &&
+    !clean.text &&
+    !clean.roles.length &&
+    !clean.players.length &&
+    clean.number === null &&
+    !clean.answer;
+  return empty ? null : clean;
+};
 // clients connected before conversations existed lack these fields
 const withDefaults = (state) => ({
   location: PLAZA,
@@ -122,6 +155,7 @@ const chatMessage = (row) => ({
   from: row.sender,
   channel: row.channel,
   text: row.text,
+  card: row.card ? JSON.parse(row.card) : null,
 });
 
 /**
@@ -157,6 +191,12 @@ export class VoiceRoom {
         recipients TEXT NOT NULL
       )`,
     );
+    // info cards are chat messages with a card (added after the first version)
+    try {
+      this.sql.exec(`ALTER TABLE chat ADD COLUMN card TEXT`);
+    } catch (e) {
+      // the column exists already
+    }
     // microphones each client receives: one row per pulled track
     this.sql.exec(
       `CREATE TABLE IF NOT EXISTS pulls (
@@ -698,7 +738,12 @@ export class VoiceRoom {
         const text = String(message.text || "")
           .trim()
           .slice(0, MAX_MESSAGE_LENGTH);
-        if (!text) break;
+        // info cards: storyteller only, always private
+        const card =
+          isStoryteller && message.to !== undefined && message.to !== null
+            ? cleanCard(message.card)
+            : null;
+        if (!text && !card) break;
         let channel;
         let recipients;
         if (message.to !== undefined && message.to !== null) {
@@ -727,19 +772,20 @@ export class VoiceRoom {
         const at = Date.now();
         const { id } = this.sql
           .exec(
-            `INSERT INTO chat (at, sender, channel, text, recipients)
-             VALUES (?, ?, ?, ?, ?) RETURNING id`,
+            `INSERT INTO chat (at, sender, channel, text, recipients, card)
+             VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
             at,
             peerId,
             channel,
             text,
             JSON.stringify(recipients),
+            card ? JSON.stringify(card) : null,
           )
           .one();
         this.sql.exec(`DELETE FROM chat WHERE id <= ?`, id - CHAT_HISTORY);
         const out = {
           type: "chat",
-          message: { id, at, from: peerId, channel, text },
+          message: { id, at, from: peerId, channel, text, card },
         };
         this.chatSockets()
           .filter((socket) =>

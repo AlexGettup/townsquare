@@ -67,6 +67,11 @@ export default class ChatClient {
     this._send({ type: "chat", text, to });
   }
 
+  /** Storyteller only: send a player an info card (privately). */
+  sendCard(to, card) {
+    this._send({ type: "chat", text: "", to, card });
+  }
+
   clear() {
     this._send({ type: "clear-chat" });
   }

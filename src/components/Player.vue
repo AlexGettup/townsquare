@@ -208,6 +208,10 @@
             <font-awesome-icon icon="hand-paper" />
             {{ $t("player.raiseHand") }}
           </li>
+          <li @click="sendInfoCard" v-if="canSendInfoCard">
+            <font-awesome-icon icon="address-card" />
+            {{ $t("cards.send") }}
+          </li>
           <li @click="inviteToTalk" v-if="canInvite">
             <font-awesome-icon icon="user-plus" />
             {{ $t("voice.invite") }}
@@ -366,6 +370,15 @@ export default {
     ...mapState(["grimoire", "session", "voice"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
+    // storyteller: info cards go to seated players through the chat
+    canSendInfoCard: function () {
+      return (
+        !this.session.isSpectator &&
+        !!this.session.sessionId &&
+        !!this.player.id &&
+        this.voice.isAvailable
+      );
+    },
     // players can guess anyone's character, except travellers (public)
     canChangeRole: function () {
       return !(
@@ -585,6 +598,10 @@ export default {
     toggleAwakeVoice() {
       this.isMenuOpen = false;
       this.$store.dispatch("voice/toggleAwake", this.player.id);
+    },
+    sendInfoCard() {
+      this.isMenuOpen = false;
+      this.$store.commit("chat/composeCard", this.player.id);
     },
     inviteToTalk() {
       this.isMenuOpen = false;
