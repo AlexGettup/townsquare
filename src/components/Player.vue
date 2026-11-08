@@ -463,7 +463,31 @@ export default {
       isSwap: false,
     };
   },
+  watch: {
+    // only one player menu at a time: a click anywhere else closes it
+    // (the empty square, or another player to open their menu)
+    isMenuOpen(isOpen) {
+      if (isOpen) {
+        document.addEventListener("click", this.closeMenuOnOutsideClick, true);
+      } else {
+        document.removeEventListener(
+          "click",
+          this.closeMenuOnOutsideClick,
+          true,
+        );
+      }
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.closeMenuOnOutsideClick, true);
+  },
   methods: {
+    closeMenuOnOutsideClick(event) {
+      const player = this.$refs.player;
+      if (player && !player.contains(event.target)) {
+        this.isMenuOpen = false;
+      }
+    },
     formatNightReminder(text) {
       return text
         .replace(/\*(.*?)\*/g, "<b>$1</b>")
