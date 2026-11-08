@@ -326,10 +326,14 @@ class LiveSession {
     this._store.commit("session/setPing", 0);
     this._store.commit("session/setReconnecting", false);
     clearTimeout(this._reconnectTimer);
+    clearInterval(this._pingTimer);
+    this._pingTimer = null;
     if (this._socket) {
       if (this._isSpectator) {
         this._sendDirect("host", "bye", this._store.state.session.playerId);
       }
+      // its close event arrives later and must not touch a newer session
+      this._socket.onclose = null;
       this._socket.close(1000);
       this._socket = null;
     }
