@@ -104,43 +104,6 @@
           </div>
         </div>
       </template>
-      <template v-else-if="canVote">
-        <div v-if="!session.isVoteInProgress">
-          {{
-            $t("vote.secondsBetweenVotes", {
-              count: session.votingSpeed / 1000,
-            })
-          }}
-        </div>
-        <div class="button-group">
-          <div
-            class="button townsfolk"
-            @click="vote(0)"
-            :class="{ disabled: !currentVote }"
-          >
-            {{ $t("vote.handDown") }}
-          </div>
-          <div
-            class="button demon"
-            @click="vote(1)"
-            :class="{ disabled: currentVote === 1 }"
-          >
-            {{ $t("vote.handUp") }}
-          </div>
-          <div
-            class="button demon"
-            @click="vote(2)"
-            :class="{ disabled: currentVote === 2 }"
-            v-if="player.hasTwoVotes"
-          >
-            x2
-          </div>
-        </div>
-      </template>
-      <div v-else-if="!player">{{ $t("vote.claimSeatToVote") }}</div>
-      <div v-else-if="!player.connected">
-        {{ $t("vote.reclaimSeatToVote") }}
-      </div>
     </div>
     <transition name="blur">
       <div

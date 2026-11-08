@@ -30,6 +30,7 @@
       <Vote v-if="session.nomination" ref="vote"></Vote>
     </transition>
     <TownSquare></TownSquare>
+    <VotePanel v-if="session.nomination" />
     <Menu ref="menu"></Menu>
     <EditionModal />
     <NpcModal />
@@ -61,6 +62,7 @@ import EditionModal from "./components/modals/EditionModal";
 import Intro from "./components/Intro";
 import ReferenceModal from "./components/modals/ReferenceModal";
 import Vote from "./components/Vote";
+import VotePanel from "./components/VotePanel";
 import Gradients from "./components/Gradients";
 import NightOrderModal from "./components/modals/NightOrderModal";
 import NpcModal from "@/components/modals/NpcModal";
@@ -88,6 +90,7 @@ export default {
     NpcModal,
     NightOrderModal,
     Vote,
+    VotePanel,
     ReferenceModal,
     Intro,
     TownInfo,
