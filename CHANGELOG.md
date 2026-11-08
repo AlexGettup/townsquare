@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.4.0
+- The text chat is open by default
+- On phones the chat is compact (the last few lines) and grows while typing
+
 ### Version 3.3.1
 - Fixed players losing their seat and missing their character after switching apps on a phone: the seat is restored automatically when they come back, and the storyteller sends them the character they were dealt
 
