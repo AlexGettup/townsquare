@@ -5,3 +5,5 @@ tmp
 *.pem
 .DS_Store
 src/assets/icons
+# personal Claude Code context (not shared)
+CLAUDE.local.md
