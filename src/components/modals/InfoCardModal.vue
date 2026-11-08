@@ -1,6 +1,7 @@
 <template>
   <Modal class="info-card-modal" v-if="chat.shownCard" @close="close">
     <InfoCard :card="chat.shownCard.card" />
+    <p class="hint" v-if="isChoice">{{ $t("cards.choiceHint") }}</p>
     <div class="button-group">
       <div class="button townsfolk" @click="close">
         {{ $t("cards.gotIt") }}
@@ -19,10 +20,15 @@ export default {
   components: { Modal, InfoCard },
   computed: {
     ...mapState(["chat"]),
+    // the player answers a "choose…" card in the private chat
+    isChoice: function () {
+      const { phrase } = this.chat.shownCard.card;
+      return !!phrase && phrase.startsWith("choose");
+    },
   },
   methods: {
     close() {
-      this.$store.commit("chat/hideCard");
+      this.$store.dispatch("chat/closeCard");
     },
   },
 };
@@ -31,9 +37,16 @@ export default {
 <style scoped lang="scss">
 .info-card-modal :deep(.modal) {
   overflow-y: auto;
-  padding: 20px 30px;
+  // room for the maximize and close buttons in the top right corner
+  padding: 45px 30px 20px;
 }
 .button-group {
   margin-top: 15px;
+}
+.hint {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 85%;
+  color: lightgray;
 }
 </style>

@@ -6,7 +6,8 @@ const RECONNECT_DELAY = 3000;
  * doesn't need the microphone: everyone in a live session is connected.
  *
  * Server messages: history (on connect), chat (a new message), cleared
- * (the storyteller emptied the chat) and chat-error.
+ * (the storyteller emptied the chat), card-seen (a player saw an info
+ * card) and chat-error.
  */
 export default class ChatClient {
   constructor({
@@ -16,6 +17,7 @@ export default class ChatClient {
     onMessage,
     onCleared,
     onError,
+    onSeen,
   }) {
     this.serverUrl = serverUrl;
     this.onStatus = onStatus;
@@ -23,6 +25,7 @@ export default class ChatClient {
     this.onMessage = onMessage;
     this.onCleared = onCleared;
     this.onError = onError;
+    this.onSeen = onSeen;
     this.socket = null;
     this.target = null;
     this.night = null;
@@ -72,6 +75,11 @@ export default class ChatClient {
     this._send({ type: "chat", text: "", to, card });
   }
 
+  /** Player: tell the storyteller we saw an info card. */
+  markSeen(id) {
+    this._send({ type: "card-seen", id });
+  }
+
   clear() {
     this._send({ type: "clear-chat" });
   }
@@ -113,6 +121,9 @@ export default class ChatClient {
           break;
         case "cleared":
           this.onCleared();
+          break;
+        case "card-seen":
+          this.onSeen(message.id, message.seen);
           break;
         case "chat-error":
           this.onError(message.reason);

@@ -156,6 +156,7 @@ const chatMessage = (row) => ({
   channel: row.channel,
   text: row.text,
   card: row.card ? JSON.parse(row.card) : null,
+  seen: row.seen || null,
 });
 
 /**
@@ -194,6 +195,12 @@ export class VoiceRoom {
     // info cards are chat messages with a card (added after the first version)
     try {
       this.sql.exec(`ALTER TABLE chat ADD COLUMN card TEXT`);
+    } catch (e) {
+      // the column exists already
+    }
+    // when the player said they saw an info card
+    try {
+      this.sql.exec(`ALTER TABLE chat ADD COLUMN seen INTEGER`);
     } catch (e) {
       // the column exists already
     }
@@ -794,11 +801,30 @@ export class VoiceRoom {
         this.sql.exec(`DELETE FROM chat WHERE id <= ?`, id - CHAT_HISTORY);
         const out = {
           type: "chat",
-          message: { id, at, from: peerId, channel, text, card },
+          message: { id, at, from: peerId, channel, text, card, seen: null },
         };
         this.chatSockets()
           .filter((socket) =>
             recipients.includes(socket.deserializeAttachment().peerId),
+          )
+          .forEach((socket) => this.send(socket, out));
+        break;
+      }
+      case "card-seen": {
+        // a player saw an info card: the storyteller gets a tick
+        const row = this.sql
+          .exec(`SELECT * FROM chat WHERE id = ?`, Number(message.id) || 0)
+          .toArray()[0];
+        if (!row || !row.card || row.seen) break;
+        if (row.channel !== "dm:" + peerId) break;
+        const seen = Date.now();
+        this.sql.exec(`UPDATE chat SET seen = ? WHERE id = ?`, seen, row.id);
+        const out = { type: "card-seen", id: row.id, seen };
+        this.chatSockets()
+          .filter((socket) =>
+            [STORYTELLER, peerId].includes(
+              socket.deserializeAttachment().peerId,
+            ),
           )
           .forEach((socket) => this.send(socket, out));
         break;
