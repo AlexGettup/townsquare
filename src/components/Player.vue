@@ -550,15 +550,18 @@ export default {
         return;
       }
       if (this.tapTimer) {
-        // second tap: double tap
+        // second tap: a double tap, undo the menu of the first tap
         clearTimeout(this.tapTimer);
         this.tapTimer = null;
+        this.isMenuOpen = this.menuBeforeTap;
         this.toggleStatus();
         return;
       }
+      // first tap: the menu reacts at once, a second tap may still follow
+      this.menuBeforeTap = this.isMenuOpen;
+      this.isMenuOpen = !this.isMenuOpen;
       this.tapTimer = setTimeout(() => {
         this.tapTimer = null;
-        this.isMenuOpen = !this.isMenuOpen;
       }, 300);
     },
     closeMenuOnOutsideClick(event) {
