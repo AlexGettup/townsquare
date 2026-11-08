@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.6.1
+- Fixed the info card windows being wider than the screen on phones (they could be scrolled sideways)
+
 ### Version 3.6.0
 - Info cards: the storyteller can send a player what they learn (a phrase such as "You are" or "This is the Demon", text, characters, players, a number or yes/no) from the player menu; it pops up on the player's screen and stays in the private chat
 - Choice cards ("Choose a player", "Choose 2 players", "Choose a character"): the player answers in the private chat
