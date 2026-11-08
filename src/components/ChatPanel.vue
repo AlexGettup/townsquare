@@ -47,12 +47,6 @@
           :class="{ mine: message.from === selfPeerId }"
         >
           <small class="time">{{ time(message.at) }}</small>
-          <small
-            v-if="chat.tab === placeTab && message.channel !== 'plaza'"
-            class="place"
-            :style="{ color: placeColor(message.channel) }"
-            >[{{ messagePlace(message) }}]</small
-          >
           <b>{{ peerName(message.from) }}:</b>
           <a
             v-if="message.card"
@@ -95,7 +89,7 @@
 import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
 import { PLACE_TAB } from "../store/modules/chat";
-import { STORYTELLER, isConversation } from "../store/modules/voice";
+import { STORYTELLER } from "../store/modules/voice";
 
 /**
  * Text chat panel (bottom right): what is said around us, and the private
@@ -106,7 +100,6 @@ export default {
   data() {
     return {
       text: "",
-      placeTab: PLACE_TAB,
     };
   },
   computed: {
@@ -202,12 +195,6 @@ export default {
       }
       if (card.answer) parts.push(this.$t(`cards.${card.answer}`));
       return parts.length ? "— " + parts.join(" · ") : "";
-    },
-    messagePlace({ channel }) {
-      if (isConversation(channel)) {
-        return this.placeName(channel) || this.$t("chat.privateConversation");
-      }
-      return this.$t(`voice.places.${channel}`);
     },
     time(at) {
       return new Date(at).toLocaleTimeString(this.grimoire.locale, {
@@ -339,9 +326,6 @@ export default {
   }
   .time {
     color: gray;
-    margin-right: 4px;
-  }
-  .place {
     margin-right: 4px;
   }
   .card-link {
