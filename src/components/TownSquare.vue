@@ -444,11 +444,14 @@ export default {
   position: absolute;
   &.bluffs {
     bottom: 10px;
+    left: 10px;
   }
+  // top right, below the menu (the top left corner is for voice chat)
   &.npcs {
-    top: 10px;
+    top: 55px;
+    right: 10px;
+    transform-origin: top right;
   }
-  left: 10px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   border: 3px solid black;
@@ -687,18 +690,19 @@ export default {
     opacity: 1;
   }
 
-  // adjustment for npcs
-  .npcs &.first {
+  // adjustment for npcs: they sit on the right edge, so the "other nights"
+  // description opens to the left
+  .npcs &.other {
     .description {
-      right: auto;
-      left: 40px;
+      left: auto;
+      right: 40px;
       &:after {
-        left: auto;
-        right: 100%;
-        margin-left: 0;
-        margin-right: 3px;
-        border-left-color: transparent;
-        border-right-color: $townsfolk;
+        right: auto;
+        left: 100%;
+        margin-right: 0;
+        margin-left: 3px;
+        border-right-color: transparent;
+        border-left-color: $demon;
       }
     }
   }
