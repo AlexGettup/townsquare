@@ -92,7 +92,8 @@ botc.app has something similar.
 
 ### Translation
 
-- [x] Red Herring reminder: "Señuelo" everywhere (the official data said "Pista falsa" on the token but "SEÑUELO" in the night text)
+- [ ] Red Herring reminder: official data says "Pista falsa" (token) but "SEÑUELO" (night text).
+      "Señuelo" was offered as an override and not confirmed; ask before changing.
 
 ## Notes
 
