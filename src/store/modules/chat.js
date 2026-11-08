@@ -7,7 +7,7 @@
  * between a player and the storyteller. The panel shows them in tabs:
  * "place" (everything said around us) and one tab per private channel.
  */
-import { STORYTELLER } from "./voice";
+import { PLAZA, STORYTELLER } from "./voice";
 
 export const PLACE_TAB = "place";
 export const dmTab = (playerId) => "dm:" + playerId;
@@ -34,8 +34,18 @@ const state = () => ({
 
 const getters = {
   isConnected: (state) => state.status === "connected",
-  messagesOf: (state) => (tab) =>
-    state.messages.filter((message) => tabOf(message) === tab),
+  // where we are for the chat: our voice place, or the plaza without voice
+  currentPlace: (state, getters, rootState, rootGetters) =>
+    rootGetters["voice/isConnected"] ? rootState.voice.location : PLAZA,
+  // the place tab only shows what was said where we are now (the plaza, a
+  // room or a private conversation), not the places we were before
+  messagesOf: (state, getters) => (tab) =>
+    state.messages.filter((message) =>
+      tab === PLACE_TAB
+        ? tabOf(message) === PLACE_TAB &&
+          message.channel === getters.currentPlace
+        : tabOf(message) === tab,
+    ),
   /**
    * Private tabs: a player only talks with the storyteller; the storyteller
    * has one per seated player (and anyone else who wrote to them).
