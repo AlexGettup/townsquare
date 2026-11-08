@@ -30,25 +30,32 @@ computer. Marked *(official)* when botc.app has something similar.
 The order to build in, across all the sections below (which are the full catalogue). Ranked by
 **instinctive use** (it works where people already look or tap, with nothing to learn) and
 **UX clarity** (it removes doubts instead of adding a new place to check), then by value for a
-game without Discord and by cost.
+game without Discord and by cost. **Computers and phones count the same**: about half the
+players use each, so a feature that only helps one of them is worth half as much.
 
-1. **Ability in the player menu** (For players): cheap, and answers "what does this character
-   do?" on touch screens, where there is no hover.
-2. **Alerts** (For players): vibration and an on-screen notice, so phone players don't miss
-   being woken up, an info card or their vote.
+1. **Alerts** (For players): an on-screen notice and a sound when you are woken up, get an info
+   card, a nomination starts or it's your turn to vote; the phone also vibrates. Helps both:
+   on a computer the game is often in a background tab.
+2. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
+   a slider next to their name needs no explanation.
 3. **Choose targets on screen** (Night without talking): players tap seats instead of typing
    their choice in the chat; the last big gap for a silent night.
-4. **Notes per player** (For players): the biggest gap for playing without paper.
-5. **Day and night counter** (For players): passive context for everyone, and labels for the
+4. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+5. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+   the wrong one (headset + separate mic); cheap. Phones choose it themselves.
+6. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+   so today the ability is hard to reach. Computers already show it on hover.
+7. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-6. **Minion and demon info** (Night without talking): one button instead of several cards on
+8. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-7. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters and the
-   info cards sent when the page is reloaded mid-game.
-8. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
-   storyteller explaining it out loud.
+9. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters and
+   the info cards sent when the page is reloaded mid-game.
+10. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+    storyteller explaining it out loud.
 
-After these: game diary, guided night, own live session server, and the rest of the catalogue.
+After these: game diary, push-to-talk, guided night, own live session server, and the rest of
+the catalogue.
 
 ### Phones and tablets
 
@@ -90,26 +97,26 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 | # | Feature | Instinctive | Clarity | Value | Cost |
 |---|---------|:-----------:|:-------:|:-----:|:----:|
-| 1 | Ability in the player menu | ●●●●● | ●●●●● | ●●●○○ | Low |
-| 2 | Alerts (vibration + on-screen notice) | ●●●●● | ●●●●○ | ●●●●○ | Low |
-| 3 | Notes per player | ●●●○○ | ●●●●○ | ●●●●● | Medium |
+| 1 | Alerts (on-screen notice, sound, vibration) | ●●●●● | ●●●●○ | ●●●●○ | Low |
+| 2 | Notes per player | ●●●○○ | ●●●●○ | ●●●●● | Medium |
+| 3 | Ability in the player menu | ●●●●● | ●●●●● | ●●○○○ | Low |
 | 4 | Day and night counter | ●●●●● | ●●●●○ | ●●○○○ | Low |
 | 5 | Game diary | ●●●○○ | ●●●●○ | ●●●○○ | Medium |
 | 6 | Claims on the reference sheet | ●●○○○ | ●●●○○ | ●●○○○ | Medium |
 
-1. [ ] **Ability in the player menu**: the menu header (the bottom panel on phones) already shows
-   the name and character; add the ability text. Tapping your own token answers "what does my
-   character do?" right where you look, and tapping another token explains the character you
-   think they are. On touch screens there is no hover, so today the ability is hard to reach.
-2. [ ] **Alerts**: the phone vibrates and a short notice shows on screen ("The Storyteller woke
-   you up", "New information", "Vote on Ana!", "Your turn to vote") when you are woken up,
-   receive an info card, a nomination starts or the vote reaches you. Nothing to learn: it
-   comes to the player. iPhones don't support vibration in the browser, so the on-screen
-   notice (and a sound unless muted) is the part everyone gets.
-3. [ ] **Notes per player** *(official)*: a "Notes" entry in the player menu with free text
+1. [ ] **Alerts**: a short notice on screen ("The Storyteller woke you up", "New information",
+   "Vote on Ana!", "Your turn to vote") and a sound unless muted, when you are woken up,
+   receive an info card, a nomination starts or the vote reaches you. Phones also vibrate
+   (not iPhones: their browser doesn't support it); on a computer, the tab title can flag it
+   while the game is in the background. Nothing to learn: it comes to the player.
+2. [ ] **Notes per player** *(official)*: a "Notes" entry in the player menu with free text
    ("claims Chef, saw a 1"), and a small icon on the token when it has a note, so they are
    found again at a glance. Only visible to you and saved on your device. The biggest gap for
-   playing without paper, but it has to be discovered: it ranks below the passive features.
+   playing without paper, but it has to be discovered.
+3. [ ] **Ability in the player menu**: the bottom panel on touch screens already shows the name
+   and character; add the ability text. Tapping your own token answers "what does my
+   character do?" right where you look, and tapping another token explains the character you
+   think they are. Only for touch screens: computers already show it on hover.
 4. [ ] **Day and night counter**: "Day 3" / "Night 2" instead of only day or night, synced from
    the storyteller. Passive and clear; also gives the diary and the notes a reference.
 5. [ ] **Game diary**: everything you learnt, night by night ("Night 1: you are the Empath;
@@ -130,8 +137,10 @@ Ranked with the same criteria as the [next steps](#next-steps).
 ### Voice chat
 
 - [ ] **Push-to-talk**: the microphone only sends while a key or an on-screen button is held.
-      Useful with background noise and on phones.
+      Useful with background noise; optional, since it has to be learnt (and holding a button
+      while talking is awkward on a phone).
 - [ ] **Volume per person**: a slider for each participant (some people sound too loud or too quiet).
+      iPhones don't let a web page change an audio element's volume: route it through Web Audio.
 - [ ] **Choose microphone and speaker**: pick the input/output device (headphones + separate mic).
 - [ ] **Video**: optional camera with thumbnails on the seats. Estimated ~15 GB per hour for
       11 people at ~300 kbps, well inside the Cloudflare Realtime free tier (1,000 GB/month).
