@@ -308,6 +308,28 @@ export default {
   }
 }
 
+// phones: a smaller panel, so it doesn't cover the town square
+@media screen and (max-width: 767.98px), screen and (max-height: 500px) {
+  .chat {
+    width: 250px;
+    bottom: 20px;
+  }
+  .messages {
+    height: 18vh;
+    font-size: 75%;
+  }
+  .tabs {
+    font-size: 70%;
+  }
+  .input {
+    margin: 4px;
+    input {
+      font-size: 75%;
+      padding: 2px 6px;
+    }
+  }
+}
+
 .notice {
   margin: 4px 8px 0;
   font-size: 80%;
