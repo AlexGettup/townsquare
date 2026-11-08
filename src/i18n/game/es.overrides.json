@@ -7,6 +7,8 @@
       "name": "Información de los Esbirros"
     }
   },
-  "reminders": {},
+  "reminders": {
+    "redherring": "Señuelo"
+  },
   "jinxes": {}
 }
