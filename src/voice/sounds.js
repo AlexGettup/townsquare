@@ -40,6 +40,15 @@ export const playGatherBell = () => {
   strike(ctx, now + 0.9, 659);
 };
 
+/** Two rising notes: something needs the player (woken up, their vote). */
+export const playAlert = () => {
+  const ctx = getContext();
+  if (!ctx) return;
+  const now = ctx.currentTime + 0.05;
+  strike(ctx, now, 784);
+  strike(ctx, now + 0.18, 1175);
+};
+
 /** Soft chime: an invitation or a request to join. */
 export const playChime = () => {
   const ctx = getContext();

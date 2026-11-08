@@ -125,6 +125,9 @@
     "clearConfirm": "Clear the chat history for everyone?",
     "privateConversation": "Private conversation"
   },
+  "alerts": {
+    "newInfo": "New information"
+  },
   "cards": {
     "send": "Send Information",
     "title": "Information for {name}",
@@ -250,6 +253,7 @@
     "handUp": "Hand UP",
     "claimSeatToVote": "Please claim a seat to vote.",
     "reclaimSeatToVote": "Please reclaim your seat to vote.",
+    "yourTurn": "Your turn to vote!",
     "go": "GO"
   },
   "modals": {

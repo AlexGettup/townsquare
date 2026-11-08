@@ -42,6 +42,7 @@
     <Gradients />
     <VoiceCorner />
     <VoicePrompts />
+    <AlertNotices />
     <ChatPanel />
     <InfoCardModal />
     <InfoCardComposer />
@@ -68,6 +69,7 @@ import GameStateModal from "@/components/modals/GameStateModal";
 import ChangelogModal from "@/components/modals/ChangelogModal";
 import VoiceCorner from "@/components/VoiceCorner";
 import VoicePrompts from "@/components/VoicePrompts";
+import AlertNotices from "@/components/AlertNotices";
 import ChatPanel from "@/components/ChatPanel";
 import InfoCardModal from "@/components/modals/InfoCardModal";
 import InfoCardComposer from "@/components/modals/InfoCardComposer";
@@ -76,6 +78,7 @@ export default {
   components: {
     VoiceCorner,
     VoicePrompts,
+    AlertNotices,
     ChatPanel,
     InfoCardModal,
     InfoCardComposer,
