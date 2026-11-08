@@ -58,6 +58,8 @@
     "nightOrderSheet": "Night Order Sheet",
     "gameStateJson": "Game State JSON",
     "whatsNew": "What's New",
+    "settings": "Settings",
+    "copySessionCode": "Copy Session Code",
     "sourceCode": "Source Code"
   },
   "voice": {

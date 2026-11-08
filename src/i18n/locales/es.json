@@ -58,6 +58,8 @@
     "nightOrderSheet": "Hoja de orden de noche",
     "gameStateJson": "Estado de partida (JSON)",
     "whatsNew": "Novedades",
+    "settings": "Ajustes",
+    "copySessionCode": "Copiar código de sesión",
     "sourceCode": "Código fuente"
   },
   "voice": {

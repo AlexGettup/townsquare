@@ -22,7 +22,7 @@
           session.isSpectator && !!voice.speaking.host && canHearVoice('host'),
       }"
       v-if="session.sessionId"
-      @click="leaveSession"
+      @click="openTab('session')"
       :title="
         $t('menu.sessionPlayers', { count: session.playerCount }) +
         (session.ping
@@ -32,6 +32,17 @@
     >
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
+    </span>
+    <span
+      class="day-night"
+      v-if="!session.isSpectator"
+      @click="toggleNight"
+      :title="
+        (grimoire.isNight ? $t('menu.switchToDay') : $t('menu.switchToNight')) +
+        ' [S]'
+      "
+    >
+      <font-awesome-icon :icon="grimoire.isNight ? 'sun' : 'moon'" />
     </span>
     <span
       class="reference"
@@ -44,15 +55,37 @@
       <font-awesome-icon icon="cog" @click="toggleMenu" />
       <ul>
         <li class="tabs" :class="tab">
-          <font-awesome-icon icon="book-open" @click="tab = 'grimoire'" />
-          <font-awesome-icon icon="broadcast-tower" @click="tab = 'session'" />
+          <font-awesome-icon
+            icon="book-open"
+            :title="$t('menu.grimoire')"
+            @click="tab = 'grimoire'"
+          />
+          <font-awesome-icon
+            icon="broadcast-tower"
+            :title="$t('menu.liveSession')"
+            @click="tab = 'session'"
+          />
           <font-awesome-icon
             icon="users"
             v-if="!session.isSpectator"
+            :title="$t('menu.players')"
             @click="tab = 'players'"
           />
-          <font-awesome-icon icon="theater-masks" @click="tab = 'characters'" />
-          <font-awesome-icon icon="question" @click="tab = 'help'" />
+          <font-awesome-icon
+            icon="theater-masks"
+            :title="$t('menu.characters')"
+            @click="tab = 'characters'"
+          />
+          <font-awesome-icon
+            icon="tools"
+            :title="$t('menu.settings')"
+            @click="tab = 'settings'"
+          />
+          <font-awesome-icon
+            icon="question"
+            :title="$t('menu.help')"
+            @click="tab = 'help'"
+          />
         </li>
 
         <template v-if="tab === 'grimoire'">
@@ -61,7 +94,7 @@
           <li @click="toggleGrimoire" v-if="players.length">
             <template v-if="!grimoire.isPublic">{{ $t("menu.hide") }}</template>
             <template v-if="grimoire.isPublic">{{ $t("menu.show") }}</template>
-            <em>[G]</em>
+            <em class="key">[G]</em>
           </li>
           <li @click="toggleNight" v-if="!session.isSpectator">
             <template v-if="!grimoire.isNight">{{
@@ -70,7 +103,7 @@
             <template v-if="grimoire.isNight">{{
               $t("menu.switchToDay")
             }}</template>
-            <em>[S]</em>
+            <em class="key">[S]</em>
           </li>
           <li
             @click="toggleNightOrder"
@@ -86,6 +119,11 @@
               />
             </em>
           </li>
+        </template>
+
+        <template v-if="tab === 'settings'">
+          <!-- Settings: personal preferences -->
+          <li class="headline">{{ $t("menu.settings") }}</li>
           <li v-if="players.length">
             {{ $t("menu.zoom") }}
             <em>
@@ -160,8 +198,12 @@
           </li>
           <li class="headline" v-else>{{ $t("menu.liveSession") }}</li>
           <template v-if="!session.sessionId">
-            <li @click="hostSession">{{ $t("menu.host") }}<em>[H]</em></li>
-            <li @click="joinSession">{{ $t("menu.join") }}<em>[J]</em></li>
+            <li @click="hostSession">
+              {{ $t("menu.host") }}<em class="key">[H]</em>
+            </li>
+            <li @click="joinSession">
+              {{ $t("menu.join") }}<em class="key">[J]</em>
+            </li>
           </template>
           <template v-else>
             <li v-if="session.ping">
@@ -173,6 +215,10 @@
                 }}
               </small>
               <em>{{ session.ping }}ms</em>
+            </li>
+            <li @click="copySessionCode">
+              {{ $t("menu.copySessionCode") }}
+              <em class="code">{{ session.sessionId }}</em>
             </li>
             <li @click="copySessionUrl">
               {{ $t("menu.copyPlayerLink") }}
@@ -189,7 +235,7 @@
               v-if="session.voteHistory.length || !session.isSpectator"
               @click="toggleModal('voteHistory')"
             >
-              {{ $t("menu.voteHistory") }}<em>[V]</em>
+              {{ $t("menu.voteHistory") }}<em class="key">[V]</em>
             </li>
             <li v-if="!session.isSpectator" @click="setVoteWatching">
               {{ $t("menu.secretVote") }}
@@ -213,7 +259,7 @@
             </li>
             <li @click="leaveSession">
               {{ $t("menu.leaveSession") }}
-              <em>{{ session.sessionId }}</em>
+              <em><font-awesome-icon icon="sign-out-alt" /></em>
             </li>
           </template>
         </template>
@@ -222,7 +268,7 @@
           <!-- Users -->
           <li class="headline">{{ $t("menu.players") }}</li>
           <li @click="addPlayer" v-if="players.length < 20">
-            {{ $t("menu.add") }}<em>[A]</em>
+            {{ $t("menu.add") }}<em class="key">[A]</em>
           </li>
           <li v-if="!session.isSpectator" @click="toggleSelfNaming">
             {{ $t("menu.allowSelfNaming") }}
@@ -253,14 +299,14 @@
           <li class="headline">{{ $t("menu.characters") }}</li>
           <li v-if="!session.isSpectator" @click="toggleModal('edition')">
             {{ $t("menu.selectEdition") }}
-            <em>[E]</em>
+            <em class="key">[E]</em>
           </li>
           <li
             @click="toggleModal('roles')"
             v-if="!session.isSpectator && players.length > 4"
           >
             {{ $t("menu.chooseAndAssign") }}
-            <em>[C]</em>
+            <em class="key">[C]</em>
           </li>
           <li v-if="!session.isSpectator" @click="toggleModal('npc')">
             {{ $t("menu.addNpcs") }}
@@ -277,7 +323,7 @@
           <li class="headline">{{ $t("menu.help") }}</li>
           <li @click="toggleModal('nightOrder')">
             {{ $t("menu.nightOrderSheet") }}
-            <em>[N]</em>
+            <em class="key">[N]</em>
           </li>
           <li @click="toggleModal('gameState')">
             {{ $t("menu.gameStateJson") }}
@@ -354,6 +400,14 @@ export default {
         this.copySessionUrl();
       }
     },
+    // open the menu on a tab (the session icon at the top opens "session")
+    openTab(tab) {
+      this.tab = tab;
+      if (!this.grimoire.isMenuOpen) this.toggleMenu();
+    },
+    copySessionCode() {
+      navigator.clipboard.writeText(this.session.sessionId);
+    },
     copySessionUrl() {
       const url = window.location.href.split("#")[0];
       const link = url + "#" + this.session.sessionId;
@@ -382,6 +436,7 @@ export default {
     joinSession() {
       if (this.session.sessionId) return this.leaveSession();
       let sessionId = prompt(this.$t("dialogs.joinChannel"));
+      if (!sessionId) return;
       if (sessionId.match(/^https?:\/\//i)) {
         sessionId = sessionId.split("#").pop();
       }
@@ -559,9 +614,11 @@ export default {
     }
   }
 
-  // character reference sheet, always at hand for players.
+  // character reference sheet, always at hand for players, and the
+  // storyteller's day / night switch.
   // Boxed like the menu cog: translucent black background, solid black border
-  span.reference {
+  span.reference,
+  span.day-night {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -697,6 +754,17 @@ export default {
         font-style: normal;
         margin-left: 10px;
         font-size: 80%;
+        &.code {
+          font-size: 100%;
+          font-weight: bold;
+          user-select: text;
+        }
+        // keyboard shortcuts are no use on touch screens
+        @media (hover: none) {
+          &.key {
+            display: none;
+          }
+        }
       }
 
       &.language {
