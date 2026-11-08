@@ -180,12 +180,21 @@
     "unableToParseJson": "Unable to parse JSON: {error}",
     "assignAndSendWarning": "WARNING: Some players have not yet taken their seats. Are you sure you want to assign and distribute characters?",
     "assignAndSendConfirm": "Do you want to assign and distribute characters to all players?",
-    "missingRoles": "This session contains custom characters that can't be found. Please load them before joining! Missing roles: {roles}"
+    "missingRoles": "This session contains custom characters that can't be found. Please load them before joining! Missing roles: {roles}",
+    "playerCount": "How many players are there?",
+    "playerCountInvalid": "Enter a number from 1 to {max}."
   },
   "intro": {
-    "welcome": "Welcome to the (unofficial) {title} for Blood on the Clocktower! Please add more players through the {menu} on the top right or by pressing {keyAdd}. You can also join a game session by pressing {keyJoin}.",
+    "welcome": "Welcome to the (unofficial) {title} for Blood on the Clocktower!",
     "title": "Virtual Town Square and Grimoire",
+    "host": "Create a game (Storyteller)",
+    "hostHint": "Choose how many players there are; the link for them is copied, share it.",
+    "join": "Join a game (Player)",
+    "joinHint": "Enter the code or paste the link your Storyteller gives you, then claim your seat.",
+    "offline": "You can also prepare a game without connecting from the {menu}.",
     "menu": "Menu",
+    "hosted": "Game created. The players' link is copied: share it. It is also in the menu, under “Live Session”.",
+    "joined": "You're in! Tap a free seat and choose “Claim seat”.",
     "footer": "This project is free and open source and can be found on {github}. It is not affiliated with The Pandemonium Institute. \"Blood on the Clocktower\" is a trademark of Steven Medway and The Pandemonium Institute."
   },
   "townInfo": {
