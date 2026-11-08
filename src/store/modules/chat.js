@@ -17,7 +17,7 @@ export const tabOf = (message) =>
 const state = () => ({
   status: "off", // off | connecting | connected | error
   messages: [],
-  isOpen: false,
+  isOpen: true,
   tab: PLACE_TAB,
   // tab -> number of messages not read yet
   unread: {},

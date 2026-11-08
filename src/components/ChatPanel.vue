@@ -308,6 +308,45 @@ export default {
   }
 }
 
+// phones: a compact panel showing the last few lines, so it doesn't cover
+// the town square; it grows while typing
+@media screen and (max-width: 767.98px), screen and (max-height: 500px) {
+  .chat {
+    width: 220px;
+    bottom: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    h3 {
+      margin: 2px 6px;
+      font-size: 90%;
+    }
+  }
+  .messages {
+    height: 5.2em;
+    font-size: 75%;
+    margin: 0 4px;
+    padding: 2px 4px;
+    background: rgba(0, 0, 0, 0.3);
+    transition: height 200ms;
+  }
+  .chat:focus-within .messages {
+    height: 30vh;
+  }
+  .tabs {
+    font-size: 65%;
+    padding: 0 4px 2px;
+  }
+  .input {
+    margin: 3px 4px 4px;
+    input {
+      font-size: 75%;
+      padding: 1px 6px;
+    }
+    button {
+      padding: 0 8px;
+    }
+  }
+}
+
 .notice {
   margin: 4px 8px 0;
   font-size: 80%;
