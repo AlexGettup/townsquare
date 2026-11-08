@@ -44,7 +44,7 @@
     <VoiceCorner />
     <VoicePrompts />
     <AlertNotices />
-    <ChatPanel />
+    <ChatPanel v-if="players.length" />
     <InfoCardModal />
     <InfoCardComposer />
     <span id="version">v{{ version }}</span>
