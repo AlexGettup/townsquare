@@ -352,6 +352,8 @@ class LiveSession {
       hasTwoVotes: player.hasTwoVotes,
       handRaised: player.handRaised,
       pronouns: player.pronouns,
+      hasNominated: !!player.hasNominated,
+      wasNominated: !!player.wasNominated,
       ...(player.role && player.role.team === "traveller"
         ? { roleId: player.role.id }
         : {}),
@@ -428,6 +430,8 @@ class LiveSession {
         "hasTwoVotes",
         "handRaised",
         "pronouns",
+        "hasNominated",
+        "wasNominated",
       ].forEach((property) => {
         const value = state[property];
         if (player[property] !== value) {

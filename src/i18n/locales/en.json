@@ -203,6 +203,8 @@
     "swapWithPlayer": "Swap seats with this player",
     "moveToSeat": "Move player to this seat",
     "nominatePlayer": "Nominate this player",
+    "hasNominated": "Has nominated today",
+    "wasNominated": "Has been nominated today",
     "raiseHand": "Raise Hand",
     "changeRole": "Change Character",
     "changeAlignment": "Change Alignment",

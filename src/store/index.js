@@ -278,10 +278,19 @@ export default new Vuex.Store({
       // This function can be called with an explicit value pushed from the
       // socket. In that case, the value the host has declared takes effect,
       // assuming it is at least a valid boolean.
+      const wasNight = grimoire.isNight;
       if (val === true || val === false) {
         grimoire.isNight = val;
       } else {
         grimoire.isNight = !grimoire.isNight;
+      }
+      // a new day or night: forget who nominated and was nominated
+      if (grimoire.isNight !== wasNight) {
+        players.players.forEach((player) => {
+          // only touch set marks: assigning a missing key would not be reactive
+          if (player.hasNominated) player.hasNominated = false;
+          if (player.wasNominated) player.wasNominated = false;
+        });
       }
     },
     toggleGrimoire: toggle("isPublic"),

@@ -193,6 +193,21 @@
         @click="isMenuOpen = !isMenuOpen"
         :class="{ active: isMenuOpen }"
       >
+        <div
+          class="nomination-marks"
+          v-if="player.hasNominated || player.wasNominated"
+        >
+          <font-awesome-icon
+            icon="hand-point-right"
+            v-if="player.hasNominated"
+            :title="$t('player.hasNominated')"
+          />
+          <font-awesome-icon
+            icon="gavel"
+            v-if="player.wasNominated"
+            :title="$t('player.wasNominated')"
+          />
+        </div>
         <span>{{ player.name }}</span>
         <span class="pronouns" v-if="player.pronouns">{{
           player.pronouns
@@ -1242,6 +1257,25 @@ li.move:not(.from) .player .overlay svg.move {
     font-size: 60%;
     line-height: 1;
     padding-bottom: 5px;
+  }
+
+  // nominated someone / was nominated today, to the left of the name
+  .nomination-marks {
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 80%;
+    color: white;
+    filter: drop-shadow(0 0 2px black);
+    svg {
+      top: 0;
+      margin: 0;
+    }
   }
 }
 
