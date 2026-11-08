@@ -2,6 +2,10 @@
   {
     "version": "3.6.2",
     "date": "2026-11-08",
+    "title": {
+      "en": "Info cards in the chat",
+      "es": "Tarjetas en el chat"
+    },
     "en": [
       "Fixed info cards not opening again when clicked in the chat",
       "The chat shows what each info card says (text, characters, players, number, yes/no), not only its phrase"
@@ -14,6 +18,10 @@
   {
     "version": "3.6.1",
     "date": "2026-11-08",
+    "title": {
+      "en": "Info cards on phones",
+      "es": "Tarjetas en el móvil"
+    },
     "en": [
       "Fixed the info card windows being wider than the screen on phones (they could be scrolled sideways)"
     ],
@@ -24,6 +32,10 @@
   {
     "version": "3.6.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "Info cards",
+      "es": "Tarjetas de información"
+    },
     "en": [
       "Info cards: the Storyteller can send a player what they learn (a phrase such as \"You are\" or \"This is the Demon\", text, characters, players, a number or yes/no) from the player menu; it pops up on the player's screen and stays in the private chat",
       "Choice cards (\"Choose a player\", \"Choose 2 players\", \"Choose a character\"): the player answers in the private chat",
@@ -46,6 +58,10 @@
   {
     "version": "3.5.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "Screen always on and installable app",
+      "es": "Pantalla siempre encendida y app instalable"
+    },
     "en": [
       "The screen stays on during a live session, so phones don't lock in the middle of a game",
       "The app can be installed on the home screen (phones and tablets) and opens without the browser bar"
@@ -58,6 +74,10 @@
   {
     "version": "3.4.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "Compact chat on phones",
+      "es": "Chat compacto en el móvil"
+    },
     "en": [
       "The text chat is open by default",
       "On phones the chat is compact (the last few lines) and grows while typing"
@@ -70,6 +90,10 @@
   {
     "version": "3.3.1",
     "date": "2026-11-08",
+    "title": {
+      "en": "Seat back after switching apps",
+      "es": "Recuperar el asiento al volver a la app"
+    },
     "en": [
       "Fixed players losing their seat and missing their character after switching apps on a phone: the seat comes back automatically and the Storyteller sends them the character they were dealt"
     ],
@@ -80,6 +104,10 @@
   {
     "version": "3.3.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "New voice chat layout",
+      "es": "Nueva disposición del chat de voz"
+    },
     "en": [
       "The voice chat button and the conversations panel are in the top left corner; the NPC panel moves to the top right, below the menu",
       "Fixed NPC ability and night order tooltips opening off screen",
@@ -94,6 +122,10 @@
   {
     "version": "3.2.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "More private voice chat",
+      "es": "Chat de voz más privado"
+    },
     "en": [
       "Voice chat: the server decides whose audio each player receives, so nobody can listen to a private conversation or to other players at night by tweaking their browser; it also uses much less data",
       "Only one player menu stays open: clicking elsewhere (the empty square or another player) closes it"
@@ -106,6 +138,10 @@
   {
     "version": "3.1.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "Player menu from the token",
+      "es": "Menú del jugador desde el token"
+    },
     "en": [
       "Clicking a character token opens the player menu, with a new \"Change Character\" entry (the shroud on top of the token still toggles death)"
     ],
@@ -116,11 +152,17 @@
   {
     "version": "3.0.0",
     "date": "2026-11-08",
+    "title": {
+      "en": "Spanish, voice and text chat",
+      "es": "Español, chat de voz y de texto"
+    },
     "en": [
       {
         "text": "Spanish: language selector in the Grimoire menu, translated interface and game content (characters, reminders, night order and jinxes, from the official translations)"
       },
-      { "text": "A reference sheet button next to the menu" },
+      {
+        "text": "A reference sheet button next to the menu"
+      },
       {
         "text": "Voice chat for live sessions, without Discord",
         "items": [
@@ -132,13 +174,17 @@
       {
         "text": "Text chat following the same rules as voice, plus a private channel between each player and the Storyteller (the only one open at night); works without a microphone"
       },
-      { "text": "Removed Google Analytics" }
+      {
+        "text": "Removed Google Analytics"
+      }
     ],
     "es": [
       {
         "text": "Español: selector de idioma en el menú del Grimorio, interfaz y contenido del juego traducidos (personajes, recordatorios, orden nocturno y jinxes, de las traducciones oficiales)"
       },
-      { "text": "Botón de hoja de referencia junto al menú" },
+      {
+        "text": "Botón de hoja de referencia junto al menú"
+      },
       {
         "text": "Chat de voz para las sesiones en vivo, sin Discord",
         "items": [
@@ -150,7 +196,9 @@
       {
         "text": "Chat de texto con las mismas reglas que la voz, más un canal privado entre cada jugador y el Narrador (el único abierto de noche); funciona sin micrófono"
       },
-      { "text": "Eliminado Google Analytics" }
+      {
+        "text": "Eliminado Google Analytics"
+      }
     ]
   }
 ]

@@ -8,10 +8,13 @@
     <div class="versions">
       <section v-for="(release, index) in releases" :key="release.version">
         <h4>
-          {{ $t("modals.changelog.version", { version: release.version }) }}
+          {{ release.title }}
           <em v-if="index === 0">{{ $t("modals.changelog.current") }}</em>
-          <small>{{ formatDate(release.date) }}</small>
         </h4>
+        <p class="version">
+          {{ $t("modals.changelog.version", { version: release.version }) }}
+          · {{ formatDate(release.date) }}
+        </p>
         <ul>
           <li v-for="(item, i) in release.items" :key="i">
             {{ item.text }}
@@ -41,6 +44,7 @@ export default {
       const locale = this.grimoire.locale;
       return changelog.map((release) => ({
         ...release,
+        title: release.title ? release.title[locale] || release.title.en : "",
         items: (release[locale] || release.en).map((item) =>
           typeof item === "string"
             ? { text: item, items: [] }
@@ -92,18 +96,21 @@ h4 {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
+  font-size: 115%;
   em {
     font-style: normal;
-    font-size: 75%;
+    font-size: 65%;
     color: black;
     background: $fabled;
     border-radius: 8px;
     padding: 0 6px;
   }
-  small {
-    font-weight: normal;
-    color: gray;
-  }
+}
+
+.version {
+  margin: 0 0 4px;
+  font-size: 80%;
+  color: gray;
 }
 
 // the base modal styles lists as centered flex rows; these are plain lists
