@@ -13,6 +13,9 @@ class LiveSession {
     this._reconnectTimer = null;
     this._players = {}; // map of players connected to a session
     this._pings = {}; // map of player IDs to ping
+    // ST: characters handed out to each player ID with "distribute", so a
+    // player who was away (phone in the background…) still gets theirs
+    this._dealtRoles = {};
     this._notify = new Audio(require("@/assets/sounds/roles-notify.mp3"));
     // reconnect to previous session
     if (this._store.state.session.sessionId) {
@@ -103,6 +106,21 @@ class LiveSession {
   }
 
   /**
+   * The app is visible again (back from another app, screen unlocked…):
+   * phones freeze background tabs, so reconnect or ping right away instead
+   * of waiting for the next timer.
+   */
+  wakeUp() {
+    if (!this._isSpectator || !this._store.state.session.sessionId) return;
+    if (this._socket && this._socket.readyState === 1) {
+      this._ping();
+    } else if (!this._socket) {
+      clearTimeout(this._reconnectTimer);
+      this.connect(this._store.state.session.sessionId);
+    }
+  }
+
+  /**
    * Send a ping message with player ID and ST flag.
    * @private
    */
@@ -133,6 +151,8 @@ class LiveSession {
     switch (command) {
       case "getGamestate":
         this.sendGamestate(params);
+        // a player (re)connected: hand them their character if they missed it
+        this._resendRole(params);
         break;
       case "edition":
         this._updateEdition(params);
@@ -461,6 +481,7 @@ class LiveSession {
    */
   sendClear() {
     if (this._isSpectator) return;
+    this._dealtRoles = {};
     this._send("clear");
   }
 
@@ -593,6 +614,15 @@ class LiveSession {
           this._store.state.roles.get(value) ||
           this._store.getters.rolesJSONbyId.get(value) ||
           {};
+        // the storyteller sends our character again when we reconnect:
+        // keep our notes and don't ring if we already have it
+        if (
+          this._store.state.session.playerId === player.id &&
+          role.id &&
+          player.role.id === role.id
+        ) {
+          return;
+        }
         if (
           this._store.state.session.playerId === player.id &&
           role.team !== "traveller"
@@ -751,6 +781,9 @@ class LiveSession {
       // store new player data
       if (playerIdOrCount) {
         this._players[playerIdOrCount] = now;
+        if (typeof playerIdOrCount === "string") {
+          this._restoreSeat(playerIdOrCount);
+        }
         const ping = parseInt(latency, 10);
         if (ping && ping > 0 && ping < 30 * 1000) {
           // ping to Players
@@ -773,6 +806,45 @@ class LiveSession {
         this._isSpectator ? playerIdOrCount : Object.keys(this._players).length,
       );
     }
+  }
+
+  /**
+   * A player whose seat was reserved (no ping for a while) is back: give
+   * them their seat again without having to claim it. ST only
+   * @param playerId
+   * @private
+   */
+  _restoreSeat(playerId) {
+    const player = this._store.state.players.players.find(
+      (player) => player.id === playerId,
+    );
+    if (!player || player.connected) return;
+    this._store.commit("players/update", {
+      player,
+      property: "connected",
+      value: true,
+    });
+    this._resendRole(playerId);
+  }
+
+  /**
+   * Send a player the character they were dealt, if any. ST only
+   * @param playerId
+   * @private
+   */
+  _resendRole(playerId) {
+    if (this._isSpectator || !playerId) return;
+    const roleId = this._dealtRoles[playerId];
+    if (!roleId) return;
+    const index = this._store.state.players.players.findIndex(
+      (player) => player.id === playerId,
+    );
+    if (index < 0) return;
+    this._sendDirect(playerId, "player", {
+      index,
+      property: "role",
+      value: roleId,
+    });
   }
 
   /**
@@ -863,6 +935,8 @@ class LiveSession {
     }
     // update player session list as if this was a ping
     this._handlePing([true, value, 0]);
+    // a player claiming their seat again gets the character they were dealt
+    if (index >= 0) this._resendRole(value);
   }
 
   /**
@@ -872,8 +946,12 @@ class LiveSession {
   distributeRoles() {
     if (this._isSpectator) return;
     const message = {};
+    this._dealtRoles = {};
     this._store.state.players.players.forEach((player, index) => {
-      if (player.connected && player.role) {
+      if (!player.id || !player.role || !player.role.id) return;
+      // remembered for every seated player, also those away right now
+      this._dealtRoles[player.id] = player.role.id;
+      if (player.connected) {
         message[player.id] = [
           "player",
           { index, property: "role", value: player.role.id },
@@ -1075,6 +1153,12 @@ class LiveSession {
 export default (store) => {
   // setup
   const session = new LiveSession(store);
+
+  // phones pause the app in the background: catch up when it's back
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") session.wakeUp();
+  });
+  window.addEventListener("online", () => session.wakeUp());
 
   // listen to actions
   store.subscribeAction(({ type }) => {
