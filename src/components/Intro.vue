@@ -1,7 +1,7 @@
 <template>
   <div class="intro">
     <img src="static/apple-icon.png" alt="" class="logo" />
-    <div>
+    <div class="box">
       <i18n path="intro.welcome" tag="p">
         <template #title>
           <b>{{ $t("intro.title") }}</b>
@@ -131,31 +131,46 @@ export default {
 </script>
 
 <style scoped lang="scss">
+// logo, box and badge stacked in a column that scrolls on very short windows,
+// so nothing ends up cut off above or below the screen
 .intro {
   text-align: center;
-  width: 50%;
+  width: 60%;
   @media screen and (max-width: 767.98px) {
     width: 85%;
     font-size: 100%;
   }
   font-size: 120%;
   position: absolute;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 3px solid black;
-  border-radius: 10px;
+  max-height: 100vh;
+  box-sizing: border-box;
+  padding: 1vh 10px;
+  overflow-y: auto;
   z-index: 3;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vh;
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  .box {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid black;
+    border-radius: 10px;
+  }
+
   a {
     color: white;
   }
   a.redirect {
     display: block;
     text-decoration: none;
-    position: absolute;
-    top: 100%;
-    margin-top: 2vh;
     padding: 10px;
     background: rgba(0, 0, 0, 0.5);
     border: 3px solid black;
@@ -172,21 +187,16 @@ export default {
   }
 
   img.logo {
-    position: absolute;
-    bottom: 100%;
-    width: 25vh;
-    margin-bottom: 2vh;
+    width: 20vh;
     max-width: 192px;
+    box-sizing: border-box;
     border-radius: 50%;
     box-shadow: 0 0 10px black;
     border: 3px solid black;
   }
 
   img.ccc {
-    position: absolute;
-    top: 100%;
-    width: 25vh;
-    margin-top: 2vh;
+    width: 20vh;
     max-width: 192px;
     filter: drop-shadow(0 0 10px black);
   }
@@ -216,7 +226,10 @@ export default {
     gap: 6px;
 
     .button {
-      font-size: 110%;
+      font-size: 100%;
+      @media screen and (max-width: 767.98px) {
+        font-size: 110%;
+      }
       padding: 6px 16px;
       white-space: nowrap;
     }
