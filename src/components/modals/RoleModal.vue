@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { isTouchScreen } from "../../touch";
 import { mapGetters, mapMutations, mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
@@ -190,7 +191,11 @@ export default {
         this.tab = "editionRoles";
         this.alignment = "Regular";
         this.query = "";
-        this.$nextTick(() => this.$refs.searchInput.focus());
+        // focus the search only with a keyboard: on touch screens it pops up the
+        // on-screen keyboard, which covers the window and is rarely needed
+        if (!isTouchScreen()) {
+          this.$nextTick(() => this.$refs.searchInput.focus());
+        }
       }
     },
   },

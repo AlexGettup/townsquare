@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { isTouchScreen } from "../../touch";
 import Modal from "./Modal";
 import { mapGetters, mapMutations, mapState } from "vuex";
 
@@ -210,7 +211,10 @@ export default {
   watch: {
     isDisplayed(shown) {
       this.query = "";
-      if (shown) this.$nextTick(() => this.$refs.searchInput.focus());
+      // focus the search only with a keyboard: on touch screens it pops up the
+      // on-screen keyboard, which covers the window and is rarely needed
+      if (shown && !isTouchScreen())
+        this.$nextTick(() => this.$refs.searchInput.focus());
     },
   },
 };

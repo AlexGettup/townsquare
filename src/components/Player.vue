@@ -393,6 +393,7 @@
 </template>
 
 <script>
+import { isTouchScreen } from "../touch";
 import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
@@ -580,18 +581,15 @@ export default {
     // Touch screens: the shroud is easy to hit by mistake, so one tap
     // anywhere on the token opens the player menu and a double tap toggles
     // death. With a mouse, the shroud toggles death and the token opens the menu.
-    isTouchScreen() {
-      return !!window.matchMedia && window.matchMedia("(hover: none)").matches;
-    },
     onStatusClick() {
-      if (this.isTouchScreen()) {
+      if (isTouchScreen()) {
         this.onTokenTap();
       } else {
         this.toggleStatus();
       }
     },
     onTokenClick() {
-      if (this.isTouchScreen()) {
+      if (isTouchScreen()) {
         this.onTokenTap();
       } else {
         this.isMenuOpen = !this.isMenuOpen;
