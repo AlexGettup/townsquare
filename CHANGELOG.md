@@ -7,7 +7,7 @@ release of this fork; older versions belong to the original project.
 ### Version 3.5.0
 - The screen stays on during a live session, so phones don't lock in the middle of a game
 - The app can be installed on the home screen (phones and tablets) and opens without the browser bar
-- Added the project roadmap (ROADMAP.md) and project context (CLAUDE.md)
+- Added the project roadmap (ROADMAP.md)
 
 ### Version 3.4.0
 - The text chat is open by default
