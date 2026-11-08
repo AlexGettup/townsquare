@@ -43,6 +43,7 @@ const faIcons = [
   "Microphone",
   "MicrophoneSlash",
   "MinusCircle",
+  "Newspaper",
   "PeopleArrows",
   "PlusCircle",
   "Question",

@@ -142,6 +142,7 @@ export default new Vuex.Store({
       locale: DEFAULT_LOCALE,
     },
     modals: {
+      changelog: false,
       edition: false,
       npc: false,
       gameState: false,
