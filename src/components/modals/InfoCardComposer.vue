@@ -215,7 +215,15 @@ export default {
 
 .info-card-composer :deep(.modal) {
   overflow-y: auto;
+  overflow-x: hidden;
   width: 900px;
+  // phones: fit the screen, no sideways scroll
+  @media (max-width: 767.98px) {
+    padding: 10px 12px;
+    .tokens li {
+      width: 48px;
+    }
+  }
 }
 
 h3 {
@@ -279,6 +287,8 @@ input.text {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  // room for the zoom of selected tokens, so they don't stick out
+  padding: 4px;
   li {
     width: 60px;
     border-radius: 50%;

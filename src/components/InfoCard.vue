@@ -62,7 +62,10 @@ export default {
   align-items: center;
   gap: 12px;
   text-align: center;
-  min-width: min(320px, 80vw);
+  // never wider than the window it is shown in (phones)
+  min-width: min(320px, 100%);
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 h2 {
