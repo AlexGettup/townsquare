@@ -124,6 +124,32 @@
     "clearConfirm": "¿Borrar el historial del chat para todos?",
     "privateConversation": "Conversación privada"
   },
+  "cards": {
+    "send": "Enviar información",
+    "title": "Información para {name}",
+    "card": "Información",
+    "phrase": "Frase",
+    "text": "Texto (opcional)",
+    "characters": "Personajes",
+    "players": "Jugadores",
+    "number": "Número",
+    "answer": "Sí / No",
+    "none": "—",
+    "yes": "Sí",
+    "no": "No",
+    "sendButton": "Enviar",
+    "gotIt": "Entendido",
+    "phrases": {
+      "youAre": "Tú eres",
+      "thisIsTheDemon": "Este es el Demonio",
+      "theseAreYourMinions": "Estos son tus Esbirros",
+      "notInPlay": "Estos personajes no están en juego",
+      "thisPlayerIs": "Este jugador es",
+      "characterSelectedYou": "Este personaje te ha elegido",
+      "youLearn": "Descubres",
+      "useAbility": "¿Quieres usar tu habilidad?"
+    }
+  },
   "dialogs": {
     "backgroundUrl": "Introduce la URL de un fondo personalizado",
     "hostChannel": "Introduce un número o nombre de canal para tu sesión",

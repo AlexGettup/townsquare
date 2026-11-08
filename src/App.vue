@@ -42,6 +42,8 @@
     <VoiceCorner />
     <VoicePrompts />
     <ChatPanel />
+    <InfoCardModal />
+    <InfoCardComposer />
     <span id="version">v{{ version }}</span>
   </div>
 </template>
@@ -65,12 +67,16 @@ import GameStateModal from "@/components/modals/GameStateModal";
 import VoiceCorner from "@/components/VoiceCorner";
 import VoicePrompts from "@/components/VoicePrompts";
 import ChatPanel from "@/components/ChatPanel";
+import InfoCardModal from "@/components/modals/InfoCardModal";
+import InfoCardComposer from "@/components/modals/InfoCardComposer";
 
 export default {
   components: {
     VoiceCorner,
     VoicePrompts,
     ChatPanel,
+    InfoCardModal,
+    InfoCardComposer,
     GameStateModal,
     VoteHistoryModal,
     NpcModal,

@@ -24,6 +24,11 @@ export default (store) => {
       const fromOthers = message.from !== selfPeerId();
       const unread = fromOthers && (!isOpen || tab !== tabOf(message));
       store.commit("chat/addMessage", { message, unread });
+      // an info card from the storyteller pops up on screen
+      if (fromOthers && message.card) {
+        store.commit("chat/showCard", message);
+        if (navigator.vibrate) navigator.vibrate(200);
+      }
       // private messages ring, unless sounds are muted
       if (
         fromOthers &&

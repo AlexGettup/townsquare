@@ -54,6 +54,14 @@
             >[{{ messagePlace(message) }}]</small
           >
           <b>{{ peerName(message.from) }}:</b>
+          <a
+            v-if="message.card"
+            class="card-link"
+            @click="$store.commit(chat / showCard, message)"
+          >
+            <font-awesome-icon icon="address-card" />
+            {{ cardSummary(message.card) }}
+          </a>
           {{ message.text }}
         </p>
       </div>
@@ -164,6 +172,10 @@ export default {
       if (confirm(this.$t("chat.clearConfirm"))) {
         this.$store.dispatch("chat/clear");
       }
+    },
+    cardSummary(card) {
+      if (card.phrase) return this.$t(`cards.phrases.${card.phrase}`);
+      return card.text || this.$t("cards.card");
     },
     messagePlace({ channel }) {
       if (isConversation(channel)) {
@@ -305,6 +317,13 @@ export default {
   }
   .place {
     margin-right: 4px;
+  }
+  .card-link {
+    cursor: pointer;
+    color: $outsider;
+    &:hover {
+      color: red;
+    }
   }
 }
 

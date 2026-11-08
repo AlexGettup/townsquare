@@ -34,7 +34,7 @@ botc.app has something similar.
 
 ### Night without talking
 
-- [ ] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
+- [x] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
       characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
       (Fortune Teller), players. Shown on the player's device and kept in their history.
 - [ ] **Choose targets on screen** *(official)*: the storyteller asks "choose a player" (or two)
