@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.6.2
+- Fixed info cards not opening again when clicked in the chat
+- The chat shows what each info card says (text, characters, players, number, yes/no), not only its phrase
+
 ### Version 3.6.1
 - Fixed the info card windows being wider than the screen on phones (they could be scrolled sideways)
 
