@@ -2,6 +2,8 @@ import ChatClient from "../chat/ChatClient";
 import { PLACE_TAB, dmTab, tabOf } from "./modules/chat";
 import { STORYTELLER } from "./modules/voice";
 import { playChime } from "../voice/sounds";
+import { flagTitle, vibrate } from "../alerts";
+import i18n from "../i18n";
 
 const ERROR_TIMEOUT = 4 * 1000;
 
@@ -27,7 +29,8 @@ export default (store) => {
       // an info card from the storyteller pops up on screen
       if (fromOthers && message.card) {
         store.commit("chat/showCard", message);
-        if (navigator.vibrate) navigator.vibrate(200);
+        vibrate([200, 100, 200]);
+        flagTitle(i18n.t("alerts.newInfo", store.state.grimoire.locale));
       }
       // private messages ring, unless sounds are muted
       if (

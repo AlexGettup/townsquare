@@ -125,6 +125,9 @@
     "clearConfirm": "¿Borrar el historial del chat para todos?",
     "privateConversation": "Conversación privada"
   },
+  "alerts": {
+    "newInfo": "Nueva información"
+  },
   "cards": {
     "send": "Enviar información",
     "title": "Información para {name}",
@@ -250,6 +253,7 @@
     "handUp": "Mano ARRIBA",
     "claimSeatToVote": "Reclama un asiento para votar.",
     "reclaimSeatToVote": "Vuelve a reclamar tu asiento para votar.",
+    "yourTurn": "¡Te toca votar!",
     "go": "¡YA!"
   },
   "modals": {
