@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.12.2
+- Fixed "Join a game" doing nothing, even after a reload, once a session with no game was saved (a wrong code, or joining before the game was created); "Create a game" had the same problem
+- Fixed replacing a session clearing the new one as well
+- After joining a session with no game yet, the first screen says it's waiting for the Storyteller and shows the code; "You're in!" only appears when the seats arrive, and the chat stays hidden until then
+
 ### Version 3.12.1
 - Fixed the logo and the "Community Created Content" badge being cut off on the first screen on laptops; the buttons now fit side by side there, and the screen scrolls on very short windows
 
