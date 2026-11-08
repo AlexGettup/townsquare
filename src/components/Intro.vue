@@ -2,19 +2,35 @@
   <div class="intro">
     <img src="static/apple-icon.png" alt="" class="logo" />
     <div>
-      <i18n path="intro.welcome" tag="span">
+      <i18n path="intro.welcome" tag="p">
         <template #title>
           <b>{{ $t("intro.title") }}</b>
         </template>
+      </i18n>
+
+      <!-- the two ways in: run the game, or play in someone else's -->
+      <div class="start">
+        <div class="option">
+          <span class="button townsfolk" @click="host">
+            <font-awesome-icon icon="book-open" /> {{ $t("intro.host") }}
+          </span>
+          <small>{{ $t("intro.hostHint") }}</small>
+        </div>
+        <div class="option">
+          <span class="button" @click="join">
+            <font-awesome-icon icon="users" /> {{ $t("intro.join") }}
+          </span>
+          <small>{{ $t("intro.joinHint") }}</small>
+        </div>
+      </div>
+
+      <i18n path="intro.offline" tag="p" class="offline">
         <template #menu>
-          <span class="button" @click="toggleMenu">
+          <span class="button small" @click="toggleMenu">
             <font-awesome-icon icon="cog" /> {{ $t("intro.menu") }}
           </span>
         </template>
-        <template #keyAdd><b>[A]</b></template>
-        <template #keyJoin><b>[J]</b></template>
       </i18n>
-      <br />
       <i18n path="intro.footer" tag="div" class="footer">
         <template #github>
           <a href="https://github.com/AlexGettup/townsquare" target="_blank"
@@ -38,13 +54,79 @@
 <script>
 import { mapMutations } from "vuex";
 
+const MAX_PLAYERS = 20;
+const NOTICE_TIMEOUT = 8 * 1000;
+
+/**
+ * First screen (no players yet): create a game as the storyteller or join one
+ * as a player, each with a line on what happens next.
+ */
 export default {
   data() {
     return {
       language: window.navigator.userLanguage || window.navigator.language,
     };
   },
-  methods: mapMutations(["toggleMenu"]),
+  methods: {
+    ...mapMutations(["toggleMenu"]),
+    // a notice at the top of the screen saying what to do next
+    notify(key, icon) {
+      this.$store.commit("alerts/add", { key, icon });
+      const notice = this.$store.state.alerts.notices.find(
+        (notice) => notice.key === key,
+      );
+      setTimeout(
+        () => this.$store.commit("alerts/remove", notice.id),
+        NOTICE_TIMEOUT,
+      );
+    },
+    // storyteller: how many players, the session code, then the seats
+    host() {
+      if (this.$store.state.session.sessionId) return;
+      const answer = prompt(this.$t("dialogs.playerCount"), "8");
+      if (answer === null) return;
+      const count = parseInt(answer, 10);
+      if (!(count >= 1 && count <= MAX_PLAYERS)) {
+        alert(this.$t("dialogs.playerCountInvalid", { max: MAX_PLAYERS }));
+        return;
+      }
+      const sessionId = prompt(
+        this.$t("dialogs.hostChannel"),
+        Math.round(Math.random() * 10000),
+      );
+      if (!sessionId) return;
+      for (let n = 1; n <= count; n++) {
+        this.$store.commit(
+          "players/add",
+          this.$t("dialogs.defaultPlayerName", { n }),
+        );
+      }
+      this.$store.commit("session/clearVoteHistory");
+      this.$store.commit("session/setSpectator", false);
+      this.$store.commit("session/setSessionId", sessionId);
+      // the players' link, ready to paste
+      const link = window.location.href.split("#")[0] + "#" + sessionId;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(link).catch(() => {});
+      }
+      this.notify("intro.hosted", "book-open");
+    },
+    // player: the code or link from the storyteller
+    join() {
+      if (this.$store.state.session.sessionId) return;
+      let sessionId = prompt(this.$t("dialogs.joinChannel"));
+      if (!sessionId) return;
+      if (sessionId.match(/^https?:\/\//i)) {
+        sessionId = sessionId.split("#").pop();
+      }
+      if (!sessionId) return;
+      this.$store.commit("session/clearVoteHistory");
+      this.$store.commit("session/setSpectator", true);
+      this.$store.commit("toggleGrimoire", false);
+      this.$store.commit("session/setSessionId", sessionId);
+      this.notify("intro.joined", "chair");
+    },
+  },
 };
 </script>
 
@@ -52,6 +134,10 @@ export default {
 .intro {
   text-align: center;
   width: 50%;
+  @media screen and (max-width: 767.98px) {
+    width: 85%;
+    font-size: 100%;
+  }
   font-size: 120%;
   position: absolute;
   padding: 10px;
@@ -108,6 +194,47 @@ export default {
   .footer {
     font-size: 60%;
     opacity: 0.75;
+  }
+
+  p {
+    margin: 0 0 10px;
+  }
+
+  .start {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 10px 0;
+  }
+
+  .option {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    .button {
+      font-size: 110%;
+      padding: 6px 16px;
+      white-space: nowrap;
+    }
+
+    small {
+      font-size: 75%;
+      opacity: 0.85;
+    }
+  }
+
+  .offline {
+    font-size: 75%;
+    opacity: 0.85;
+
+    .button.small {
+      font-size: 100%;
+      padding: 0 8px;
+    }
   }
 }
 </style>
