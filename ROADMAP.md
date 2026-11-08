@@ -23,16 +23,40 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 ## Planned
 
 The goal: play a whole game without Discord, as comfortably on a phone or tablet as on a
-computer. Suggested order: phone basics (wake lock, PWA) → night info cards and choosing
-targets on screen → player features (ranked below) → own live session server. Marked *(official)* when
-botc.app has something similar.
+computer. Marked *(official)* when botc.app has something similar.
+
+### Next steps
+
+The order to build in, across all the sections below (which are the full catalogue). Ranked by
+**instinctive use** (it works where people already look or tap, with nothing to learn) and
+**UX clarity** (it removes doubts instead of adding a new place to check), then by value for a
+game without Discord and by cost.
+
+1. **Ability in the player menu** (For players): cheap, and answers "what does this character
+   do?" on touch screens, where there is no hover.
+2. **Alerts** (For players): vibration and an on-screen notice, so phone players don't miss
+   being woken up, an info card or their vote.
+3. **Choose targets on screen** (Night without talking): players tap seats instead of typing
+   their choice in the chat; the last big gap for a silent night.
+4. **Notes per player** (For players): the biggest gap for playing without paper.
+5. **Day and night counter** (For players): passive context for everyone, and labels for the
+   notes and the diary.
+6. **Minion and demon info** (Night without talking): one button instead of several cards on
+   the first night.
+7. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters and the
+   info cards sent when the page is reloaded mid-game.
+8. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+   storyteller explaining it out loud.
+
+After these: game diary, guided night, own live session server, and the rest of the catalogue.
 
 ### Phones and tablets
 
 - [x] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
       players don't drop from their seats.
 - [x] **Install as an app (PWA)**: home screen icon and full screen, without the browser bar.
-- [ ] **Long press instead of hover** on touch screens: see a token's ability or night order.
+- [ ] **Long press for the night order** on touch screens (no hover there). A token's ability
+      is covered by "Ability in the player menu" (For players).
 - [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
       the bottom instead of floating over the seats.
 
@@ -40,7 +64,7 @@ botc.app has something similar.
 
 - [x] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
       characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
-      (Fortune Teller), players. Shown on the player's device and kept in their history.
+      (Fortune Teller), players. Shown on the player's device and kept in their private chat.
 - [ ] **Choose targets on screen** *(official)*: the storyteller asks "choose a player" (or two)
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
@@ -56,12 +80,13 @@ botc.app has something similar.
 - [ ] **Day timer** *(official)*: a countdown everyone sees ("5 minutes of discussion left"),
       with a sound when it ends.
 - [ ] **Ambient sounds**: dusk, dawn, executions.
+- [ ] **End of game and grimoire reveal** *(official)*: the storyteller ends the game and
+      declares the winning team (Good or Evil); everyone sees the result and the full
+      grimoire, and voice brings everyone back to the plaza to talk about it.
 
 ### For players
 
-Ranked for the next steps. What counts most: **instinctive use** (it works where the player
-already looks or taps, with nothing to learn) and **UX clarity** (it removes doubts instead of
-adding a new place to check). Then value for a phone game and cost.
+Ranked with the same criteria as the [next steps](#next-steps).
 
 | # | Feature | Instinctive | Clarity | Value | Cost |
 |---|---------|:-----------:|:-------:|:-----:|:----:|
@@ -93,10 +118,6 @@ adding a new place to check). Then value for a phone game and cost.
 6. [ ] **Claims on the reference sheet**: tap a character on the reference sheet and note who
    claims it, so a double claim stands out. Hard to find and overlaps with the notes: better
    as a later extension of them than as a separate feature.
-
-- [ ] **End of game and grimoire reveal** *(official)*: the storyteller ends the game and
-      declares the winning team (Good or Evil); everyone sees the result and the full
-      grimoire, and voice brings everyone back to the plaza to talk about it.
 
 ### Robustness
 
