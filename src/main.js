@@ -18,6 +18,8 @@ const faIcons = [
   "BroadcastTower",
   "Chair",
   "CheckSquare",
+  "ChevronLeft",
+  "ChevronRight",
   "CloudMoon",
   "Cog",
   "Copy",
