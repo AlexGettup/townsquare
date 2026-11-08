@@ -57,11 +57,14 @@
           <a
             v-if="message.card"
             class="card-link"
-            @click="$store.commit(chat / showCard, message)"
+            @click="$store.commit('chat/showCard', message)"
           >
             <font-awesome-icon icon="address-card" />
             {{ cardSummary(message.card) }}
           </a>
+          <span v-if="message.card" class="card-details">{{
+            cardDetails(message.card)
+          }}</span>
           {{ message.text }}
         </p>
       </div>
@@ -175,7 +178,30 @@ export default {
     },
     cardSummary(card) {
       if (card.phrase) return this.$t(`cards.phrases.${card.phrase}`);
-      return card.text || this.$t("cards.card");
+      return this.$t("cards.card");
+    },
+    // what the card says, written out: text, characters, players, number…
+    cardDetails(card) {
+      const roleName = (id) => {
+        const role =
+          this.$store.state.roles.get(id) ||
+          this.$store.getters.rolesJSONbyId.get(id) ||
+          this.$store.state.otherTravellers.get(id);
+        return role ? this.$store.getters.localizeRole(role).name : id;
+      };
+      const parts = [];
+      if (card.text) parts.push(card.text);
+      if (card.roles && card.roles.length) {
+        parts.push(card.roles.map(roleName).join(", "));
+      }
+      if (card.players && card.players.length) {
+        parts.push(card.players.join(", "));
+      }
+      if (card.number !== null && card.number !== undefined) {
+        parts.push(String(card.number));
+      }
+      if (card.answer) parts.push(this.$t(`cards.${card.answer}`));
+      return parts.length ? "— " + parts.join(" · ") : "";
     },
     messagePlace({ channel }) {
       if (isConversation(channel)) {
@@ -324,6 +350,9 @@ export default {
     &:hover {
       color: red;
     }
+  }
+  .card-details {
+    user-select: text;
   }
 }
 
