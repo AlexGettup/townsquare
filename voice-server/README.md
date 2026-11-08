@@ -3,14 +3,18 @@
 Backend for the in-app voice chat. It runs for free on Cloudflare:
 
 - **Cloudflare Realtime SFU** carries the audio: every player uploads their
-  microphone once and downloads the others.
+  microphone once and downloads the people they may hear.
 - **This Worker** (with one Durable Object per game session) tells each client
-  who is in the voice room, and proxies the SFU API so its secret never
-  reaches the browser.
+  who is in the voice room and runs the text chat. It proxies the SFU API so
+  its secret never reaches the browser, and decides who receives whose
+  microphone: clients pull tracks by peerId (SFU sessions are never shared),
+  the room refuses pulls the hearing rules do not allow, and force-closes the
+  tracks someone may no longer hear (a private conversation, the night…).
 
 ```
-browser ──WebSocket──► Worker /rooms/<session>/ws   (who is in voice)
-browser ──HTTPS─────► Worker /sfu/...  ──► Cloudflare Realtime API
+browser ──WebSocket──► Worker /rooms/<session>/ws    (who is in voice)
+browser ──WebSocket──► Worker /rooms/<session>/chat  (text chat)
+browser ──HTTPS─────► Worker /rooms/<session>/sfu/... ──► Cloudflare Realtime API
 browser ◄──WebRTC───► Cloudflare Realtime SFU      (the audio itself)
 ```
 

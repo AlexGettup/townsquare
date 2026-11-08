@@ -94,12 +94,25 @@ export default (store) => {
         } else if (store.getters["voice/isStoryteller"]) {
           // share the current night state with whoever is in the room
           const { awake, broadcast } = store.state.voice;
-          client.setNight({ awake, broadcast });
+          client.setNight({
+            awake,
+            broadcast,
+            isNight: store.state.grimoire.isNight,
+          });
         }
         applyAudibility();
         break;
       case "toggleNight":
         if (store.getters["voice/isStoryteller"]) {
+          // the voice server decides who hears whom: tell it day or night
+          if (client.isActive) {
+            const { awake, broadcast } = store.state.voice;
+            client.setNight({
+              awake,
+              broadcast,
+              isNight: store.state.grimoire.isNight,
+            });
+          }
           if (store.state.grimoire.isNight) {
             // nightfall: private conversations close, silently
             store.dispatch("voice/gather", { sound: false });

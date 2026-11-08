@@ -220,9 +220,13 @@ const actions = {
     if (!getters.isStoryteller) return;
     dispatch("setNight", { awake: state.awake, broadcast: !state.broadcast });
   },
-  setNight({ commit, state }, night) {
+  setNight({ commit, state, rootState }, night) {
     commit("setNight", night);
-    this.$voice.setNight({ awake: state.awake, broadcast: state.broadcast });
+    this.$voice.setNight({
+      awake: state.awake,
+      broadcast: state.broadcast,
+      isNight: rootState.grimoire.isNight,
+    });
   },
 
   // --- private conversations and rooms --------------------------------------

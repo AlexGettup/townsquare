@@ -5,7 +5,9 @@
  * One RTCPeerConnection per client: the microphone is pushed once, and each
  * remote peer's audio track is pulled through the same connection.
  * The voice server (see /voice-server) relays who is connected and proxies
- * the SFU API so its secret stays private.
+ * the SFU API so its secret stays private. The server decides whose
+ * microphone each client receives (only the people it may hear), and stops
+ * the rest at the SFU.
  *
  * Events (callbacks passed to the constructor):
  * - onStatus(status, error)   "connecting" | "connected" | "off" | "error"
@@ -22,6 +24,9 @@ const RECONNECT_DELAY = 2000;
 // voice activity detection
 const SPEAKING_THRESHOLD = 0.02; // RMS of the signal
 const SPEAKING_HOLD = 400; // ms to keep "speaking" after the last sound
+
+// changes when a peer rejoins with a new connection
+const remoteKey = (peer) => `${peer.peerId}/${peer.since}`;
 
 export default class VoiceClient {
   constructor({
@@ -156,9 +161,9 @@ export default class VoiceClient {
   }
 
   /** Storyteller only: share who is awake at night and the broadcast mode. */
-  setNight({ awake, broadcast }) {
-    this.night = { awake, broadcast };
-    this._sendSocket({ type: "night", awake, broadcast });
+  setNight({ awake, broadcast, isNight }) {
+    this.night = { awake, broadcast, isNight };
+    this._sendSocket({ type: "night", awake, broadcast, isNight });
   }
 
   /**
@@ -187,11 +192,15 @@ export default class VoiceClient {
   }
 
   async _api(method, path, body) {
-    const response = await fetch(`${this.serverUrl}/sfu/${path}`, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    const room = encodeURIComponent(this.channel);
+    const response = await fetch(
+      `${this.serverUrl}/rooms/${room}/sfu/${path}`,
+      {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      },
+    );
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.errorCode) {
       throw new Error(data.errorDescription || `SFU ${response.status}`);
@@ -231,52 +240,104 @@ export default class VoiceClient {
     await this.pc.setRemoteDescription(response.sessionDescription);
   }
 
-  /** Receive the microphone of a remote peer. */
+  /**
+   * Receive the microphone of a remote peer. The voice server only lets us
+   * pull the people we may hear, naming them by peerId.
+   */
   _pull(peer) {
-    const key = `${peer.sessionId}/${peer.trackName}`;
     const remote = {
       peerId: peer.peerId,
-      key,
+      key: remoteKey(peer),
       mid: null,
       audio: null,
       analyser: null,
+      closed: false,
     };
     this.remotes.set(peer.peerId, remote);
     return this._enqueue(async () => {
       if (!this.pc || this.remotes.get(peer.peerId) !== remote) return;
-      const response = await this._api(
-        "POST",
-        `sessions/${this.sessionId}/tracks/new`,
-        {
-          tracks: [
-            {
-              location: "remote",
-              sessionId: peer.sessionId,
-              trackName: peer.trackName,
-            },
-          ],
-        },
-      );
-      const track = (response.tracks || [])[0];
-      if (!track || track.errorCode) {
-        throw new Error(track ? track.errorDescription : "no track");
-      }
-      remote.mid = track.mid;
-      if (response.requiresImmediateRenegotiation) {
-        await this.pc.setRemoteDescription(response.sessionDescription);
-        await this.pc.setLocalDescription(await this.pc.createAnswer());
-        await this._api("PUT", `sessions/${this.sessionId}/renegotiate`, {
-          sessionDescription: {
-            type: "answer",
-            sdp: this.pc.localDescription.sdp,
-          },
-        });
+      try {
+        const response = await this._api(
+          "POST",
+          `sessions/${this.sessionId}/tracks/new`,
+          { tracks: [{ location: "remote", peerId: peer.peerId }] },
+        );
+        const track = (response.tracks || [])[0];
+        if (!track || track.errorCode) {
+          throw new Error(track ? track.errorDescription : "no track");
+        }
+        remote.mid = track.mid;
+        await this._renegotiateIfNeeded(response);
+      } catch (error) {
+        // not allowed (any more) or failed: try again on the next update
+        if (this.remotes.get(peer.peerId) === remote && !remote.mid) {
+          this.remotes.delete(peer.peerId);
+        }
+        throw error;
       }
       // the track may have arrived during the negotiation
       if (this.pendingStreams.has(remote.mid)) {
         this._attach(remote, this.pendingStreams.get(remote.mid));
         this.pendingStreams.delete(remote.mid);
       }
+    });
+  }
+
+  /**
+   * We may hear a peer again (back in the same place, woken up…): reuse the
+   * transceiver the server stopped, or pull again if that fails.
+   */
+  _reopen(peer) {
+    const remote = this.remotes.get(peer.peerId);
+    remote.closed = false;
+    // still being pulled: nothing to reopen yet
+    if (!remote.mid) return;
+    return this._enqueue(async () => {
+      if (!this.pc || this.remotes.get(peer.peerId) !== remote) return;
+      if (remote.closed) return;
+      try {
+        const response = await this._api(
+          "PUT",
+          `sessions/${this.sessionId}/tracks/update`,
+          {
+            tracks: [
+              { location: "remote", mid: remote.mid, peerId: peer.peerId },
+            ],
+          },
+        );
+        const track = (response.tracks || [])[0];
+        if (track && track.errorCode) throw new Error(track.errorDescription);
+        await this._renegotiateIfNeeded(response);
+      } catch (error) {
+        console.warn("Voice chat: reopening failed, pulling again", error);
+        if (this.remotes.get(peer.peerId) !== remote) return;
+        this.remotes.delete(peer.peerId);
+        this._disposeRemote(remote);
+        this._pull(peer);
+      }
+    });
+  }
+
+  /** The server stopped forwarding this peer: we can't hear them now. */
+  _markClosed(peerId) {
+    const remote = this.remotes.get(peerId);
+    if (!remote || remote.closed) return;
+    remote.closed = true;
+    if (remote.speaking) {
+      remote.speaking = false;
+      this.onSpeaking(peerId, false);
+    }
+  }
+
+  async _renegotiateIfNeeded(response) {
+    if (!response.requiresImmediateRenegotiation) return;
+    await this.pc.setRemoteDescription(response.sessionDescription);
+    await this.pc.setLocalDescription(await this.pc.createAnswer());
+    await this._api("PUT", `sessions/${this.sessionId}/renegotiate`, {
+      sessionDescription: {
+        type: "answer",
+        sdp: this.pc.localDescription.sdp,
+      },
     });
   }
 
@@ -294,22 +355,36 @@ export default class VoiceClient {
         .getTransceivers()
         .find((t) => t.mid === remote.mid);
       if (!transceiver) return;
+      if (remote.closed) {
+        // already stopped by the server: just forget it
+        await this._api("PUT", `sessions/${this.sessionId}/tracks/close`, {
+          tracks: [{ mid: remote.mid }],
+          force: true,
+        }).catch(() => {});
+        return;
+      }
       transceiver.direction = "inactive";
       await this.pc.setLocalDescription(await this.pc.createOffer());
-      const response = await this._api(
-        "PUT",
-        `sessions/${this.sessionId}/tracks/close`,
-        {
-          tracks: [{ mid: remote.mid }],
-          sessionDescription: {
-            type: "offer",
-            sdp: this.pc.localDescription.sdp,
+      try {
+        const response = await this._api(
+          "PUT",
+          `sessions/${this.sessionId}/tracks/close`,
+          {
+            tracks: [{ mid: remote.mid }],
+            sessionDescription: {
+              type: "offer",
+              sdp: this.pc.localDescription.sdp,
+            },
+            force: false,
           },
-          force: false,
-        },
-      );
-      if (response.sessionDescription) {
-        await this.pc.setRemoteDescription(response.sessionDescription);
+        );
+        if (response.sessionDescription) {
+          await this.pc.setRemoteDescription(response.sessionDescription);
+        }
+      } catch (error) {
+        // don't leave the connection waiting for an answer
+        await this.pc.setLocalDescription({ type: "rollback" }).catch(() => {});
+        throw error;
       }
     });
   }
@@ -344,14 +419,22 @@ export default class VoiceClient {
     if (remote.source) remote.source.disconnect();
   }
 
-  /** Room state from the voice server: pull new peers, drop gone ones. */
-  _onPeers(peers) {
+  /**
+   * Room state from the voice server: receive whoever we may hear ("hear",
+   * decided by the server), stop the rest, drop who left.
+   */
+  _onPeers(peers, hear = []) {
     const others = peers.filter((peer) => peer.peerId !== this.peerId);
     others.forEach((peer) => {
       const remote = this.remotes.get(peer.peerId);
-      const key = `${peer.sessionId}/${peer.trackName}`;
-      if (remote && remote.key !== key) this._drop(peer.peerId);
-      if (!this.remotes.has(peer.peerId)) this._pull(peer);
+      if (remote && remote.key !== remoteKey(peer)) this._drop(peer.peerId);
+      if (!hear.includes(peer.peerId)) {
+        this._markClosed(peer.peerId);
+      } else if (!this.remotes.has(peer.peerId)) {
+        this._pull(peer);
+      } else if (this.remotes.get(peer.peerId).closed) {
+        this._reopen(peer);
+      }
     });
     [...this.remotes.keys()].forEach((peerId) => {
       if (!others.some((peer) => peer.peerId === peerId)) this._drop(peerId);
@@ -447,8 +530,9 @@ export default class VoiceClient {
       } catch (e) {
         return;
       }
-      if (message.type === "peers") this._onPeers(message.peers);
-      else if (message.type === "mute") this.onForceMute();
+      if (message.type === "peers") {
+        this._onPeers(message.peers, message.hear);
+      } else if (message.type === "mute") this.onForceMute();
       // invitations, join requests, declines, gathering in the plaza
       else this.onEvent(message);
     };
