@@ -4,6 +4,16 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.6.0
+- Info cards: the storyteller can send a player what they learn (a phrase such as "You are" or "This is the Demon", text, characters, players, a number or yes/no) from the player menu; it pops up on the player's screen and stays in the private chat
+- Choice cards ("Choose a player", "Choose 2 players", "Choose a character"): the player answers in the private chat
+- The storyteller sees on each token whether the player has seen the last info card (envelope until seen, then a thumbs up)
+- Enter sends the info card
+- Fixed nobody being able to join the voice chat (the voice server crashed when joining)
+- Fixed the player menu going off the top of the screen for players at the top of the circle
+- Fixed the info card being covered by the window buttons
+- Fixed a chat connection error in the console when joining a session
+
 ### Version 3.5.0
 - The screen stays on during a live session, so phones don't lock in the middle of a game
 - The app can be installed on the home screen (phones and tablets) and opens without the browser bar
