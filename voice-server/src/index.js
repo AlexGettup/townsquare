@@ -433,11 +433,20 @@ export class VoiceRoom {
     if (!isAllowedSfuRoute(request.method, path)) {
       return json({ errorCode: "not_found" }, 404);
     }
-    const body = request.method === "GET" ? undefined : await request.json();
+    // some calls (sessions/new) have no body
+    const raw = request.method === "GET" ? "" : await request.text();
+    let body;
+    try {
+      body = raw ? JSON.parse(raw) : undefined;
+    } catch (e) {
+      return json({ errorCode: "bad_request" }, 400);
+    }
     const session = (path.match(/^sessions\/([\w-]+)\//) || [])[1];
     const isPull = /\/tracks\/(new|update)$/.test(path);
     const remote = isPull
-      ? (body.tracks || []).filter((track) => track.location === "remote")
+      ? ((body && body.tracks) || []).filter(
+          (track) => track.location === "remote",
+        )
       : [];
 
     let pulled = [];
@@ -485,7 +494,7 @@ export class VoiceRoom {
         });
       }
       if (path.endsWith("/tracks/close")) {
-        (body.tracks || []).forEach(({ mid }) =>
+        ((body && body.tracks) || []).forEach(({ mid }) =>
           this.sql.exec(
             `DELETE FROM pulls WHERE session = ? AND mid = ?`,
             session,
