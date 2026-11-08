@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.12.2",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Joining a game without getting stuck",
+      "es": "Unirse a una partida sin quedarse atascado"
+    },
+    "en": [
+      "Fixed \"Join a game\" and \"Create a game\" doing nothing after entering a code with no game (a wrong code, or joining before the game was created)",
+      "If there is no game yet, the first screen now says it's waiting for the Storyteller and shows the code, so you can check it"
+    ],
+    "es": [
+      "Corregido que «Unirse a partida» y «Crear partida» no hicieran nada tras introducir un código sin partida (mal escrito, o antes de que se creara la partida)",
+      "Si todavía no hay partida, la primera pantalla indica que está esperando al Narrador y muestra el código, para que puedas comprobarlo"
+    ]
+  },
+  {
     "version": "3.12.1",
     "date": "2026-11-08",
     "title": {
