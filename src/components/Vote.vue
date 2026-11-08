@@ -185,6 +185,12 @@ export default {
           this.session.votes[index] === undefined
             ? 0
             : this.session.votes[index],
+        )
+        // keyboard votes are true / false; Bureaucrat x3, Thief -1
+        .map(
+          (vote, index) =>
+            (vote === true ? 1 : vote || 0) *
+            ((this.players[index] && this.players[index].voteWeight) || 1),
         );
       const reorder = [
         ...votes.slice(nomination + 1),
