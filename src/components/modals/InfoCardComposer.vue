@@ -112,6 +112,9 @@ const PHRASES = [
   "characterSelectedYou",
   "youLearn",
   "useAbility",
+  "choosePlayer",
+  "chooseTwoPlayers",
+  "chooseCharacter",
 ];
 
 /**

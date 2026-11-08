@@ -27,6 +27,9 @@ const state = () => ({
   shownCard: null,
   // storyteller: player ID we are writing an info card for
   composingFor: null,
+  // storyteller: card ticks only show for cards sent after this (each
+  // nightfall and dawn starts afresh)
+  cardsSince: 0,
 });
 
 const getters = {
@@ -49,6 +52,21 @@ const getters = {
     });
     return tabs;
   },
+  /**
+   * Storyteller: the last info card sent to a player in this phase:
+   * "sent" (not seen yet), "seen" or null (none).
+   */
+  cardStatusOf: (state) => (playerId) => {
+    const channel = dmTab(playerId);
+    for (let i = state.messages.length - 1; i >= 0; i--) {
+      const message = state.messages[i];
+      if (message.at < state.cardsSince) return null;
+      if (message.channel === channel && message.card) {
+        return message.seen ? "seen" : "sent";
+      }
+    }
+    return null;
+  },
   totalUnread: (state) =>
     Object.values(state.unread).reduce((total, count) => total + count, 0),
 };
@@ -68,6 +86,14 @@ const mutations = {
       const tab = tabOf(message);
       state.unread = { ...state.unread, [tab]: (state.unread[tab] || 0) + 1 };
     }
+  },
+  setSeen(state, { id, seen }) {
+    state.messages = state.messages.map((message) =>
+      message.id === id ? { ...message, seen } : message,
+    );
+  },
+  resetCardStatus(state) {
+    state.cardsSince = Date.now();
   },
   clear(state) {
     state.messages = [];
@@ -111,6 +137,19 @@ const actions = {
   sendCard({ rootGetters }, { to, card }) {
     if (rootGetters["voice/selfPeerId"] !== STORYTELLER || !to) return;
     this.$chat.sendCard(to, card);
+  },
+  /** Player: close an info card, telling the storyteller we saw it. */
+  closeCard({ state, commit, rootGetters }) {
+    const message = state.shownCard;
+    commit("hideCard");
+    if (
+      message &&
+      !message.seen &&
+      message.from === STORYTELLER &&
+      rootGetters["voice/selfPeerId"] !== STORYTELLER
+    ) {
+      this.$chat.markSeen(message.id);
+    }
   },
   /** Storyteller only: empty the chat for everyone. */
   clear({ rootGetters }) {

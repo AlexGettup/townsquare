@@ -139,6 +139,9 @@
     "no": "No",
     "sendButton": "Send",
     "gotIt": "Got It",
+    "choiceHint": "Write your choice to the Storyteller in the private chat",
+    "sent": "Information sent, not seen yet",
+    "seen": "The player saw the information",
     "phrases": {
       "youAre": "You are",
       "thisIsTheDemon": "This is the Demon",
@@ -147,7 +150,10 @@
       "thisPlayerIs": "This player is",
       "characterSelectedYou": "This character selected you",
       "youLearn": "You learn",
-      "useAbility": "Do you want to use your ability?"
+      "useAbility": "Do you want to use your ability?",
+      "choosePlayer": "Choose a player",
+      "chooseTwoPlayers": "Choose 2 players",
+      "chooseCharacter": "Choose a character"
     }
   },
   "dialogs": {

@@ -80,6 +80,15 @@
         @set-role="isMenuOpen = !isMenuOpen"
       />
 
+      <!-- Storyteller: last info card sent to this player, and if they saw it -->
+      <font-awesome-icon
+        :icon="cardStatus === 'seen' ? 'thumbs-up' : 'envelope'"
+        class="card-status"
+        :class="cardStatus"
+        v-if="cardStatus"
+        :title="$t(`cards.${cardStatus}`)"
+      />
+
       <!-- Voice chat: ring while talking, icon while the microphone is off -->
       <div class="voice-ring" v-if="voiceSpeaking"></div>
       <font-awesome-icon
@@ -378,6 +387,10 @@ export default {
         !!this.player.id &&
         this.voice.isAvailable
       );
+    },
+    cardStatus: function () {
+      if (this.session.isSpectator || !this.player.id) return null;
+      return this.$store.getters["chat/cardStatusOf"](this.player.id);
     },
     // players can guess anyone's character, except travellers (public)
     canChangeRole: function () {
@@ -1136,6 +1149,23 @@ li.move:not(.from) .player .overlay svg.move {
   filter: drop-shadow(0 0 3px black);
   z-index: 2;
   pointer-events: none;
+}
+
+/****** Info card status (storyteller) ********/
+.player .card-status {
+  position: absolute;
+  right: -5px;
+  margin-top: -100%;
+  font-size: 130%;
+  filter: drop-shadow(0 0 3px black);
+  z-index: 2;
+  pointer-events: none;
+  &.sent {
+    color: lightgray;
+  }
+  &.seen {
+    color: $townsfolk;
+  }
 }
 
 /****** Seat icon ********/

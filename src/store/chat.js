@@ -39,6 +39,7 @@ export default (store) => {
       }
     },
     onCleared: () => store.commit("chat/clear"),
+    onSeen: (id, seen) => store.commit("chat/setSeen", { id, seen }),
     onError: (reason) => {
       store.commit("chat/setError", reason);
       clearTimeout(errorTimer);
@@ -88,6 +89,7 @@ export default (store) => {
       case "toggleNight":
         if (isStoryteller()) {
           client.setNight(store.state.grimoire.isNight);
+          store.commit("chat/resetCardStatus");
         } else if (store.state.grimoire.isNight) {
           // at night players can only write to the storyteller
           store.commit("chat/setTab", dmTab(selfPeerId()));

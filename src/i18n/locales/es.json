@@ -139,6 +139,9 @@
     "no": "No",
     "sendButton": "Enviar",
     "gotIt": "Entendido",
+    "choiceHint": "Escribe tu elección al Narrador en el chat privado",
+    "sent": "Información enviada, aún sin ver",
+    "seen": "El jugador ha visto la información",
     "phrases": {
       "youAre": "Tú eres",
       "thisIsTheDemon": "Este es el Demonio",
@@ -147,7 +150,10 @@
       "thisPlayerIs": "Este jugador es",
       "characterSelectedYou": "Este personaje te ha elegido",
       "youLearn": "Descubres",
-      "useAbility": "¿Quieres usar tu habilidad?"
+      "useAbility": "¿Quieres usar tu habilidad?",
+      "choosePlayer": "Elige un jugador",
+      "chooseTwoPlayers": "Elige 2 jugadores",
+      "chooseCharacter": "Elige un personaje"
     }
   },
   "dialogs": {
