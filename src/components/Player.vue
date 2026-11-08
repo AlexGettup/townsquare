@@ -40,8 +40,8 @@
         'alignment-' + player.alignmentIndex,
       ]"
     >
-      <div class="shroud" @click="toggleStatus()"></div>
-      <div class="life" @click="toggleStatus()"></div>
+      <div class="shroud" @click="onStatusClick"></div>
+      <div class="life" @click="onStatusClick"></div>
 
       <div
         class="night-order first"
@@ -77,7 +77,7 @@
             ? 0
             : player.alignmentIndex
         "
-        @set-role="isMenuOpen = !isMenuOpen"
+        @set-role="onTokenClick"
       />
 
       <!-- Storyteller: last info card sent to this player, and if they saw it -->
@@ -520,8 +520,47 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener("click", this.closeMenuOnOutsideClick, true);
+    clearTimeout(this.tapTimer);
   },
   methods: {
+    // Touch screens: the shroud is easy to hit by mistake, so one tap
+    // anywhere on the token opens the player menu and a double tap toggles
+    // death. With a mouse, the shroud toggles death and the token opens the menu.
+    isTouchScreen() {
+      return !!window.matchMedia && window.matchMedia("(hover: none)").matches;
+    },
+    onStatusClick() {
+      if (this.isTouchScreen()) {
+        this.onTokenTap();
+      } else {
+        this.toggleStatus();
+      }
+    },
+    onTokenClick() {
+      if (this.isTouchScreen()) {
+        this.onTokenTap();
+      } else {
+        this.isMenuOpen = !this.isMenuOpen;
+      }
+    },
+    onTokenTap() {
+      // players can't change deaths: open the menu right away
+      if (this.session.isSpectator) {
+        this.isMenuOpen = !this.isMenuOpen;
+        return;
+      }
+      if (this.tapTimer) {
+        // second tap: double tap
+        clearTimeout(this.tapTimer);
+        this.tapTimer = null;
+        this.toggleStatus();
+        return;
+      }
+      this.tapTimer = setTimeout(() => {
+        this.tapTimer = null;
+        this.isMenuOpen = !this.isMenuOpen;
+      }, 300);
+    },
     closeMenuOnOutsideClick(event) {
       const player = this.$refs.player;
       if (player && !player.contains(event.target)) {
@@ -720,6 +759,8 @@ export default {
     top: 0;
     left: 0;
     position: absolute;
+    // no double-tap zoom: a double tap toggles death on touch screens
+    touch-action: manipulation;
     width: 100%;
     height: 45%;
     cursor: pointer;
@@ -774,6 +815,7 @@ export default {
   z-index: 2;
 
   .life {
+    touch-action: manipulation;
     border-radius: 50%;
     width: 100%;
     background: url("../assets/life.webp") center center;
@@ -845,6 +887,7 @@ export default {
 
 /***** Role token ******/
 .player .token {
+  touch-action: manipulation;
   position: absolute;
   left: 0;
   top: 0;
