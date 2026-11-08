@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.10.0",
+    "date": "2026-11-08",
+    "title": {
+      "en": "A clearer vote",
+      "es": "Una votación más clara"
+    },
+    "en": [
+      "During a nomination, a \"Your vote\" panel at the bottom of the screen asks the question (\"Execute Ana?\"), with big Yes / No buttons that light up with your choice, your vote in words, how many seats the clock hand is from you and when your vote is locked",
+      "If you can't vote, the panel says why (no seat, disconnected, ghost vote already used); if you are dead, it reminds you that voting yes uses your ghost vote",
+      "When the Storyteller wakes you up at night, a notice appears with a sound (unless muted), the phone vibrates and, if the game is in another tab, its title shows it; new information also shows in the tab title"
+    ],
+    "es": [
+      "Durante una nominación, un panel «Tu voto» en la parte inferior de la pantalla hace la pregunta («¿Ejecutar a Ana?»), con botones grandes de Sí / No que se iluminan con tu elección, tu voto en palabras, cuántos asientos le faltan a la mano del reloj para llegar a ti y cuándo se fija tu voto",
+      "Si no puedes votar, el panel te dice por qué (sin asiento, desconectado, voto fantasma ya usado); si estás muerto, te recuerda que votar SÍ gasta tu voto fantasma",
+      "Cuando el Narrador te despierta de noche, aparece un aviso con sonido (salvo que esté silenciado), el móvil vibra y, si tienes la partida en otra pestaña, su título lo indica; la información nueva también se marca en el título de la pestaña"
+    ]
+  },
+  {
     "version": "3.9.0",
     "date": "2026-11-08",
     "title": {
