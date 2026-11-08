@@ -6,18 +6,21 @@
  *   track to pull from Cloudflare Realtime for each of them.
  * - /rooms/<channel>/chat?peer=<peerId>  WebSocket for the text chat of the
  *   same game session (works without joining voice).
- * - /sfu/...  proxy to the Cloudflare Realtime SFU API, so the app secret
- *   never reaches the browser.
+ * - /rooms/<channel>/sfu/...  proxy to the Cloudflare Realtime SFU API, so
+ *   the app secret never reaches the browser. It goes through the room, which
+ *   only lets each client receive the microphones it is allowed to hear.
  *
  * Secrets (set with `wrangler secret put`): CF_APP_ID, CF_APP_TOKEN.
  */
 
+// SFU_API_URL (optional var) points to a fake SFU in tests
 const SFU_API = "https://rtc.live.cloudflare.com/v1/apps";
 
 // SFU endpoints the app is allowed to call through the proxy
 const SFU_ROUTES = [
   ["POST", /^sessions\/new$/],
   ["POST", /^sessions\/[\w-]+\/tracks\/new$/],
+  ["PUT", /^sessions\/[\w-]+\/tracks\/update$/],
   ["PUT", /^sessions\/[\w-]+\/tracks\/close$/],
   ["PUT", /^sessions\/[\w-]+\/renegotiate$/],
 ];
@@ -44,20 +47,28 @@ const withCors = (response, origin) => {
   return new Response(response.body, { status: response.status, headers });
 };
 
-async function proxySfu(request, env, path) {
-  const allowed = SFU_ROUTES.some(
-    ([method, pattern]) => request.method === method && pattern.test(path),
+const isAllowedSfuRoute = (method, path) =>
+  SFU_ROUTES.some(
+    ([allowedMethod, pattern]) =>
+      method === allowedMethod && pattern.test(path),
   );
-  if (!allowed) return new Response("Not found", { status: 404 });
-  return fetch(`${SFU_API}/${env.CF_APP_ID}/${path}`, {
-    method: request.method,
+
+// call the Cloudflare Realtime SFU API with the app secret
+const callSfu = (env, method, path, body) =>
+  fetch(`${env.SFU_API_URL || SFU_API}/${env.CF_APP_ID}/${path}`, {
+    method,
     headers: {
       Authorization: `Bearer ${env.CF_APP_TOKEN}`,
       "Content-Type": "application/json",
     },
-    body: request.method === "GET" ? undefined : await request.text(),
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
-}
+
+const json = (data, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 
 export default {
   async fetch(request, env) {
@@ -70,19 +81,17 @@ export default {
       return withCors(new Response(null, { status: 204 }), origin);
     }
 
-    const room = url.pathname.match(/^\/rooms\/([^/]+)\/(ws|chat)$/);
+    const room = url.pathname.match(/^\/rooms\/([^/]+)\/(ws|chat|sfu\/.+)$/);
     if (room) {
+      const channel = decodeURIComponent(room[1]).toLowerCase();
+      const stub = env.ROOMS.get(env.ROOMS.idFromName(channel));
+      if (room[2].startsWith("sfu/")) {
+        return withCors(await stub.fetch(request), origin);
+      }
       if (request.headers.get("Upgrade") !== "websocket") {
         return new Response("Expected a WebSocket", { status: 426 });
       }
-      const channel = decodeURIComponent(room[1]).toLowerCase();
-      const stub = env.ROOMS.get(env.ROOMS.idFromName(channel));
       return stub.fetch(request);
-    }
-
-    if (url.pathname.startsWith("/sfu/")) {
-      const path = url.pathname.slice("/sfu/".length);
-      return withCors(await proxySfu(request, env, path), origin);
     }
 
     return withCors(new Response("Not found", { status: 404 }), origin);
@@ -129,8 +138,9 @@ const chatMessage = (row) => ({
  * Uses the hibernation API, so an idle room costs nothing.
  */
 export class VoiceRoom {
-  constructor(ctx) {
+  constructor(ctx, env) {
     this.ctx = ctx;
+    this.env = env;
     // answer keepalive pings without waking the object up
     this.ctx.setWebSocketAutoResponse(
       new WebSocketRequestResponsePair('{"type":"ping"}', '{"type":"pong"}'),
@@ -147,10 +157,34 @@ export class VoiceRoom {
         recipients TEXT NOT NULL
       )`,
     );
+    // microphones each client receives: one row per pulled track
+    this.sql.exec(
+      `CREATE TABLE IF NOT EXISTS pulls (
+        session TEXT NOT NULL,
+        mid TEXT NOT NULL,
+        speaker TEXT NOT NULL,
+        open INTEGER NOT NULL,
+        PRIMARY KEY (session, mid)
+      )`,
+    );
+    // day or night, set by the storyteller
+    this.night = false;
+    ctx.blockConcurrencyWhile(async () => {
+      this.night = !!(await ctx.storage.get("night"));
+    });
+  }
+
+  async setIsNight(night) {
+    if (this.night === !!night) return false;
+    this.night = !!night;
+    await this.ctx.storage.put("night", this.night);
+    return true;
   }
 
   async fetch(request) {
     const url = new URL(request.url);
+    const sfu = url.pathname.match(/\/sfu\/(.+)$/);
+    if (sfu) return this.proxySfu(request, sfu[1]);
     const peerId = url.searchParams.get("peer");
     if (!peerId || peerId.length > 200) {
       return new Response("Missing peer", { status: 400 });
@@ -187,8 +221,41 @@ export class VoiceRoom {
       .map((peer) => {
         const visible = withDefaults(peer);
         delete visible.invitedBy;
+        // the SFU session stays secret: tracks are pulled by peerId
+        delete visible.sessionId;
+        delete visible.trackName;
         return visible;
       });
+  }
+
+  // the voice state of everyone sending audio (SFU session included)
+  voicePeers(except) {
+    return this.sockets(except)
+      .map((ws) => withDefaults(ws.deserializeAttachment() || {}))
+      .filter((peer) => peer.sessionId);
+  }
+
+  /**
+   * May the listener receive the speaker's microphone right now? Same rules
+   * as the app: during the day, people in the same place; at night players
+   * only hear the storyteller once woken up (or while they talk to
+   * everyone). The storyteller receives everyone (the app silences locally
+   * whoever they shouldn't hear, so they still see who is talking).
+   */
+  canPull(listener, speaker, host) {
+    if (listener.peerId === speaker.peerId) return false;
+    if (listener.peerId === STORYTELLER) return true;
+    if (!this.night) return listener.location === speaker.location;
+    if (speaker.peerId !== STORYTELLER || !host) return false;
+    return !!host.broadcast || (host.awake || []).includes(listener.peerId);
+  }
+
+  // peerIds the listener may receive
+  hearList(listener, everyone) {
+    const host = everyone.find((peer) => peer.peerId === STORYTELLER);
+    return everyone
+      .filter((speaker) => this.canPull(listener, speaker, host))
+      .map((speaker) => speaker.peerId);
   }
 
   // voice sockets only (text chat sockets are handled apart)
@@ -260,17 +327,134 @@ export class VoiceRoom {
   }
 
   broadcastPeers(except) {
-    const message = JSON.stringify({
-      type: "peers",
-      peers: this.peers(except),
-    });
+    const peers = this.peers(except);
+    const everyone = this.voicePeers(except);
     this.sockets(except).forEach((ws) => {
-      try {
-        ws.send(message);
-      } catch (e) {
-        // socket is closing
-      }
+      const listener = withDefaults(ws.deserializeAttachment() || {});
+      this.send(ws, {
+        type: "peers",
+        peers,
+        hear: this.hearList(listener, everyone),
+      });
     });
+  }
+
+  /**
+   * Stop the audio nobody may hear any more (someone left a conversation,
+   * night fell…): the SFU stops forwarding it, whatever the client does.
+   */
+  async enforce(except) {
+    const everyone = this.voicePeers(except);
+    const host = everyone.find((peer) => peer.peerId === STORYTELLER);
+    const bySession = new Map(everyone.map((peer) => [peer.sessionId, peer]));
+    const byPeer = new Map(everyone.map((peer) => [peer.peerId, peer]));
+    const toClose = new Map();
+    this.sql
+      .exec(`SELECT session, mid, speaker FROM pulls WHERE open = 1`)
+      .toArray()
+      .forEach(({ session, mid, speaker }) => {
+        const listener = bySession.get(session);
+        if (!listener) {
+          // that client is gone: forget its tracks
+          this.sql.exec(`DELETE FROM pulls WHERE session = ?`, session);
+          return;
+        }
+        const target = byPeer.get(speaker);
+        if (target && this.canPull(listener, target, host)) return;
+        if (!target) return; // left: the client closes it itself
+        toClose.set(session, [...(toClose.get(session) || []), mid]);
+      });
+    await Promise.all(
+      [...toClose].map(async ([session, mids]) => {
+        mids.forEach((mid) =>
+          this.sql.exec(
+            `UPDATE pulls SET open = 0 WHERE session = ? AND mid = ?`,
+            session,
+            mid,
+          ),
+        );
+        try {
+          await callSfu(this.env, "PUT", `sessions/${session}/tracks/close`, {
+            tracks: mids.map((mid) => ({ mid })),
+            force: true,
+          });
+        } catch (e) {
+          // the SFU session may be gone already
+        }
+      }),
+    );
+  }
+
+  /**
+   * SFU API proxy. Pulling a remote microphone names the speaker by peerId;
+   * the room checks the caller may hear them and fills in the SFU session.
+   */
+  async proxySfu(request, path) {
+    if (!isAllowedSfuRoute(request.method, path)) {
+      return json({ errorCode: "not_found" }, 404);
+    }
+    const body = request.method === "GET" ? undefined : await request.json();
+    const session = (path.match(/^sessions\/([\w-]+)\//) || [])[1];
+    const isPull = /\/tracks\/(new|update)$/.test(path);
+    const remote = isPull
+      ? (body.tracks || []).filter((track) => track.location === "remote")
+      : [];
+
+    let pulled = [];
+    if (remote.length) {
+      const everyone = this.voicePeers();
+      const host = everyone.find((peer) => peer.peerId === STORYTELLER);
+      const listener = everyone.find((peer) => peer.sessionId === session);
+      if (!listener) return json({ errorCode: "not_in_room" }, 403);
+      for (const track of remote) {
+        const speaker = everyone.find((peer) => peer.peerId === track.peerId);
+        if (!speaker || !this.canPull(listener, speaker, host)) {
+          return json({ errorCode: "not_allowed" }, 403);
+        }
+        pulled.push({ track, speaker: speaker.peerId });
+        track.sessionId = speaker.sessionId;
+        track.trackName = speaker.trackName;
+        delete track.peerId;
+      }
+    }
+
+    const response = await callSfu(this.env, request.method, path, body);
+    const data = await response.json().catch(() => ({}));
+
+    if (session && response.ok) {
+      if (pulled.length) {
+        // remember which microphone each new track carries
+        const results = data.tracks || [];
+        pulled.forEach(({ track, speaker }, index) => {
+          const result =
+            results.find(
+              (item) =>
+                item.mid && track.mid !== undefined && item.mid === track.mid,
+            ) ||
+            results.filter((item) => item.location !== "local")[index] ||
+            {};
+          const mid = result.mid || track.mid;
+          if (!mid || result.errorCode) return;
+          this.sql.exec(
+            `INSERT OR REPLACE INTO pulls (session, mid, speaker, open)
+             VALUES (?, ?, ?, 1)`,
+            session,
+            String(mid),
+            speaker,
+          );
+        });
+      }
+      if (path.endsWith("/tracks/close")) {
+        (body.tracks || []).forEach(({ mid }) =>
+          this.sql.exec(
+            `DELETE FROM pulls WHERE session = ? AND mid = ?`,
+            session,
+            String(mid),
+          ),
+        );
+      }
+    }
+    return json(data, response.status);
   }
 
   async webSocketMessage(ws, data) {
@@ -292,6 +476,8 @@ export class VoiceRoom {
           sessionId: String(message.sessionId),
           trackName: String(message.trackName),
           muted: !!message.muted,
+          // tells clients a peer rejoined with a new connection
+          since: Date.now(),
         });
         this.broadcastPeers();
         break;
@@ -316,6 +502,9 @@ export class VoiceRoom {
             .map(String),
           broadcast: !!message.broadcast,
         });
+        if (message.isNight !== undefined) {
+          await this.setIsNight(message.isNight);
+        }
         this.broadcastPeers();
         break;
       default:
@@ -324,6 +513,7 @@ export class VoiceRoom {
           this.broadcastPeers();
         }
     }
+    await this.enforce();
   }
 
   /**
@@ -499,8 +689,9 @@ export class VoiceRoom {
       }
       case "phase":
         // storyteller: day or night (players can't chat in public at night)
-        if (isStoryteller) {
-          await this.ctx.storage.put("night", !!message.night);
+        if (isStoryteller && (await this.setIsNight(message.night))) {
+          this.broadcastPeers();
+          await this.enforce();
         }
         break;
       case "chat": {
@@ -519,7 +710,7 @@ export class VoiceRoom {
           channel = "dm:" + player;
           recipients = [STORYTELLER, player];
         } else {
-          if (!isStoryteller && (await this.ctx.storage.get("night"))) {
+          if (!isStoryteller && this.night) {
             this.send(ws, { type: "chat-error", reason: "night" });
             break;
           }
@@ -577,11 +768,13 @@ export class VoiceRoom {
     if (isChat(ws)) return;
     this.cleanUp(ws);
     this.broadcastPeers(ws);
+    await this.enforce(ws);
   }
 
   async webSocketError(ws) {
     if (isChat(ws)) return;
     this.cleanUp(ws);
     this.broadcastPeers(ws);
+    await this.enforce(ws);
   }
 }
