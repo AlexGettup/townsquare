@@ -113,6 +113,17 @@
       "Replaced": "Has abierto el chat de voz en otra pestaña."
     }
   },
+  "chat": {
+    "title": "Chat",
+    "placeholder": "Escribe un mensaje…",
+    "send": "Enviar",
+    "empty": "Todavía no hay mensajes.",
+    "connecting": "Conectando…",
+    "nightLocked": "De noche solo puedes escribir al Narrador.",
+    "clear": "Borrar chat",
+    "clearConfirm": "¿Borrar el historial del chat para todos?",
+    "privateConversation": "Conversación privada"
+  },
   "dialogs": {
     "backgroundUrl": "Introduce la URL de un fondo personalizado",
     "hostChannel": "Introduce un número o nombre de canal para tu sesión",

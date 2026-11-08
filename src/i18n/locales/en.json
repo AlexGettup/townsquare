@@ -113,6 +113,17 @@
       "Replaced": "Voice chat was opened in another tab."
     }
   },
+  "chat": {
+    "title": "Chat",
+    "placeholder": "Write a message…",
+    "send": "Send",
+    "empty": "No messages yet.",
+    "connecting": "Connecting…",
+    "nightLocked": "At night you can only write to the Storyteller.",
+    "clear": "Clear chat",
+    "clearConfirm": "Clear the chat history for everyone?",
+    "privateConversation": "Private conversation"
+  },
   "dialogs": {
     "backgroundUrl": "Enter custom background URL",
     "hostChannel": "Enter a channel number / name for your session",

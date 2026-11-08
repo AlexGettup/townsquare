@@ -41,6 +41,7 @@
     <Gradients />
     <VoiceConversations />
     <VoicePrompts />
+    <ChatPanel />
     <span id="version">v{{ version }}</span>
   </div>
 </template>
@@ -63,11 +64,13 @@ import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import GameStateModal from "@/components/modals/GameStateModal";
 import VoiceConversations from "@/components/VoiceConversations";
 import VoicePrompts from "@/components/VoicePrompts";
+import ChatPanel from "@/components/ChatPanel";
 
 export default {
   components: {
     VoiceConversations,
     VoicePrompts,
+    ChatPanel,
     GameStateModal,
     VoteHistoryModal,
     NpcModal,
