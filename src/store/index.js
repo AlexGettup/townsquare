@@ -136,7 +136,6 @@ export default new Vuex.Store({
       isMuted: false,
       isArtUnofficial: false,
       isImageOptIn: false,
-      isMockAssignmentsAllowed: false,
       zoom: 0,
       background: "",
       locale: DEFAULT_LOCALE,
@@ -270,7 +269,6 @@ export default new Vuex.Store({
     toggleMenu: toggle("isMenuOpen"),
     toggleNightOrder: toggle("isNightOrder"),
     toggleStatic: toggle("isStatic"),
-    toggleMockAssignments: toggle("isMockAssignmentsAllowed"),
     toggleNight({ grimoire, players }, val) {
       // Reset the hasResponded var for the next night.
       players.players.map((player) => {

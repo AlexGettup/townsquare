@@ -78,7 +78,7 @@ const faIcons = [
   "WindowMinimize",
   "YinYang",
 ];
-const fabIcons = ["Github", "Discord"];
+const fabIcons = ["Github"];
 library.add(
   ...faIcons.map((i) => fas["fa" + i]),
   ...fabIcons.map((i) => fab["fa" + i]),
