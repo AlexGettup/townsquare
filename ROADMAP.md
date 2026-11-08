@@ -14,6 +14,11 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   tooltips kept on screen
 - **3.3.1** Seat and character restored after a player switches apps on a phone
 - **3.4.0** Chat open by default, compact on phones
+- **3.5.0** Screen kept on during a game; installable app (PWA)
+- **3.6.0** Info cards (and choice cards) with seen receipts on the storyteller's tokens
+- **3.7.0** "What's New" in the menu, Settings tab, day/night button, session code to copy
+- **3.8.0** Nomination marks on the tokens, tap/double tap on touch screens, reorganized
+  player menu
 
 ## Planned
 
