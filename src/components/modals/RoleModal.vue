@@ -11,9 +11,7 @@
               demon: alignment === 'Evil',
             }"
             @click="toggleAlignment"
-            >{{
-              $t(`modals.role.alignment.${alignment.toLowerCase()}`)
-            }}</span
+            >{{ $t(`modals.role.alignment.${alignment.toLowerCase()}`) }}</span
           >
         </div>
       </li>

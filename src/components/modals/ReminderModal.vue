@@ -5,7 +5,10 @@
       <li
         v-for="reminder in availableReminders"
         class="reminder"
-        :class="[reminder.role, { match: queryMatches(reminderLabel(reminder)) }]"
+        :class="[
+          reminder.role,
+          { match: queryMatches(reminderLabel(reminder)) },
+        ]"
         :key="reminder.role + ' ' + reminder.name"
         @click="addReminder(reminder)"
       >
