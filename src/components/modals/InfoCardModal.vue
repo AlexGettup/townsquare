@@ -37,8 +37,13 @@ export default {
 <style scoped lang="scss">
 .info-card-modal :deep(.modal) {
   overflow-y: auto;
+  overflow-x: hidden;
   // room for the maximize and close buttons in the top right corner
   padding: 45px 30px 20px;
+  // phones: the card uses the whole width of the window, no sideways scroll
+  @media (max-width: 767.98px) {
+    padding: 40px 12px 15px;
+  }
 }
 .button-group {
   margin-top: 15px;
