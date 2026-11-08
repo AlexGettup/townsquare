@@ -89,6 +89,20 @@
         :title="$t(`cards.${cardStatus}`)"
       />
 
+      <!-- Today: nominated someone (bottom left) / was nominated (bottom right) -->
+      <font-awesome-icon
+        icon="hand-point-right"
+        class="nomination-mark nominator"
+        v-if="player.hasNominated"
+        :title="$t('player.hasNominated')"
+      />
+      <font-awesome-icon
+        icon="gavel"
+        class="nomination-mark nominee"
+        v-if="player.wasNominated"
+        :title="$t('player.wasNominated')"
+      />
+
       <!-- Voice chat: ring while talking, icon while the microphone is off -->
       <div class="voice-ring" v-if="voiceSpeaking"></div>
       <font-awesome-icon
@@ -193,21 +207,6 @@
         @click="isMenuOpen = !isMenuOpen"
         :class="{ active: isMenuOpen }"
       >
-        <div
-          class="nomination-marks"
-          v-if="player.hasNominated || player.wasNominated"
-        >
-          <font-awesome-icon
-            icon="hand-point-right"
-            v-if="player.hasNominated"
-            :title="$t('player.hasNominated')"
-          />
-          <font-awesome-icon
-            icon="gavel"
-            v-if="player.wasNominated"
-            :title="$t('player.wasNominated')"
-          />
-        </div>
         <span>{{ player.name }}</span>
         <span class="pronouns" v-if="player.pronouns">{{
           player.pronouns
@@ -1166,6 +1165,24 @@ li.move:not(.from) .player .overlay svg.move {
   pointer-events: none;
 }
 
+/****** Nominated today: bottom corners, above the seat and ghost vote icons ******/
+.player .nomination-mark {
+  position: absolute;
+  margin-top: -38%;
+  font-size: 130%;
+  filter: drop-shadow(0 0 3px black);
+  z-index: 2;
+  pointer-events: none;
+  &.nominator {
+    left: -5px;
+    color: $townsfolk;
+  }
+  &.nominee {
+    right: -5px;
+    color: $demon;
+  }
+}
+
 /****** Info card status (storyteller) ********/
 .player .card-status {
   position: absolute;
@@ -1257,25 +1274,6 @@ li.move:not(.from) .player .overlay svg.move {
     font-size: 60%;
     line-height: 1;
     padding-bottom: 5px;
-  }
-
-  // nominated someone / was nominated today, to the left of the name
-  .nomination-marks {
-    position: absolute;
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-right: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 80%;
-    color: white;
-    filter: drop-shadow(0 0 2px black);
-    svg {
-      top: 0;
-      margin: 0;
-    }
   }
 }
 
