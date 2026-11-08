@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.9.0",
+    "date": "2026-11-08",
+    "title": {
+      "en": "A player menu made for touch screens",
+      "es": "Un menú del jugador pensado para pantallas táctiles"
+    },
+    "en": [
+      "On phones and tablets, the player menu opens as a panel at the bottom of the screen: the player's name and character on top, bigger options that are easier to tap, and the \"Seat\" options on a second page",
+      "On phones and tablets, adding a reminder or choosing a character no longer opens the keyboard"
+    ],
+    "es": [
+      "En móviles y tablets, el menú del jugador se abre como un panel en la parte inferior de la pantalla: arriba el nombre y el personaje, opciones más grandes y fáciles de pulsar, y las opciones de «Asiento» en una segunda página",
+      "En móviles y tablets, añadir un recordatorio o elegir un personaje ya no abre el teclado"
+    ]
+  },
+  {
     "version": "3.8.0",
     "date": "2026-11-08",
     "title": {
