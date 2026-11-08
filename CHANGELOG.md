@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.5.0
+- The screen stays on during a live session, so phones don't lock in the middle of a game
+- The app can be installed on the home screen (phones and tablets) and opens without the browser bar
+- Added the project roadmap (ROADMAP.md) and project context (CLAUDE.md)
+
 ### Version 3.4.0
 - The text chat is open by default
 - On phones the chat is compact (the last few lines) and grows while typing
