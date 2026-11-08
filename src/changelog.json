@@ -1,5 +1,37 @@
 [
   {
+    "version": "3.7.0",
+    "date": "2026-11-08",
+    "title": {
+      "en": "What's New and a tidier menu",
+      "es": "Novedades y un menú más ordenado"
+    },
+    "en": [
+      "\"What's New\" in the menu: the changes of each version, in English or Spanish",
+      "New Settings tab in the menu with the personal preferences (zoom, background, art, animations, sounds, language); the Grimoire tab keeps the game",
+      "Storyteller: a sun/moon button next to the reference sheet switches between day and night",
+      "The session tab shows the session code with a button to copy it; the session icon at the top opens this tab instead of offering to leave",
+      "Mock assignment (deal characters in the grimoire without sending them) is always available in the roles window",
+      "Menu tabs show their name on hover; keyboard shortcuts are hidden on touch screens",
+      "Removed the unofficial Discord link",
+      "Fixed the chat of a room or conversation also showing the messages of the plaza",
+      "Fixed the character name of a seated player moving up and down",
+      "Fixed an error when cancelling the Join Session dialog"
+    ],
+    "es": [
+      "«Novedades» en el menú: los cambios de cada versión, en español o en inglés",
+      "Nueva pestaña Ajustes en el menú con las preferencias personales (zoom, fondo, arte, animaciones, sonidos, idioma); la pestaña Grimorio se queda con la partida",
+      "Narrador: un botón de sol/luna junto a la hoja de referencia cambia entre día y noche",
+      "La pestaña de sesión muestra el código de sesión con un botón para copiarlo; el icono de sesión de arriba abre esa pestaña en vez de ofrecer salir",
+      "La asignación de prueba (repartir los personajes en el grimorio sin enviarlos) está siempre disponible en la ventana de reparto",
+      "Las pestañas del menú muestran su nombre al pasar el ratón; los atajos de teclado se ocultan en pantallas táctiles",
+      "Eliminado el enlace al Discord no oficial",
+      "Arreglado: el chat de una sala o conversación también mostraba los mensajes de la plaza",
+      "Arreglado: el nombre del personaje de un jugador sentado se movía arriba y abajo",
+      "Arreglado: un error al cancelar «Unirse a la sesión»"
+    ]
+  },
+  {
     "version": "3.6.2",
     "date": "2026-11-08",
     "title": {

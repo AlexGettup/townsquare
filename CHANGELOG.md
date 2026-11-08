@@ -4,6 +4,18 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.7.0
+- "What's New" in the menu: the changes of each version, in English or Spanish
+- New Settings tab in the menu with the personal preferences (zoom, background, art, animations, sounds, language); the Grimoire tab keeps the game
+- Storyteller: a sun/moon button next to the reference sheet switches between day and night
+- The session tab shows the session code with a button to copy it; the session icon at the top opens this tab instead of offering to leave
+- Mock assignment (deal characters in the grimoire without sending them) is always available in the roles window; the setting is gone from the menu
+- Menu tabs show their name on hover; keyboard shortcuts are hidden on touch screens
+- Removed the unofficial Discord link
+- Fixed the chat of a room or conversation also showing the messages of the plaza
+- Fixed the character name of a seated player moving up and down
+- Fixed an error when cancelling the Join Session dialog
+
 ### Version 3.6.2
 - Fixed info cards not opening again when clicked in the chat
 - The chat shows what each info card says (text, characters, players, number, yes/no), not only its phrase
