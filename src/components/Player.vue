@@ -77,7 +77,7 @@
             ? 0
             : player.alignmentIndex
         "
-        @set-role="$emit('trigger', ['openRoleModal'])"
+        @set-role="isMenuOpen = !isMenuOpen"
       />
 
       <!-- Voice chat: ring while talking, icon while the microphone is off -->
@@ -192,6 +192,10 @@
 
       <transition name="fold">
         <ul class="menu" v-if="isMenuOpen">
+          <li @click="changeRole" v-if="canChangeRole">
+            <font-awesome-icon icon="theater-masks" />
+            {{ $t("player.changeRole") }}
+          </li>
           <li
             @click="raiseHand"
             v-if="
@@ -362,6 +366,12 @@ export default {
     ...mapState(["grimoire", "session", "voice"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
+    // players can guess anyone's character, except travellers (public)
+    canChangeRole: function () {
+      return !(
+        this.session.isSpectator && this.player.role.team === "traveller"
+      );
+    },
     ...mapGetters("voice", [
       "isConnected",
       "selfPeerId",
@@ -539,6 +549,10 @@ export default {
       if (closeMenu) {
         this.isMenuOpen = false;
       }
+    },
+    changeRole() {
+      this.isMenuOpen = false;
+      this.$emit("trigger", ["openRoleModal"]);
     },
     removePlayer() {
       this.isMenuOpen = false;

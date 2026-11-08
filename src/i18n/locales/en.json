@@ -171,6 +171,7 @@
     "moveToSeat": "Move player to this seat",
     "nominatePlayer": "Nominate this player",
     "raiseHand": "Raise Hand",
+    "changeRole": "Change Character",
     "changeAlignment": "Change Alignment",
     "changePronouns": "Change Pronouns",
     "rename": "Rename",
