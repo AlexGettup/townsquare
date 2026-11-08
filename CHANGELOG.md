@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.3.0
+- Moved the voice chat button and the conversations panel to the top left corner; the NPC panel moves to the top right, below the menu
+- Fixed NPC ability and night order tooltips opening off screen
+- Fixed night order descriptions going off screen on phones
+
 ### Version 3.2.0
 - Voice chat: the voice server now decides whose audio each player receives, so nobody can listen to a private conversation or to other players at night by tweaking their browser; it also uses much less data (requires deploying the voice server together with the app)
 - Only one player menu stays open: clicking elsewhere (the empty square or another player) closes it
