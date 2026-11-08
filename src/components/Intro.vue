@@ -82,7 +82,6 @@ export default {
     },
     // storyteller: how many players, the session code, then the seats
     host() {
-      if (this.$store.state.session.sessionId) return;
       const answer = prompt(this.$t("dialogs.playerCount"), "8");
       if (answer === null) return;
       const count = parseInt(answer, 10);
@@ -111,9 +110,9 @@ export default {
       }
       this.notify("intro.hosted", "book-open");
     },
-    // player: the code or link from the storyteller
+    // player: the code or link from the storyteller. A session saved from
+    // before (a wrong code, a game that never started) is simply replaced
     join() {
-      if (this.$store.state.session.sessionId) return;
       let sessionId = prompt(this.$t("dialogs.joinChannel"));
       if (!sessionId) return;
       if (sessionId.match(/^https?:\/\//i)) {
