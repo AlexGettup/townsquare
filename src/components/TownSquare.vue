@@ -544,6 +544,18 @@ export default {
   transform: scale(0.1);
 }
 
+// the NPC panel sits on the right edge: show the ability tooltip on the left
+.npcs ul li .token .ability {
+  right: 120%;
+  left: auto;
+  &:before {
+    border-right-color: transparent;
+    border-left-color: black;
+    right: auto;
+    left: 100%;
+  }
+}
+
 .npcs ul li .token:before {
   content: " ";
   opacity: 0;
