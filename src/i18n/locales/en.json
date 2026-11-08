@@ -59,6 +59,7 @@
     "gameStateJson": "Game State JSON",
     "mockAssignments": "Mock Assignments",
     "discord": "Join Unofficial Discord",
+    "whatsNew": "What's New",
     "sourceCode": "Source Code"
   },
   "voice": {
@@ -263,6 +264,11 @@
       "enterUrl": "Enter URL",
       "useClipboard": "Use JSON from Clipboard",
       "back": "Back"
+    },
+    "changelog": {
+      "title": "What's New",
+      "version": "Version {version}",
+      "current": "current"
     },
     "gameState": {
       "title": "Current Game State",

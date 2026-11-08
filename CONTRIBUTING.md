@@ -50,9 +50,11 @@ To release, on a `feature/release-x.y.z` branch off `develop`:
    `npm version x.y.z --no-git-tag-version`
 2. Add a `### Version x.y.z` entry at the top of `CHANGELOG.md`, listing the
    `feat` and `fix` commits since the last tag (`git log vA.B.C..develop --no-merges --oneline`).
-3. Commit as `chore(release): x.y.z`, merge into `develop`, then fast-forward `main`
+3. Add the same version at the top of `src/changelog.json`, in English and Spanish: it is
+   what players see in the menu ("What's New"). Leave out notes that only matter to developers.
+4. Commit as `chore(release): x.y.z`, merge into `develop`, then fast-forward `main`
    to `develop` and push both.
-4. Tag the release on `main` and push the tag:
+5. Tag the release on `main` and push the tag:
    `git tag -a vx.y.z -m "Version x.y.z" && git push origin vx.y.z`
 
 ## Development Setup

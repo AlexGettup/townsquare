@@ -38,6 +38,7 @@
     <NightOrderModal />
     <VoteHistoryModal />
     <GameStateModal />
+    <ChangelogModal />
     <Gradients />
     <VoiceCorner />
     <VoicePrompts />
@@ -64,6 +65,7 @@ import NightOrderModal from "./components/modals/NightOrderModal";
 import NpcModal from "@/components/modals/NpcModal";
 import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import GameStateModal from "@/components/modals/GameStateModal";
+import ChangelogModal from "@/components/modals/ChangelogModal";
 import VoiceCorner from "@/components/VoiceCorner";
 import VoicePrompts from "@/components/VoicePrompts";
 import ChatPanel from "@/components/ChatPanel";
@@ -78,6 +80,7 @@ export default {
     InfoCardModal,
     InfoCardComposer,
     GameStateModal,
+    ChangelogModal,
     VoteHistoryModal,
     NpcModal,
     NightOrderModal,

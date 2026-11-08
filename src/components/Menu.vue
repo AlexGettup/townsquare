@@ -305,6 +305,10 @@
               </a>
             </em>
           </li>
+          <li @click="toggleModal('changelog')">
+            {{ $t("menu.whatsNew") }}
+            <em><font-awesome-icon icon="newspaper" /></em>
+          </li>
           <li>
             <a href="https://github.com/AlexGettup/townsquare" target="_blank">
               {{ $t("menu.sourceCode") }}

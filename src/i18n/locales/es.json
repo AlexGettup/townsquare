@@ -59,6 +59,7 @@
     "gameStateJson": "Estado de partida (JSON)",
     "mockAssignments": "Asignaciones de prueba",
     "discord": "Discord no oficial",
+    "whatsNew": "Novedades",
     "sourceCode": "Código fuente"
   },
   "voice": {
@@ -263,6 +264,11 @@
       "enterUrl": "Introducir URL",
       "useClipboard": "Usar JSON del portapapeles",
       "back": "Volver"
+    },
+    "changelog": {
+      "title": "Novedades",
+      "version": "Versión {version}",
+      "current": "actual"
     },
     "gameState": {
       "title": "Estado actual de la partida",
