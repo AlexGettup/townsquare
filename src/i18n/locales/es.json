@@ -171,6 +171,7 @@
     "moveToSeat": "Mover al jugador a este asiento",
     "nominatePlayer": "Nominar a este jugador",
     "raiseHand": "Levantar la mano",
+    "changeRole": "Cambiar personaje",
     "changeAlignment": "Cambiar alineamiento",
     "changePronouns": "Cambiar pronombres",
     "rename": "Renombrar",
