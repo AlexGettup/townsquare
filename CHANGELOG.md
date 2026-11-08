@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.12.0
+- New first screen with two buttons, each saying what comes next: "Create a game (Storyteller)" and "Join a game (Player)"
+- Creating a game asks how many players there are (up to 20), creates the seats ("Player 1", "Player 2"…, "Jugador 1"… in Spanish), hosts the session and copies the players' link
+- Joining asks for the session code or the link, and a notice explains how to claim a seat
+
 ### Version 3.11.0
 - Vote value per player, set by the storyteller in the "Seat" submenu: x1, x2 (Banshee), x3 (Bureaucrat) or -1 (Thief). Replaces the "Voting Twice" session switch and "Has Two Votes" entry
 - Banshee (x2) is public: the player's vote panel offers "Yes", "Yes x2" and "No", with an explanation
