@@ -36,26 +36,29 @@ players use each, so a feature that only helps one of them is worth half as much
 1. **Alerts** (For players): an on-screen notice and a sound when you are woken up, get an info
    card, a nomination starts or it's your turn to vote; the phone also vibrates. Helps both:
    on a computer the game is often in a background tab.
-2. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
+2. **One voice panel** (Voice chat): the voice menu covers the conversations and rooms when it
+   opens, and people show up twice (participants and rooms). Everything in one place first,
+   so volume and microphone choice have somewhere to live.
+3. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
    a slider next to their name needs no explanation.
-3. **Choose targets on screen** (Night without talking): players tap seats instead of typing
+4. **Choose targets on screen** (Night without talking): players tap seats instead of typing
    their choice in the chat; the last big gap for a silent night.
-4. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-5. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+5. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+6. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-6. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+7. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-7. **Day and night counter** (For players): passive context for everyone, and labels for the
+8. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-8. **Minion and demon info** (Night without talking): one button instead of several cards on
+9. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-9. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters and
-   the info cards sent when the page is reloaded mid-game.
-10. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+10. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
+    and the info cards sent when the page is reloaded mid-game.
+11. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
     storyteller explaining it out loud.
 
-After these: game diary, push-to-talk, guided night, own live session server, and the rest of
-the catalogue.
+After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
+live session server, and the rest of the catalogue.
 
 ### Phones and tablets
 
@@ -136,6 +139,20 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 ### Voice chat
 
+- [ ] **One voice panel, people grouped by place** (Discord-like): today the voice button's
+      menu (join, mute, leave, night controls, participants) unfolds over the conversations
+      and rooms panel, and every person is listed twice. Instead, a single panel:
+      - on top, your own controls (microphone, leave, a cog for microphone and speaker);
+      - below, the places (plaza, private conversations, rooms), each listing who is in it
+        with the speaking indicator; no separate participant list;
+      - tap a name for its options: volume (everyone), wake up / sleep and mute
+        (storyteller), invite to talk (someone in another place);
+      - tap a place to enter or ask to join; at night the same list wakes and puts to sleep;
+      - a side panel that folds on computers, the bottom panel on touch screens.
+- [ ] **Voice and text chat together** (to analyse after the voice panel): text chat also
+      follows the places (a private conversation has its own chat), so one communication
+      panel with each place's people and messages may be clearer than two panels. Decide
+      once the voice panel is in use.
 - [ ] **Push-to-talk**: the microphone only sends while a key or an on-screen button is held.
       Useful with background noise; optional, since it has to be learnt (and holding a button
       while talking is awkward on a phone).
