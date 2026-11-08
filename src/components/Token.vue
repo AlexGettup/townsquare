@@ -20,7 +20,7 @@
     <svg viewBox="0 0 150 150" class="name">
       <path
         d="M 13 75 C 13 160, 138 160, 138 75"
-        id="curve"
+        :id="curveId"
         fill="transparent"
       />
       <text
@@ -30,7 +30,7 @@
         class="label mozilla"
         :font-size="displayRole.name | nameToFontSize"
       >
-        <textPath xlink:href="#curve">
+        <textPath :xlink:href="'#' + curveId">
           {{ displayRole.name }}
         </textPath>
       </text>
@@ -58,6 +58,11 @@ export default {
     },
   },
   computed: {
+    // each token curves its name along its own path: pointing every token
+    // at the first one makes Firefox redraw the names while a seat glows
+    curveId: function () {
+      return "curve-" + this._uid;
+    },
     // role with name and ability in the chosen language
     displayRole: function () {
       return this.localizeRole(this.role);
