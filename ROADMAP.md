@@ -23,6 +23,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   reminder or character
 - **3.10.0** "Your vote" panel for players; alerts when woken up and for info cards
 - **3.11.0** Vote value per player (Banshee x2, Bureaucrat x3, Thief -1)
+- **3.12.0** Create or join a game from the first screen
 
 ## Planned
 

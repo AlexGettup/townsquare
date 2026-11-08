@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.12.0",
+    "date": "2026-11-08",
+    "title": {
+      "en": "Start a game from the first screen",
+      "es": "Empieza a jugar desde la primera pantalla"
+    },
+    "en": [
+      "The first screen has two buttons, each saying what comes next: \"Create a game (Storyteller)\" and \"Join a game (Player)\"",
+      "Creating a game asks how many players there are, creates their seats, opens the session and copies the link to share with them",
+      "Joining asks for the code or link your Storyteller gives you, and a notice tells you how to claim your seat"
+    ],
+    "es": [
+      "La primera pantalla tiene dos botones, y cada uno explica qué viene después: «Crear partida (Narrador)» y «Unirse a partida (Jugador)»",
+      "Al crear una partida, te pregunta cuántos jugadores hay, crea sus asientos, abre la sesión y copia el enlace para compartirlo con ellos",
+      "Al unirte, te pide el código o el enlace que te pase el Narrador, y un aviso te indica cómo reclamar tu asiento"
+    ]
+  },
+  {
     "version": "3.11.0",
     "date": "2026-11-08",
     "title": {
