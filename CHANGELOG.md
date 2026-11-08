@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.1.0
+- Clicking a character token now opens the player menu, with a new "Change Character" entry (the shroud on top of the token still toggles death)
+
 ### Version 3.0.0
 - Added Spanish: language selector in the Grimoire menu, translated interface and translated
   game content (characters, reminders, night order and jinxes, from the official translations)
