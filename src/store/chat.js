@@ -56,7 +56,8 @@ export default (store) => {
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => {
       const { sessionId } = store.state.session;
-      if (!serverUrl || !sessionId) {
+      // a player gets their ID a moment after joining: wait for it
+      if (!serverUrl || !sessionId || !selfPeerId()) {
         client.disconnect();
         store.commit("chat/clear");
         return;
