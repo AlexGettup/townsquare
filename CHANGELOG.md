@@ -1,5 +1,24 @@
 # Release Notes
 
+Versions follow [Semantic Versioning](https://semver.org): a new feature bumps the minor
+version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
+release of this fork; older versions belong to the original project.
+
+### Version 3.0.0
+- Added Spanish: language selector in the Grimoire menu, translated interface and translated
+  game content (characters, reminders, night order and jinxes, from the official translations)
+- Added a reference sheet button next to the menu
+- Added voice chat for live sessions, without Discord (Cloudflare Realtime)
+  - Voice menu with join, mute (`M` key) and leave, and a ring around whoever is talking
+  - Night: players are isolated; the storyteller wakes them up one by one or talks to everyone
+  - Day: private conversations by invitation or by asking to join, open rooms (Tavern,
+    Church, Graveyard) and "Call Everyone to the Square" with a bell
+- Added text chat following the same rules as voice, plus a private channel between each
+  player and the storyteller (the only one open at night); works without a microphone
+- Changed the page title to "BotC / Town Square" and "BotC / Grimoire"
+- Removed Google Analytics
+- Deployed to GitHub Pages; project links now point to AlexGettup/townsquare
+
 ### Version 2.22.8
 - Fixed errors when only the firstNight list is provided in the JSON
 - Improved consistency of night order overlay when only one of the firstNight and otherNight lists are provided in the JSON

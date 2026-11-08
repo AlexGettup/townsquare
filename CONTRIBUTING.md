@@ -34,8 +34,26 @@ Before submitting your contribution, please make sure to take a moment and read 
   - If you are resolving a special issue, add `(fix #xxxx[,#xxxx])` (#xxxx is the issue id) in your PR title for a better release log, e.g. `update entities encoding/decoding (fix #3899)`.
   - Provide a detailed description of the bug in the PR. Live demo preferred.
   
-- You'll need to update the `CHANGELOG.md` with a description of your changes before you open a pull request and your code
-  should pass the lint check.
+- Your code should pass the lint check. The `CHANGELOG.md` is updated when releasing (see below).
+
+## Releases
+
+Every deploy to `main` is a release, numbered with [Semantic Versioning](https://semver.org):
+
+- **Minor** (3.1.0): the release contains at least one `feat` commit.
+- **Patch** (3.0.1): the release only contains `fix` (or `chore`, `docs`…) commits.
+- **Major** (4.0.0): only for big changes that break saved games or sessions.
+
+To release, on a `feature/release-x.y.z` branch off `develop`:
+
+1. Bump the version (shown at the bottom right of the app):
+   `npm version x.y.z --no-git-tag-version`
+2. Add a `### Version x.y.z` entry at the top of `CHANGELOG.md`, listing the
+   `feat` and `fix` commits since the last tag (`git log vA.B.C..develop --no-merges --oneline`).
+3. Commit as `chore(release): x.y.z`, merge into `develop`, then fast-forward `main`
+   to `develop` and push both.
+4. Tag the release on `main` and push the tag:
+   `git tag -a vx.y.z -m "Version x.y.z" && git push origin vx.y.z`
 
 ## Development Setup
 
