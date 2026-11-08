@@ -215,60 +215,20 @@
 
       <transition name="fold">
         <ul class="menu" v-if="isMenuOpen">
-          <li @click="changeRole" v-if="canChangeRole">
-            <font-awesome-icon icon="theater-masks" />
-            {{ $t("player.changeRole") }}
-          </li>
-          <li
-            @click="raiseHand"
-            v-if="
-              session.isSpectator &&
-              player.connected &&
-              player.id === session.playerId &&
-              !session.nomination
-            "
-          >
-            <font-awesome-icon icon="hand-paper" />
-            {{ $t("player.raiseHand") }}
-          </li>
-          <li @click="sendInfoCard" v-if="canSendInfoCard">
-            <font-awesome-icon icon="address-card" />
-            {{ $t("cards.send") }}
-          </li>
-          <li @click="inviteToTalk" v-if="canInvite">
-            <font-awesome-icon icon="user-plus" />
-            {{ $t("voice.invite") }}
-          </li>
-          <li @click="changeAlignment" v-if="player.role.id">
-            <font-awesome-icon icon="yin-yang" />
-            {{ $t("player.changeAlignment") }}
-          </li>
-          <li
-            @click="changePronouns"
-            v-if="
-              !session.isSpectator ||
-              (session.isSpectator &&
-                player.connected &&
-                player.id === session.playerId)
-            "
-          >
-            <font-awesome-icon icon="venus-mars" />
-            {{ $t("player.changePronouns") }}
-          </li>
-          <li
-            @click="changeName"
-            v-if="
-              !session.isSpectator ||
-              (session.allowSelfNaming &&
-                session.isSpectator &&
-                player.connected &&
-                player.id === session.playerId)
-            "
-          >
-            <font-awesome-icon icon="user-edit" />
-            {{ $t("player.rename") }}
-          </li>
-          <template v-if="!session.isSpectator">
+          <!-- Storyteller: setting up the seat, behind "Seat ▸" -->
+          <template v-if="isSeatMenu">
+            <li class="back" @click="isSeatMenu = false">
+              <font-awesome-icon icon="chevron-left" />
+              {{ $t("player.seat") }}
+            </li>
+            <li @click="changeName">
+              <font-awesome-icon icon="user-edit" />
+              {{ $t("player.rename") }}
+            </li>
+            <li @click="changePronouns">
+              <font-awesome-icon icon="venus-mars" />
+              {{ $t("player.changePronouns") }}
+            </li>
             <li
               @click="updatePlayer('hasTwoVotes', !player.hasTwoVotes, true)"
               v-if="session.isTwoVotesEnabled"
@@ -284,16 +244,6 @@
               <font-awesome-icon icon="exchange-alt" />
               {{ $t("player.swapSeats") }}
             </li>
-            <li @click="removePlayer" :class="{ disabled: session.lockedVote }">
-              <font-awesome-icon icon="times-circle" />
-              {{ $t("player.remove") }}
-            </li>
-            <li @click="toggleAwakeVoice" v-if="canWakeVoice">
-              <font-awesome-icon :icon="isAwake(player.id) ? 'bed' : 'eye'" />
-              {{
-                isAwake(player.id) ? $t("voice.putToSleep") : $t("voice.wakeUp")
-              }}
-            </li>
             <li
               @click="updatePlayer('id', '', true)"
               v-if="player.id && session.sessionId"
@@ -301,36 +251,110 @@
               <font-awesome-icon icon="chair" />
               {{ $t("player.emptySeat") }}
             </li>
-            <template v-if="!session.nomination">
-              <li @click="nominatePlayer()">
-                <font-awesome-icon icon="hand-point-right" />
+            <li
+              @click="removePlayer"
+              class="danger"
+              :class="{ disabled: session.lockedVote }"
+            >
+              <font-awesome-icon icon="times-circle" />
+              {{ $t("player.remove") }}
+            </li>
+          </template>
+          <template v-else>
+            <!-- Players: an empty seat (or their own, reserved) to claim -->
+            <li @click="claimSeat" v-if="canClaimSeat">
+              <font-awesome-icon icon="chair" />
+              {{ $t("player.claimSeat") }}
+            </li>
+            <li
+              @click="raiseHand"
+              v-if="isOwnSeat && player.connected && !session.nomination"
+            >
+              <font-awesome-icon icon="hand-paper" />
+              {{ $t("player.raiseHand") }}
+            </li>
+            <!-- Storyteller: what each phase uses most goes first -->
+            <template v-if="!session.isSpectator">
+              <template v-if="grimoire.isNight">
+                <li @click="toggleAwakeVoice" v-if="canWakeVoice">
+                  <font-awesome-icon
+                    :icon="isAwake(player.id) ? 'bed' : 'eye'"
+                  />
+                  {{
+                    isAwake(player.id)
+                      ? $t("voice.putToSleep")
+                      : $t("voice.wakeUp")
+                  }}
+                </li>
+                <li @click="sendInfoCard" v-if="canSendInfoCard">
+                  <font-awesome-icon icon="address-card" />
+                  {{ $t("cards.send") }}
+                </li>
+              </template>
+              <template v-else>
+                <li @click="nominatePlayer()" v-if="!session.nomination">
+                  <font-awesome-icon icon="hand-point-right" />
+                  {{
+                    isNominating
+                      ? $t("player.cancelNomination")
+                      : $t("player.nomination")
+                  }}
+                </li>
+                <li @click="inviteToTalk" v-if="canInvite">
+                  <font-awesome-icon icon="user-plus" />
+                  {{ $t("voice.invite") }}
+                </li>
+                <li @click="sendInfoCard" v-if="canSendInfoCard">
+                  <font-awesome-icon icon="address-card" />
+                  {{ $t("cards.send") }}
+                </li>
+              </template>
+              <li @click="toggleDeath">
+                <font-awesome-icon
+                  :icon="player.isDead ? 'heartbeat' : 'skull'"
+                />
                 {{
-                  isNominating
-                    ? $t("player.cancelNomination")
-                    : $t("player.nomination")
+                  player.isDead ? $t("player.revive") : $t("player.markDead")
                 }}
               </li>
             </template>
-          </template>
-          <li
-            @click="claimSeat"
-            v-if="session.isSpectator"
-            :class="{ disabled: player.id && player.id !== session.playerId }"
-          >
-            <font-awesome-icon icon="chair" />
-            <template
-              v-if="
-                !player.id ||
-                (player.id === session.playerId && !player.connected)
-              "
-            >
-              {{ $t("player.claimSeat") }}</template
-            >
-            <template v-else-if="player.id === session.playerId">
-              {{ $t("player.vacateSeat") }}
+            <li @click="changeRole" v-if="canChangeRole">
+              <font-awesome-icon icon="theater-masks" />
+              {{ $t("player.changeRole") }}
+            </li>
+            <li @click="inviteToTalk" v-if="session.isSpectator && canInvite">
+              <font-awesome-icon icon="user-plus" />
+              {{ $t("voice.invite") }}
+            </li>
+            <li @click="changeAlignment" v-if="alignmentName">
+              <font-awesome-icon icon="yin-yang" />
+              {{ $t("player.alignment", { alignment: alignmentName }) }}
+            </li>
+            <li @click="addReminder">
+              <font-awesome-icon icon="plus-circle" />
+              {{ $t("player.addReminder") }}
+            </li>
+            <!-- Players: their own seat -->
+            <template v-if="isOwnSeat && player.connected">
+              <li @click="changePronouns">
+                <font-awesome-icon icon="venus-mars" />
+                {{ $t("player.changePronouns") }}
+              </li>
+              <li @click="changeName" v-if="session.allowSelfNaming">
+                <font-awesome-icon icon="user-edit" />
+                {{ $t("player.rename") }}
+              </li>
+              <li @click="claimSeat">
+                <font-awesome-icon icon="chair" />
+                {{ $t("player.vacateSeat") }}
+              </li>
             </template>
-            <template v-else> {{ $t("player.seatOccupied") }}</template>
-          </li>
+            <li @click="isSeatMenu = true" v-if="!session.isSpectator">
+              <font-awesome-icon icon="cog" />
+              {{ $t("player.seat") }}
+              <font-awesome-icon icon="chevron-right" class="submenu" />
+            </li>
+          </template>
         </ul>
       </transition>
     </div>
@@ -405,6 +429,33 @@ export default {
     cardStatus: function () {
       if (this.session.isSpectator || !this.player.id) return null;
       return this.$store.getters["chat/cardStatusOf"](this.player.id);
+    },
+    // players: this seat is theirs
+    isOwnSeat: function () {
+      return (
+        this.session.isSpectator &&
+        !!this.player.id &&
+        this.player.id === this.session.playerId
+      );
+    },
+    // players: an empty seat, or their own one after reconnecting
+    canClaimSeat: function () {
+      return (
+        this.session.isSpectator &&
+        (!this.player.id || (this.isOwnSeat && !this.player.connected))
+      );
+    },
+    // current alignment of the character token, for the menu
+    alignmentName: function () {
+      const { team } = this.player.role;
+      const index = this.player.alignmentIndex;
+      let key;
+      if (team === "traveller") key = ["regular", "good", "evil"][index];
+      else if (team === "townsfolk" || team === "outsider")
+        key = index ? "evil" : "good";
+      else if (team === "minion" || team === "demon")
+        key = index ? "good" : "evil";
+      return key ? this.$t("modals.role.alignment." + key) : "";
     },
     // players can guess anyone's character, except travellers (public)
     canChangeRole: function () {
@@ -500,6 +551,8 @@ export default {
   data() {
     return {
       isMenuOpen: false,
+      // storyteller: the "Seat" submenu of the player menu is showing
+      isSeatMenu: false,
       isSwap: false,
     };
   },
@@ -507,6 +560,7 @@ export default {
     // only one player menu at a time: a click anywhere else closes it
     // (the empty square, or another player to open their menu)
     isMenuOpen(isOpen) {
+      if (!isOpen) this.isSeatMenu = false;
       if (isOpen) {
         document.addEventListener("click", this.closeMenuOnOutsideClick, true);
       } else {
@@ -655,6 +709,21 @@ export default {
       if (closeMenu) {
         this.isMenuOpen = false;
       }
+    },
+    // explicit death toggle in the menu (a double tap does it on touch screens)
+    toggleDeath() {
+      if (this.player.isDead) {
+        this.updatePlayer("isDead", false);
+        if (this.player.isVoteless) this.updatePlayer("isVoteless", false);
+      } else {
+        this.updatePlayer("isDead", true);
+        if (this.player.isMarked) this.updatePlayer("isMarked", false);
+      }
+      this.isMenuOpen = false;
+    },
+    addReminder() {
+      this.isMenuOpen = false;
+      this.$emit("trigger", ["openReminderModal"]);
     },
     changeRole() {
       this.isMenuOpen = false;
@@ -1374,6 +1443,25 @@ li.move:not(.from) .player .overlay svg.move {
 
   .two-votes-icon {
     transform: rotate(60deg);
+  }
+
+  // "Seat" submenu: an arrow on the right, the way back on top
+  .submenu {
+    margin: 0 0 0 6px;
+    font-size: 80%;
+  }
+  li.back {
+    color: gray;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 2px;
+    &:hover {
+      color: red;
+    }
+  }
+  li.danger {
+    color: $demon;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: 2px;
   }
 }
 
