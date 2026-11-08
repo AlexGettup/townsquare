@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.12.1",
+    "date": "2026-11-08",
+    "title": {
+      "en": "First screen on laptops",
+      "es": "Primera pantalla en portátiles"
+    },
+    "en": [
+      "Fixed the logo being cut off on the first screen on laptops; the buttons now fit side by side there"
+    ],
+    "es": [
+      "Corregido el logo cortado en la primera pantalla en portátiles; ahora los botones caben uno al lado del otro"
+    ]
+  },
+  {
     "version": "3.12.0",
     "date": "2026-11-08",
     "title": {

@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.12.1
+- Fixed the logo and the "Community Created Content" badge being cut off on the first screen on laptops; the buttons now fit side by side there, and the screen scrolls on very short windows
+
 ### Version 3.12.0
 - New first screen with two buttons, each saying what comes next: "Create a game (Storyteller)" and "Join a game (Player)"
 - Creating a game asks how many players there are (up to 20), creates the seats ("Player 1", "Player 2"…, "Jugador 1"… in Spanish), hosts the session and copies the players' link
