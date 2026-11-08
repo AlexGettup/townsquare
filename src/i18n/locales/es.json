@@ -203,6 +203,8 @@
     "swapWithPlayer": "Intercambiar asiento con este jugador",
     "moveToSeat": "Mover al jugador a este asiento",
     "nominatePlayer": "Nominar a este jugador",
+    "hasNominated": "Ha nominado hoy",
+    "wasNominated": "Ha sido nominado hoy",
     "raiseHand": "Levantar la mano",
     "changeRole": "Cambiar personaje",
     "changeAlignment": "Cambiar alineamiento",

@@ -1,3 +1,5 @@
+import Vue from "vue";
+
 const NEWPLAYER = {
   name: "",
   id: "",
@@ -10,6 +12,9 @@ const NEWPLAYER = {
   hasResponded: {},
   isDead: false,
   handRaised: false,
+  // nominated someone / was nominated today (cleared when day or night starts)
+  hasNominated: false,
+  wasNominated: false,
   pronouns: "",
 };
 
@@ -151,7 +156,8 @@ const mutations = {
   update(state, { player, property, value }) {
     const index = state.players.indexOf(player);
     if (index >= 0) {
-      state.players[index][property] = value;
+      // Vue.set: players loaded from older saves may lack newer properties
+      Vue.set(state.players[index], property, value);
       if (property === "role" && value) state.players[index].alignmentIndex = 0;
     }
   },

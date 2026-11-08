@@ -287,6 +287,22 @@ export default {
       } else {
         const nomination = [this.nominate, this.players.indexOf(to)];
         this.$store.commit("session/nomination", { nomination });
+        // marks next to the names until the day ends (synced to the players)
+        const [nominator, nominee] = nomination.map((i) => this.players[i]);
+        if (nominator && !nominator.hasNominated) {
+          this.$store.commit("players/update", {
+            player: nominator,
+            property: "hasNominated",
+            value: true,
+          });
+        }
+        if (nominee && !nominee.wasNominated) {
+          this.$store.commit("players/update", {
+            player: nominee,
+            property: "wasNominated",
+            value: true,
+          });
+        }
         this.cancel();
       }
     },
