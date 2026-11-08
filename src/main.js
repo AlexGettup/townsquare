@@ -37,6 +37,7 @@ const faIcons = [
   "FileCode",
   "FileUpload",
   "HandPaper",
+  "Lock",
   "Gavel",
   "HandPointRight",
   "Headset",
