@@ -437,6 +437,25 @@ export default {
         transform: rotate($rot * -1deg);
       }
 
+      // top half of the circle: the menu opens downwards, so it never goes
+      // off the top of the screen
+      @if $rot < 90 or $rot > 270 {
+        .player > .menu {
+          bottom: auto;
+          top: -5px;
+          &:before {
+            bottom: auto;
+            top: 5px;
+          }
+          @media screen and (max-width: 767.98px) {
+            top: 0;
+            &:before {
+              top: 0;
+            }
+          }
+        }
+      }
+
       // animation cascade
       .life,
       .token,
