@@ -4,6 +4,7 @@ import persistence from "./persistence";
 import socket from "./socket";
 import voicePlugin from "./voice";
 import chatPlugin from "./chat";
+import wakeLockPlugin from "./wakeLock";
 import players from "./modules/players";
 import session from "./modules/session";
 import voice from "./modules/voice";
@@ -451,5 +452,5 @@ export default new Vuex.Store({
       state.modals.edition = false;
     },
   },
-  plugins: [persistence, socket, voicePlugin, chatPlugin],
+  plugins: [persistence, socket, voicePlugin, chatPlugin, wakeLockPlugin],
 });

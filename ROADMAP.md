@@ -24,9 +24,9 @@ botc.app has something similar.
 
 ### Phones and tablets
 
-- [ ] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
+- [x] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
       players don't drop from their seats.
-- [ ] **Install as an app (PWA)**: home screen icon and full screen, without the browser bar.
+- [x] **Install as an app (PWA)**: home screen icon and full screen, without the browser bar.
 - [ ] **Vibration** when you are woken up, receive an info card or a vote starts.
 - [ ] **Long press instead of hover** on touch screens: see a token's ability or night order.
 - [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at

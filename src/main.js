@@ -98,3 +98,13 @@ new Vue({
   store,
   i18n,
 }).$mount("#app");
+
+// installable app (home screen icon, full screen); the service worker
+// caches nothing, see public/sw.js
+if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register(process.env.BASE_URL + "sw.js")
+      .catch(() => {});
+  });
+}
