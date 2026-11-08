@@ -22,6 +22,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.9.0** Player menu as a bottom panel on touch screens; no keyboard when picking a
   reminder or character
 - **3.10.0** "Your vote" panel for players; alerts when woken up and for info cards
+- **3.11.0** Vote value per player (Banshee x2, Bureaucrat x3, Thief -1)
 
 ## Planned
 

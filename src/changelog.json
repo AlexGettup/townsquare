@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.11.0",
+    "date": "2026-11-08",
+    "title": {
+      "en": "Votes that count differently",
+      "es": "Votos que cuentan distinto"
+    },
+    "en": [
+      "The Storyteller sets how each player's vote counts from the \"Seat\" submenu: ×1, ×2 (Banshee), ×3 (Bureaucrat) or −1 (Thief), and the count takes it into account",
+      "The Banshee chooses in their vote panel between \"Yes\" and \"Yes ×2\"",
+      "Bureaucrat and Thief votes stay secret, as at a real table: only the Storyteller sees them, and they go back to normal when night starts"
+    ],
+    "es": [
+      "El Narrador elige cuánto cuenta el voto de cada jugador desde el submenú «Asiento»: ×1, ×2 (Banshee), ×3 (Burócrata) o −1 (Ladrón), y el recuento lo tiene en cuenta",
+      "La Banshee elige en su panel de voto entre «Sí» y «Sí ×2»",
+      "Los votos del Burócrata y del Ladrón son secretos, como en una mesa real: solo los ve el Narrador, y vuelven a la normalidad al empezar la noche"
+    ]
+  },
+  {
     "version": "3.10.0",
     "date": "2026-11-08",
     "title": {
