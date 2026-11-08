@@ -24,7 +24,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 
 The goal: play a whole game without Discord, as comfortably on a phone or tablet as on a
 computer. Suggested order: phone basics (wake lock, PWA) → night info cards and choosing
-targets on screen → player notes → own live session server. Marked *(official)* when
+targets on screen → player features (ranked below) → own live session server. Marked *(official)* when
 botc.app has something similar.
 
 ### Phones and tablets
@@ -32,7 +32,6 @@ botc.app has something similar.
 - [x] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
       players don't drop from their seats.
 - [x] **Install as an app (PWA)**: home screen icon and full screen, without the browser bar.
-- [ ] **Vibration** when you are woken up, receive an info card or a vote starts.
 - [ ] **Long press instead of hover** on touch screens: see a token's ability or night order.
 - [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
       the bottom instead of floating over the seats.
@@ -60,9 +59,41 @@ botc.app has something similar.
 
 ### For players
 
-- [ ] **Notes per player** *(official)*: free text on each seat ("claims Chef, saw a 1"), only
-      visible to you and saved on your device.
-- [ ] **Game diary**: everything you learnt, night by night, in one list.
+Ranked for the next steps. What counts most: **instinctive use** (it works where the player
+already looks or taps, with nothing to learn) and **UX clarity** (it removes doubts instead of
+adding a new place to check). Then value for a phone game and cost.
+
+| # | Feature | Instinctive | Clarity | Value | Cost |
+|---|---------|:-----------:|:-------:|:-----:|:----:|
+| 1 | Ability in the player menu | ●●●●● | ●●●●● | ●●●○○ | Low |
+| 2 | Alerts (vibration + on-screen notice) | ●●●●● | ●●●●○ | ●●●●○ | Low |
+| 3 | Notes per player | ●●●○○ | ●●●●○ | ●●●●● | Medium |
+| 4 | Day and night counter | ●●●●● | ●●●●○ | ●●○○○ | Low |
+| 5 | Game diary | ●●●○○ | ●●●●○ | ●●●○○ | Medium |
+| 6 | Claims on the reference sheet | ●●○○○ | ●●●○○ | ●●○○○ | Medium |
+
+1. [ ] **Ability in the player menu**: the menu header (the bottom panel on phones) already shows
+   the name and character; add the ability text. Tapping your own token answers "what does my
+   character do?" right where you look, and tapping another token explains the character you
+   think they are. On touch screens there is no hover, so today the ability is hard to reach.
+2. [ ] **Alerts**: the phone vibrates and a short notice shows on screen ("The Storyteller woke
+   you up", "New information", "Vote on Ana!", "Your turn to vote") when you are woken up,
+   receive an info card, a nomination starts or the vote reaches you. Nothing to learn: it
+   comes to the player. iPhones don't support vibration in the browser, so the on-screen
+   notice (and a sound unless muted) is the part everyone gets.
+3. [ ] **Notes per player** *(official)*: a "Notes" entry in the player menu with free text
+   ("claims Chef, saw a 1"), and a small icon on the token when it has a note, so they are
+   found again at a glance. Only visible to you and saved on your device. The biggest gap for
+   playing without paper, but it has to be discovered: it ranks below the passive features.
+4. [ ] **Day and night counter**: "Day 3" / "Night 2" instead of only day or night, synced from
+   the storyteller. Passive and clear; also gives the diary and the notes a reference.
+5. [ ] **Game diary**: everything you learnt, night by night ("Night 1: you are the Empath;
+   Night 2: you learn 1"), in one list. Info cards are kept in the private chat today, mixed
+   with the messages. Another place to look, so it goes after the counter, which labels it.
+6. [ ] **Claims on the reference sheet**: tap a character on the reference sheet and note who
+   claims it, so a double claim stands out. Hard to find and overlaps with the notes: better
+   as a later extension of them than as a separate feature.
+
 - [ ] **End of game and grimoire reveal** *(official)*: the storyteller ends the game and
       declares the winning team (Good or Evil); everyone sees the result and the full
       grimoire, and voice brings everyone back to the plaza to talk about it.
