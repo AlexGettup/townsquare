@@ -195,6 +195,7 @@
     "menu": "Menú",
     "hosted": "Partida creada. El enlace para los jugadores está copiado: compártelo. También lo tienes en el menú, en «Sesión en vivo».",
     "joined": "¡Ya estás dentro! Toca un asiento libre y elige «Reclamar asiento».",
+    "waiting": "Esperando al Narrador en la sesión {code}. Si no aparece nada, comprueba el código.",
     "footer": "Este proyecto es gratuito y de código abierto, y puedes encontrarlo en {github}. No está afiliado a The Pandemonium Institute. «Blood on the Clocktower» es una marca registrada de Steven Medway y The Pandemonium Institute."
   },
   "townInfo": {

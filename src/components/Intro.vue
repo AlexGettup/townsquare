@@ -8,6 +8,12 @@
         </template>
       </i18n>
 
+      <!-- joined a session that has no game yet (or a wrong code) -->
+      <p v-if="isWaiting" class="waiting">
+        <font-awesome-icon icon="users" />
+        {{ $t("intro.waiting", { code: session.sessionId }) }}
+      </p>
+
       <!-- the two ways in: run the game, or play in someone else's -->
       <div class="start">
         <div class="option">
@@ -52,7 +58,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 const MAX_PLAYERS = 20;
 const NOTICE_TIMEOUT = 8 * 1000;
@@ -66,6 +72,16 @@ export default {
     return {
       language: window.navigator.userLanguage || window.navigator.language,
     };
+  },
+  computed: {
+    ...mapState(["session"]),
+    isWaiting() {
+      return !!this.session.sessionId && this.session.isSpectator;
+    },
+  },
+  // this screen goes away when the seats arrive: only now is the player in
+  beforeDestroy() {
+    if (this.isWaiting) this.notify("intro.joined", "chair");
   },
   methods: {
     ...mapMutations(["toggleMenu"]),
@@ -123,13 +139,14 @@ export default {
       this.$store.commit("session/setSpectator", true);
       this.$store.commit("toggleGrimoire", false);
       this.$store.commit("session/setSessionId", sessionId);
-      this.notify("intro.joined", "chair");
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
+@import "../vars.scss";
+
 // logo, box and badge stacked in a column that scrolls on very short windows,
 // so nothing ends up cut off above or below the screen
 .intro {
@@ -145,6 +162,7 @@ export default {
   box-sizing: border-box;
   padding: 1vh 10px;
   overflow-y: auto;
+  scrollbar-width: none;
   z-index: 3;
   display: flex;
   flex-direction: column;
@@ -209,6 +227,13 @@ export default {
     margin: 0 0 10px;
   }
 
+  .waiting {
+    padding: 6px 10px;
+    border: 1px solid $fabled;
+    border-radius: 6px;
+    color: $fabled;
+  }
+
   .start {
     display: flex;
     flex-wrap: wrap;
@@ -225,7 +250,7 @@ export default {
     gap: 6px;
 
     .button {
-      font-size: 100%;
+      font-size: 90%;
       @media screen and (max-width: 767.98px) {
         font-size: 110%;
       }
