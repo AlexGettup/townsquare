@@ -19,6 +19,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.7.0** "What's New" in the menu, Settings tab, day/night button, session code to copy
 - **3.8.0** Nomination marks on the tokens, tap/double tap on touch screens, reorganized
   player menu
+- **3.9.0** Player menu as a bottom panel on touch screens; no keyboard when picking a
+  reminder or character
 
 ## Planned
 

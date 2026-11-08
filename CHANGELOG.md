@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.9.0
+- Touch screens: the player menu opens as a panel at the bottom of the screen, with the player's name and character on top, bigger rows that are easier to tap, and the "Seat" submenu as a second page; a double tap on a token still toggles death without pressing anything in the panel
+- Touch screens: the add reminder and change character windows no longer open the keyboard (the search box is rarely needed)
+
 ### Version 3.8.0
 - Nomination marks: after a nomination, the nominator gets a blue pointing hand in the bottom left corner of their token and the nominee a red gavel in the bottom right; they are cleared when night or day starts
 - Touch screens: one tap anywhere on a token opens the player menu, and the storyteller toggles death with a double tap (the shroud was easy to hit by mistake)
