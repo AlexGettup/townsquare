@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.12.3
+- Fixed on-screen notices blocking the menu of the seats below them, so "Claim seat" only closed the menu; notices no longer catch clicks, and any click dismisses them
+- Fixed claiming a seat taking up to 30 seconds to take effect when the player connected before the Storyteller created the game
+- Fixed the player count being one too high after claiming a seat
+
 ### Version 3.12.2
 - Fixed "Join a game" doing nothing, even after a reload, once a session with no game was saved (a wrong code, or joining before the game was created); "Create a game" had the same problem
 - Fixed replacing a session clearing the new one as well
