@@ -31,6 +31,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.15.0** Choose players by tapping the seats
 - **3.16.0** The game survives the storyteller reloading or losing the connection; "Send
   characters" always in the menu
+- **3.17.0** Token size from the players and the screen; double click to kill on computers;
+  trash button in the character selector; less lag at night and adding reminders
 
 ## Planned
 

@@ -1,5 +1,27 @@
 [
   {
+    "version": "3.17.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Tokens that fit your screen",
+      "es": "Tokens que se adaptan a tu pantalla"
+    },
+    "en": [
+      "Tokens change size with the number of players and your screen, so tokens and names overlap less",
+      "The chat sits lower, in the corner. The version number is now only shown here",
+      "Smoother app: the night clouds stay still, and menus and windows open faster",
+      "Storyteller: on a computer, one click on a token no longer kills by mistake. It opens the menu, and a double click kills, same as on a phone",
+      "Storyteller: new trash button in the character selector to clear your selection"
+    ],
+    "es": [
+      "Los tokens cambian de tamaño según el número de jugadores y tu pantalla, para que tokens y nombres se solapen menos",
+      "El chat queda más abajo, en la esquina. El número de versión se ve ahora solo aquí",
+      "La aplicación va más fluida: las nubes de la noche están quietas, y los menús y las ventanas se abren más rápido",
+      "Narrador: en ordenador, un clic en un token ya no mata sin querer. Abre el menú, y el doble clic mata, igual que en el móvil",
+      "Narrador: nuevo botón de papelera en el selector de personajes para borrar la selección"
+    ]
+  },
+  {
     "version": "3.16.0",
     "date": "2026-11-09",
     "title": {

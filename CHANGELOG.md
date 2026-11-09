@@ -4,6 +4,13 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.17.0
+- On computers, one click on the top of a token no longer kills: one click anywhere on the token opens the player menu and a double click toggles death, same as on touch screens. The menu entry stays, and the shroud no longer shows on hover
+- Token size now depends on the number of players and the screen, and follows rotating and resizing. Up to 12 players neither tokens nor names touch on the screen sizes measured; with more, names may touch on small screens
+- Trash button in the character selector to clear the selection; its buttons wrap on phones instead of running off the screen
+- The version label left the corner (it stays in What's New) and the chat sits lower
+- Less lag: the night clouds no longer move, and adding a reminder has shorter animations that redraw much less. Windows open and close faster too
+
 ### Version 3.16.0
 - The Storyteller reloading the page or losing the connection no longer empties the seats: players stay seated without claiming them again
 - A reload also keeps the night (before, it turned to day for everyone), who is awake, the vote under way (it comes back paused, to be resumed), the vote history, the player marked for execution, the session settings, the dealt characters and the card ticks. A game saved more than 12 hours ago counts as a new one
