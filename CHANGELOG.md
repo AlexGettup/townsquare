@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.19.0
+- Day and night counter in the middle of the town square: "Setting up", "Night 1", "Day 1", "Night 2"… It goes up each time the Storyteller switches to night, and everyone sees it. The Storyteller can correct it by clicking it
+- Day timer: the Storyteller starts it from the hourglass next to the counter and chooses the minutes. Everyone sees the same countdown; it turns orange in the last 30 seconds, and at zero plays a sound (unless muted) and shows "Time's up!" for 15 seconds. Clicking it stops it, and nightfall stops it too. It survives reloads
+
 ### Version 3.18.0
 - Notes per player: "Add note" in the player menu opens a box to write what you know or suspect. A small mark on the name shows who has a note; hovering it shows the note, and clicking or tapping it opens it. Notes are only on your device, per game session, never sent to anyone. They survive a reload, follow a player who changes name or seat, and are dropped after 12 hours
 - Computers: choose the microphone and speaker in the voice panel ("Microphone and speaker"). The microphone changes mid-call without reconnecting; an unplugged one falls back to the default, with a notice. Choices are saved on the device. The game's sounds use the chosen speaker too

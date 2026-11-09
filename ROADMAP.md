@@ -35,6 +35,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   trash button in the character selector; less lag at night and adding reminders
 - **3.18.0** Notes per player; choose microphone and speaker; ability in the player menu on
   touch screens; small x to close the bottom panels; no "+" on the seats on touch screens
+- **3.19.0** Day and night counter; day timer
 
 ## Planned
 
@@ -90,7 +91,7 @@ cards, because characters like the Lunatic make an automatic version misleading.
 - [ ] **Speaking queue**: raise your hand to talk in the plaza; the storyteller sees the queue.
 - [ ] **Quiet nominations**: during the defence only the nominator and the nominee can talk
       (with a timer); everyone is muted when the vote starts.
-- [x] **Day timer** *(official)* (next release): a countdown everyone sees ("5 minutes of discussion left"),
+- [x] **Day timer** *(official)* (3.19.0): a countdown everyone sees ("5 minutes of discussion left"),
       with a sound when it ends.
 - [ ] **Ambient sounds**: dusk, dawn, executions.
 - [ ] **End of game and grimoire reveal** *(official)*: the storyteller ends the game and
@@ -123,7 +124,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
    and character; add the ability text. Tapping your own token answers "what does my
    character do?" right where you look, and tapping another token explains the character you
    think they are. Only for touch screens: computers already show it on hover.
-3. [x] **Day and night counter** (next release): "Day 3" / "Night 2" instead of only day or night, synced from
+3. [x] **Day and night counter** (3.19.0): "Day 3" / "Night 2" instead of only day or night, synced from
    the storyteller. Passive and clear; also gives the diary and the notes a reference.
 4. [ ] **Game diary**: everything you learnt, night by night ("Night 1: you are the Empath;
    Night 2: you learn 1"), in one list. Info cards are kept in the private chat today, mixed
