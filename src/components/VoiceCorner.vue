@@ -1,21 +1,18 @@
 <template>
   <div class="voice-corner" v-if="voice.isAvailable && session.sessionId">
-    <VoiceMenu />
-    <VoiceConversations />
+    <VoicePanel />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import VoiceMenu from "./VoiceMenu";
-import VoiceConversations from "./VoiceConversations";
+import VoicePanel from "./VoicePanel";
 
 /**
- * Top left corner: everything about voice chat. The voice button (its menu
- * unfolds downwards) and, below it, the conversations and rooms.
+ * Top left corner: the voice button and its panel.
  */
 export default {
-  components: { VoiceMenu, VoiceConversations },
+  components: { VoicePanel },
   computed: {
     ...mapState(["voice", "session"]),
   },
@@ -28,10 +25,6 @@ export default {
   left: 10px;
   top: 3px;
   z-index: 76;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
   max-width: calc(100vw - 20px);
 }
 </style>
