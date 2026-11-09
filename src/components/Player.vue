@@ -42,8 +42,8 @@
             player.id !== session.playerId,
           'vote-lock': voteLocked,
         },
-        player.role.team,
-        'alignment-' + player.alignmentIndex,
+        shownRole.team,
+        'alignment-' + shownAlignment,
       ]"
     >
       <div class="shroud" @click="onTokenTap"></div>
@@ -57,8 +57,15 @@
           !session.isSpectator
         "
       >
-        <em>{{ nightOrder.get(player).first }}</em>
-        <span class="description" v-if="displayRole.firstNightReminder">
+        <em @click.stop="toggleNightText('first')">{{
+          nightOrder.get(player).first
+        }}</em>
+        <span
+          class="description"
+          :class="{ shown: nightText === 'first' }"
+          :data-night="$t('modals.nightOrder.firstNight')"
+          v-if="displayRole.firstNightReminder"
+        >
           <span v-html="formatNightReminder(displayRole.firstNightReminder)" />
         </span>
       </div>
@@ -70,18 +77,25 @@
           !session.isSpectator
         "
       >
-        <em>{{ nightOrder.get(player).other }}</em>
-        <span class="description" v-if="displayRole.otherNightReminder">
+        <em @click.stop="toggleNightText('other')">{{
+          nightOrder.get(player).other
+        }}</em>
+        <span
+          class="description"
+          :class="{ shown: nightText === 'other' }"
+          :data-night="$t('modals.nightOrder.otherNights')"
+          v-if="displayRole.otherNightReminder"
+        >
           <span v-html="formatNightReminder(displayRole.otherNightReminder)" />
         </span>
       </div>
 
       <Token
-        :role="player.role"
+        :role="shownRole"
         :alignmentIndex="
-          player.role.team === 'traveller' && grimoire.isPublic
+          shownRole.team === 'traveller' && grimoire.isPublic && !revealed
             ? 0
-            : player.alignmentIndex
+            : shownAlignment
         "
         @set-role="onTokenTap"
       />
@@ -250,7 +264,7 @@
         >
           <li class="sheet-header" v-if="isTouch">
             <strong>{{ player.name }}</strong>
-            <span v-if="player.role.id">{{ displayRole.name }}</span>
+            <span v-if="shownRole.id">{{ displayRole.name }}</span>
             <span
               class="sheet-x"
               :title="$t('player.closeMenu')"
@@ -414,11 +428,11 @@
       </component>
     </div>
 
-    <template v-if="player.reminders">
+    <template v-if="shownReminders">
       <div
         class="reminder"
         :key="reminder.role + ' ' + reminder.name"
-        v-for="reminder in player.reminders"
+        v-for="reminder in shownReminders"
         :class="[{ custom: reminder.imageAlt === 'custom' }, reminder.role]"
         @click="removeReminder(reminder)"
       >
@@ -599,7 +613,31 @@ export default {
     ]),
     // role with night order texts in the chosen language
     displayRole: function () {
-      return this.localizeRole(this.player.role);
+      return this.localizeRole(this.shownRole);
+    },
+    // players, once the game is over: this seat in the storyteller's grimoire
+    revealed: function () {
+      const { gameOver, isSpectator } = this.session;
+      if (!isSpectator || !gameOver || !gameOver.players) return null;
+      return gameOver.players[this.players.indexOf(this.player)] || null;
+    },
+    shownRole: function () {
+      if (!this.revealed) return this.player.role;
+      const id = this.revealed.roleId;
+      return (
+        (id &&
+          (this.$store.state.roles.get(id) ||
+            this.$store.getters.rolesJSONbyId.get(id))) ||
+        {}
+      );
+    },
+    shownAlignment: function () {
+      return this.revealed
+        ? this.revealed.alignmentIndex
+        : this.player.alignmentIndex;
+    },
+    shownReminders: function () {
+      return this.revealed ? this.revealed.reminders : this.player.reminders;
     },
     note: function () {
       return this.$store.getters["notes/noteOf"](this.player.name);
@@ -673,6 +711,8 @@ export default {
       isMenuOpen: false,
       // touch screens: the menu is a panel at the bottom of the screen
       isTouch: isTouchScreen(),
+      // touch screens: the night order text shown ("first" or "other")
+      nightText: null,
       // a double tap or click may still come, the touch panel ignores taps
       isArming: false,
       // storyteller: the "Seat" submenu of the player menu is showing
@@ -791,7 +831,30 @@ export default {
         this.updatePlayer("name", name, true);
       }
     },
+    // touch screens: tap the night order number to read its text, tap
+    // anywhere to close it (computers show it on hover)
+    toggleNightText(night) {
+      if (!this.isTouch) return;
+      this.nightText = this.nightText === night ? null : night;
+      document.removeEventListener("click", this.closeNightText, true);
+      if (this.nightText) {
+        // after this tap is done
+        setTimeout(() =>
+          document.addEventListener("click", this.closeNightText, true),
+        );
+      }
+    },
+    closeNightText({ target }) {
+      // a tap on our own numbers is handled by toggleNightText
+      if (target && target.closest && target.closest(".night-order")) {
+        if (this.$el.contains(target)) return;
+      }
+      this.nightText = null;
+      document.removeEventListener("click", this.closeNightText, true);
+    },
     removeReminder(reminder) {
+      // the revealed grimoire is the storyteller's, not ours to change
+      if (this.revealed) return;
       const reminders = [...this.player.reminders];
       reminders.splice(this.player.reminders.indexOf(reminder), 1);
       this.updatePlayer("reminders", reminders, true);

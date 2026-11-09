@@ -1,6 +1,20 @@
 <template>
   <Modal class="info-card-composer" v-if="playerId" @close="close">
-    <h3>{{ $t("cards.title", { name: playerName }) }}</h3>
+    <h3>{{ $t("cards.title", { name: recipientNames }) }}</h3>
+
+    <section>
+      <h4>{{ $t("cards.to") }}</h4>
+      <ul class="chips">
+        <li
+          v-for="player in seatedPlayers"
+          :key="player.id"
+          :class="{ selected: recipients.includes(player.id) }"
+          @click="toggle(recipients, player.id)"
+        >
+          {{ player.name }}
+        </li>
+      </ul>
+    </section>
 
     <section>
       <h4>{{ $t("cards.phrase") }}</h4>
@@ -133,21 +147,29 @@ export default {
     playerId: function () {
       return this.chat.composingFor;
     },
-    playerName: function () {
-      const player = this.players.find(({ id }) => id === this.playerId);
-      return player ? player.name : "";
+    // who can get a card: seated players
+    seatedPlayers: function () {
+      return this.players.filter(({ id }) => id);
+    },
+    // in seat order, whatever the order they were picked in
+    recipientNames: function () {
+      return this.seatedPlayers
+        .filter(({ id }) => this.recipients.includes(id))
+        .map(({ name }) => name)
+        .join(", ");
     },
     scriptRoles: function () {
       return [...this.roleMap.values()];
     },
     isEmpty: function () {
       return (
-        !this.phrase &&
-        !this.text.trim() &&
-        !this.roles.length &&
-        !this.chosenPlayers.length &&
-        this.number === null &&
-        !this.answer
+        !this.recipients.length ||
+        (!this.phrase &&
+          !this.text.trim() &&
+          !this.roles.length &&
+          !this.chosenPlayers.length &&
+          this.number === null &&
+          !this.answer)
       );
     },
     ...mapState(["chat"]),
@@ -155,7 +177,7 @@ export default {
     ...mapState("players", ["players"]),
   },
   watch: {
-    // a fresh card every time it opens
+    // a fresh card every time it opens, for the player it was opened on
     playerId() {
       Object.assign(this, this.emptyCard());
     },
@@ -168,7 +190,10 @@ export default {
   },
   methods: {
     emptyCard() {
+      // also called from data(), before the computed properties exist
+      const { composingFor } = this.$store.state.chat;
       return {
+        recipients: composingFor ? [composingFor] : [],
         phrase: null,
         text: "",
         roles: [],
@@ -190,17 +215,27 @@ export default {
     },
     send() {
       if (this.isEmpty) return;
-      this.$store.dispatch("chat/sendCard", {
-        to: this.playerId,
-        card: {
-          phrase: this.phrase,
-          text: this.text.trim(),
-          roles: this.roles,
-          players: this.chosenPlayers,
-          number: this.number,
-          answer: this.answer,
-        },
-      });
+      // the same card to each one, in their own private chat
+      const card = {
+        phrase: this.phrase,
+        text: this.text.trim(),
+        roles: this.roles,
+        players: this.chosenPlayers,
+        number: this.number,
+        answer: this.answer,
+      };
+      this.seatedPlayers
+        .filter(({ id }) => this.recipients.includes(id))
+        .forEach(({ id }) => {
+          this.$store.dispatch("chat/sendCard", {
+            to: id,
+            card: {
+              ...card,
+              roles: [...card.roles],
+              players: [...card.players],
+            },
+          });
+        });
       this.close();
     },
     close() {

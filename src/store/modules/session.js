@@ -38,12 +38,40 @@ const state = () => ({
   isGameResumed: false,
   // the day timer everyone sees: { endsAt (this device's clock), duration }
   dayTimer: null,
+  // the game ended: { winner: "good" | "evil", players: [{ roleId,
+  // alignmentIndex, reminders }] by seat, bluffs: [roleId] }. Players see
+  // this grimoire instead of their own until the storyteller deals again
+  gameOver: null,
   messages: [],
 });
 
 const getters = {};
 
-const actions = {};
+const actions = {
+  /**
+   * Storyteller: end the game. Everyone sees the winner and the grimoire as it
+   * is now, by day, back in the plaza.
+   */
+  endGame({ state, commit, dispatch, rootState }, winner) {
+    if (state.isSpectator) return;
+    if (state.nomination) commit("nomination");
+    if (state.dayTimer) commit("setDayTimer", null);
+    if (rootState.grimoire.isNight)
+      commit("toggleNight", false, { root: true });
+    commit("setGameOver", {
+      winner,
+      players: rootState.players.players.map(
+        ({ role, alignmentIndex, reminders }) => ({
+          roleId: (role && role.id) || "",
+          alignmentIndex: alignmentIndex || 0,
+          reminders: reminders.map((reminder) => ({ ...reminder })),
+        }),
+      ),
+      bluffs: rootState.bluffs.map((role) => (role && role.id) || ""),
+    });
+    dispatch("voice/gather", { sound: false }, { root: true });
+  },
+};
 
 // mutations helper functions
 const set = (key) => (state, val) => {
@@ -69,6 +97,7 @@ const mutations = {
   setDealtRoles: set("dealtRoles"),
   setGameResumed: set("isGameResumed"),
   /** Start ({ remaining, duration } in ms) or stop (null) the day timer. */
+  setGameOver: set("gameOver"),
   setDayTimer(state, timer) {
     state.dayTimer = timer
       ? { endsAt: Date.now() + timer.remaining, duration: timer.duration }

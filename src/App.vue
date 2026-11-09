@@ -49,6 +49,7 @@
     <InfoCardModal />
     <ChoosePlayers />
     <InfoCardComposer />
+    <EndGameModal />
   </div>
 </template>
 
@@ -75,6 +76,7 @@ import AlertNotices from "@/components/AlertNotices";
 import ChatPanel from "@/components/ChatPanel";
 import InfoCardModal from "@/components/modals/InfoCardModal";
 import InfoCardComposer from "@/components/modals/InfoCardComposer";
+import EndGameModal from "@/components/modals/EndGameModal";
 import ChoosePlayers from "@/components/ChoosePlayers";
 
 export default {
@@ -85,6 +87,7 @@ export default {
     ChatPanel,
     InfoCardModal,
     InfoCardComposer,
+    EndGameModal,
     ChoosePlayers,
     GameStateModal,
     ChangelogModal,
