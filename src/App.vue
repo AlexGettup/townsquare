@@ -49,13 +49,11 @@
     <InfoCardModal />
     <ChoosePlayers />
     <InfoCardComposer />
-    <span id="version">v{{ version }}</span>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import { version } from "../package.json";
 import TownSquare from "./components/TownSquare";
 import TownInfo from "./components/TownInfo";
 import Menu from "./components/Menu";
@@ -108,11 +106,6 @@ export default {
     ...mapState(["edition", "grimoire", "session"]),
     ...mapState("players", ["players"]),
     ...mapGetters("chat", ["isPicking"]),
-  },
-  data() {
-    return {
-      version,
-    };
   },
   methods: {
     keyup({ key, ctrlKey, metaKey }) {
@@ -277,15 +270,6 @@ ul {
     transition: none !important;
     animation: none !important;
   }
-}
-
-#version {
-  position: absolute;
-  text-align: right;
-  right: 10px;
-  bottom: 10px;
-  font-size: 60%;
-  opacity: 0.5;
 }
 
 .blur-enter-active,
