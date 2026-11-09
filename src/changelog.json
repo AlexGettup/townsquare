@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.16.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "The game survives a Storyteller reload",
+      "es": "La partida sobrevive a una recarga del Narrador"
+    },
+    "en": [
+      "If the Storyteller reloads the page or loses the connection, everyone stays in their seat. No need to sit down again",
+      "The game carries on as it was: if it's night it stays night, and a vote comes back paused for the Storyteller to resume",
+      "Storyteller: \"Send characters\" is now always in the menu, for anyone who wasn't seated when you dealt"
+    ],
+    "es": [
+      "Si el Narrador recarga la página o pierde la conexión, todos siguen en su asiento. Ya no hace falta volver a sentarse",
+      "La partida sigue como estaba: si es de noche sigue siendo de noche, y una votación vuelve en pausa para que el Narrador la reanude",
+      "Narrador: «Enviar personajes» está ahora siempre en el menú, para quien no estuviera sentado al repartir"
+    ]
+  },
+  {
     "version": "3.15.0",
     "date": "2026-11-09",
     "title": {
