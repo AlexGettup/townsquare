@@ -1,12 +1,7 @@
 <template>
   <div class="alert-notices">
     <transition-group name="alert" tag="div">
-      <div
-        class="alert"
-        v-for="notice in alerts.notices"
-        :key="notice.id"
-        @click="$store.commit('alerts/remove', notice.id)"
-      >
+      <div class="alert" v-for="notice in alerts.notices" :key="notice.id">
         <font-awesome-icon :icon="notice.icon" v-if="notice.icon" />
         <span>{{ $t(notice.key) }}</span>
       </div>
@@ -19,11 +14,25 @@ import { mapState } from "vuex";
 
 /**
  * Notices that need the player (woken up, their turn to vote), at the top of
- * the screen. A tap dismisses them; they also go away on their own.
+ * the screen. They go away on their own or with any click or tap anywhere, and
+ * never catch it: a player menu can open right below them.
  */
 export default {
   computed: {
     ...mapState(["alerts"]),
+  },
+  mounted() {
+    document.addEventListener("click", this.dismissAll, true);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.dismissAll, true);
+  },
+  methods: {
+    dismissAll() {
+      this.alerts.notices.forEach(({ id }) =>
+        this.$store.commit("alerts/remove", id),
+      );
+    },
   },
 };
 </script>
@@ -45,8 +54,6 @@ export default {
 }
 
 .alert {
-  pointer-events: auto;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
