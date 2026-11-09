@@ -170,6 +170,10 @@
     }
   },
   "dialogs": {
+    "dayCount": "¿Qué día es?",
+    "nightCount": "¿Qué noche es?",
+    "dayTimer": "Minutos de temporizador:",
+    "stopDayTimer": "¿Parar el temporizador?",
     "clearNotes": "¿Borrar todas tus notas de esta partida?",
     "backgroundUrl": "Introduce la URL de un fondo personalizado",
     "hostChannel": "Introduce un número o nombre de canal para tu sesión",
@@ -208,6 +212,15 @@
     "joined": "¡Ya estás dentro! Toca un asiento libre y elige «Reclamar asiento».",
     "waiting": "Esperando al Narrador en la sesión {code}. Si no aparece nada, comprueba el código.",
     "footer": "Este proyecto es gratuito y de código abierto, y puedes encontrarlo en {github}. No está afiliado a The Pandemonium Institute. «Blood on the Clocktower» es una marca registrada de Steven Medway y The Pandemonium Institute."
+  },
+  "dayPhase": {
+    "day": "Día {count}",
+    "night": "Noche {count}",
+    "setup": "Preparación",
+    "editCount": "Cambiar el número de día o noche",
+    "startTimer": "Temporizador de día",
+    "stopTimer": "Parar el temporizador",
+    "timeUp": "¡Tiempo!"
   },
   "townInfo": {
     "addMorePlayers": "¡Añade más jugadores!",

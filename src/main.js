@@ -20,6 +20,8 @@ const faIcons = [
   "CheckSquare",
   "ChevronLeft",
   "ChevronDown",
+  "HourglassHalf",
+  "HourglassStart",
   "ChevronRight",
   "CloudMoon",
   "Cog",

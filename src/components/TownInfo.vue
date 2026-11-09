@@ -67,19 +67,18 @@
           :icon="teams.traveller > 1 ? 'user-friends' : 'user'"
         />
       </span>
-      <span v-if="grimoire.isNight">
-        {{ $t("townInfo.nightPhase") }}
-        <font-awesome-icon :icon="['fas', 'cloud-moon']" />
-      </span>
     </li>
+    <DayPhase />
   </ul>
 </template>
 
 <script>
 import gameJSON from "./../counts.json";
 import { mapState } from "vuex";
+import DayPhase from "./DayPhase";
 
 export default {
+  components: { DayPhase },
   computed: {
     teams: function () {
       const { players } = this.$store.state.players;
