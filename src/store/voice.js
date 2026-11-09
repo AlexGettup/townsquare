@@ -70,10 +70,13 @@ export default (store) => {
   });
   store.$voice = client;
 
-  // silence locally whoever we must not hear (night rules, other rooms)
+  // silence locally whoever we must not hear (night rules, other rooms), and
+  // play everyone else as loud as we chose
   const applyAudibility = () => {
     const canHear = store.getters["voice/canHear"];
+    const volumeOf = store.getters["voice/volumeOf"];
     Object.keys(store.state.voice.peers).forEach((peerId) => {
+      client.setVolume(peerId, volumeOf(peerId));
       client.setAudible(peerId, canHear(peerId));
     });
   };
@@ -128,6 +131,7 @@ export default (store) => {
         break;
       case "voice/setPeers":
       case "voice/setNight":
+      case "voice/setVolume":
         applyAudibility();
         break;
     }

@@ -37,6 +37,9 @@ module.exports = (store) => {
   if (localStorage.getItem("isGrimoire")) {
     store.commit("toggleGrimoire", false);
   }
+  if (localStorage.voiceVolumes !== undefined) {
+    store.commit("voice/setVolumes", JSON.parse(localStorage.voiceVolumes));
+  }
   updatePagetitle(store.state.grimoire.isPublic);
   if (localStorage.roles !== undefined) {
     store.commit("setCustomRoles", JSON.parse(localStorage.roles));
@@ -117,6 +120,12 @@ module.exports = (store) => {
         } else {
           localStorage.removeItem("muted");
         }
+        break;
+      case "voice/setVolume":
+        localStorage.setItem(
+          "voiceVolumes",
+          JSON.stringify(state.voice.volumes),
+        );
         break;
       case "toggleStatic":
         if (state.grimoire.isStatic) {

@@ -87,32 +87,41 @@
               <font-awesome-icon :icon="nightStatus.icon" />
               <small>{{ $t(nightStatus.key) }}</small>
             </li>
-            <li
-              v-for="person in everyone"
-              :key="person.peerId"
-              class="person"
-              :class="personClass(person)"
-              :title="wakeTitle(person)"
-              @click="wake(person)"
-            >
-              <span class="name">
-                <font-awesome-icon
-                  v-if="canWake(person)"
-                  :icon="person.awake ? 'eye' : 'bed'"
-                  class="night-state"
-                />
-                {{ person.name }}
-              </span>
-              <em
-                :class="{ mutable: canMute(person) }"
-                :title="canMute(person) ? $t('voice.mutePlayer') : ''"
-                @click.stop="mute(person)"
+            <template v-for="person in everyone">
+              <li
+                :key="person.peerId"
+                class="person"
+                :class="[
+                  personClass(person),
+                  { hasOptions: hasOptions(person) },
+                ]"
+                :title="wakeTitle(person)"
+                @click="onNightTap(person)"
               >
-                <font-awesome-icon
-                  :icon="person.muted ? 'microphone-slash' : 'microphone'"
-                />
-              </em>
-            </li>
+                <span class="name">
+                  <font-awesome-icon
+                    v-if="canWake(person)"
+                    :icon="person.awake ? 'eye' : 'bed'"
+                    class="night-state"
+                  />
+                  {{ person.name }}
+                </span>
+                <em
+                  :class="{ mutable: canMute(person) }"
+                  :title="canMute(person) ? $t('voice.mutePlayer') : ''"
+                  @click.stop="mute(person)"
+                >
+                  <font-awesome-icon
+                    :icon="person.muted ? 'microphone-slash' : 'microphone'"
+                  />
+                </em>
+              </li>
+              <VoiceVolume
+                v-if="optionsFor === person.peerId && hasOptions(person)"
+                :key="person.peerId + '-volume'"
+                :peer-id="person.peerId"
+              />
+            </template>
           </template>
 
           <!-- Day: the places, each with the people in it -->
@@ -165,7 +174,7 @@
                   class="person in-place"
                   :class="[
                     personClass(person),
-                    { hasOptions: canInvite(person) },
+                    { hasOptions: hasOptions(person) },
                   ]"
                   @click="toggleOptions(person)"
                 >
@@ -181,6 +190,11 @@
                   </em>
                 </li>
                 <!-- the options of the person tapped -->
+                <VoiceVolume
+                  v-if="optionsFor === person.peerId && hasOptions(person)"
+                  :key="place.location + person.peerId + '-volume'"
+                  :peer-id="person.peerId"
+                />
                 <li
                   v-if="optionsFor === person.peerId && canInvite(person)"
                   :key="place.location + person.peerId + '-invite'"
@@ -207,6 +221,7 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import BottomSheet from "./BottomSheet";
+import VoiceVolume from "./VoiceVolume";
 import peerNames from "../voice/peerNames";
 import { isTouchScreen } from "../touch";
 import closeOnOutsideClick from "../closeOnOutsideClick";
@@ -230,7 +245,7 @@ const ROOM_ICONS = {
  * Below the button on computers, the bottom panel on touch screens.
  */
 export default {
-  components: { BottomSheet },
+  components: { BottomSheet, VoiceVolume },
   mixins: [
     peerNames,
     closeOnOutsideClick({
@@ -393,10 +408,19 @@ export default {
     locationOf(peerId) {
       return this.$store.getters["voice/locationOf"](peerId);
     },
+    // tapping a name opens its options: the volume of anyone but ourselves. At
+    // night, the storyteller's tap wakes people up instead
+    hasOptions(person) {
+      return !person.isSelf && !this.canWake(person);
+    },
     toggleOptions(person) {
-      if (!this.canInvite(person)) return;
+      if (!this.hasOptions(person)) return;
       this.optionsFor =
         this.optionsFor === person.peerId ? null : person.peerId;
+    },
+    onNightTap(person) {
+      if (this.canWake(person)) this.wake(person);
+      else this.toggleOptions(person);
     },
     invite({ peerId }) {
       this.optionsFor = null;
