@@ -28,6 +28,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   straight away
 - **3.14.0** "You are" card when dealing; volume per person; menus close on a click or tap
   outside; private conversations listed below the voice button on phones
+- **3.15.0** Choose players by tapping the seats
 
 ## Planned
 
@@ -42,20 +43,18 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. **Choose targets on screen** (Night without talking): players tap seats instead of typing
-   their choice in the chat; the last big gap for a silent night.
-2. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-3. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+1. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+2. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-4. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+3. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-5. **Day and night counter** (For players): passive context for everyone, and labels for the
+4. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-6. **Minion and demon info** (Night without talking): one button instead of several cards on
+5. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-7. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
+6. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
    and the info cards sent when the page is reloaded mid-game.
-8. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+7. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
    storyteller explaining it out loud.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
@@ -82,7 +81,7 @@ live session server, and the rest of the catalogue.
       to check later, and shows the storyteller whether they have seen it. Dealing again sends
       a new card to everyone, even with the same character (it's how they know), and the old
       one is struck through.
-- [ ] **Choose targets on screen** *(official)*: the storyteller asks "choose a player" (or two)
+- [x] **Choose targets on screen** *(official)* (3.15.0): the storyteller asks "choose a player" (or two)
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
       player, shows the card, collects the choice and puts them back to sleep in one tap each.

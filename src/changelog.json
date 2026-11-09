@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.15.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Choose players on the seats",
+      "es": "Elige jugadores en los asientos"
+    },
+    "en": [
+      "When the Storyteller asks you to choose a player, tap the seats on the town square and confirm. No need to type it in the chat",
+      "You can leave it for later: a reminder stays on screen until you answer. If a vote starts, you go back to choosing when it ends",
+      "Storyteller: the answer arrives in the private chat, with a mark on the player's token and a sound"
+    ],
+    "es": [
+      "Cuando el Narrador te pida elegir un jugador, pulsa los asientos en la plaza y confirma. Ya no hace falta escribirlo en el chat",
+      "Puedes dejarlo para más tarde: un recordatorio se queda en pantalla hasta que respondas. Si empieza una votación, vuelves a elegir cuando termine",
+      "Narrador: la respuesta llega al chat privado, con una marca en la ficha del jugador y un sonido"
+    ]
+  },
+  {
     "version": "3.14.0",
     "date": "2026-11-09",
     "title": {
