@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.20.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "End of game",
+      "es": "Final de partida"
+    },
+    "en": [
+      "When the game ends, everyone sees who won and the whole grimoire: each player's real character, the reminders and the Demon's bluffs",
+      "Storyteller: \"End the game\" in the menu (Grimoire tab). It turns to day and brings everyone back to the plaza",
+      "Storyteller: send the same info card to several players at once, with the new \"To\" row",
+      "Storyteller on a phone: tap the night order number next to a token to read its text"
+    ],
+    "es": [
+      "Al terminar la partida, todos ven quién ha ganado y el grimorio completo: el personaje real de cada jugador, los recordatorios y los faroles del Demonio",
+      "Narrador: «Terminar partida» en el menú (pestaña Grimorio). Se hace de día y todos vuelven a la plaza",
+      "Narrador: envía la misma tarjeta de información a varios jugadores a la vez, con la nueva fila «Para»",
+      "Narrador en el móvil: toca el número del orden nocturno junto a un token para leer su texto"
+    ]
+  },
+  {
     "version": "3.19.0",
     "date": "2026-11-09",
     "title": {

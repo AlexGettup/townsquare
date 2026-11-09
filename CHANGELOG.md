@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.20.0
+- End of game: "End the game" in the Storyteller's menu (Grimoire tab) asks who won, Good or Evil. Everyone sees "Good wins!" or "Evil wins!" in the middle of the town square with the town bell, it turns to day, the vote and the timer stop, and voice brings everyone back to the plaza
+- Players then see the whole grimoire: everyone's real character (the Drunk shows as the Drunk), the reminders and the Demon's bluffs. Nothing of it reaches players before the end. It survives reloads, "Back to the game" undoes it, and dealing again or a new game clears it
+- Info cards: a "To" row in the card window sends the same card to several players at once, each in their own private chat
+- Touch screens: tapping the night order number next to a token shows its text; tapping again or anywhere else hides it. The "First Night" / "Other Nights" labels now follow the language
+
 ### Version 3.19.0
 - Day and night counter in the middle of the town square: "Setting up", "Night 1", "Day 1", "Night 2"… It goes up each time the Storyteller switches to night, and everyone sees it. The Storyteller can correct it by clicking it
 - Day timer: the Storyteller starts it from the hourglass next to the counter and chooses the minutes. Everyone sees the same countdown; it turns orange in the last 30 seconds, and at zero plays a sound (unless muted) and shows "Time's up!" for 15 seconds. Clicking it stops it, and nightfall stops it too. It survives reloads
