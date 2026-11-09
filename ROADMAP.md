@@ -24,6 +24,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.10.0** "Your vote" panel for players; alerts when woken up and for info cards
 - **3.11.0** Vote value per player (Banshee x2, Bureaucrat x3, Thief -1)
 - **3.12.0** Create or join a game from the first screen
+- **3.13.0** One voice panel, with people grouped by place; people joining voice are heard
+  straight away
 
 ## Planned
 
@@ -38,26 +40,23 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. **One voice panel** (Voice chat): the voice menu covers the conversations and rooms when it
-   opens, and people show up twice (participants and rooms). Everything in one place first,
-   so volume and microphone choice have somewhere to live.
-2. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
+1. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
    a slider next to their name needs no explanation.
-3. **Choose targets on screen** (Night without talking): players tap seats instead of typing
+2. **Choose targets on screen** (Night without talking): players tap seats instead of typing
    their choice in the chat; the last big gap for a silent night.
-4. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-5. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+3. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+4. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-6. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+5. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-7. **Day and night counter** (For players): passive context for everyone, and labels for the
+6. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-8. **Minion and demon info** (Night without talking): one button instead of several cards on
+7. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-9. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
+8. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
    and the info cards sent when the page is reloaded mid-game.
-10. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
-    storyteller explaining it out loud.
+9. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+   storyteller explaining it out loud.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
 live session server, and the rest of the catalogue.
@@ -141,16 +140,12 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 ### Voice chat
 
-- [ ] **One voice panel, people grouped by place** (Discord-like): today the voice button's
-      menu (join, mute, leave, night controls, participants) unfolds over the conversations
-      and rooms panel, and every person is listed twice. Instead, a single panel:
-      - on top, your own controls (microphone, leave, a cog for microphone and speaker);
-      - below, the places (plaza, private conversations, rooms), each listing who is in it
-        with the speaking indicator; no separate participant list;
-      - tap a name for its options: volume (everyone), wake up / sleep and mute
-        (storyteller), invite to talk (someone in another place);
-      - tap a place to enter or ask to join; at night the same list wakes and puts to sleep;
-      - a side panel that folds on computers, the bottom panel on touch screens.
+- [x] **One voice panel, people grouped by place** (3.13.0): your own controls on top; below,
+      the places (plaza, private conversations, rooms), each listing who is in it with the
+      speaking indicator. Tap a name to invite them to talk; enter or ask to join from each
+      place; at night the same list wakes and puts to sleep. A side panel that folds on
+      computers, the bottom panel on touch screens. Volume goes in a name's options, and
+      the choice of microphone and speaker in the controls on top.
 - [ ] **Voice and text chat together** (to analyse after the voice panel): text chat also
       follows the places (a private conversation has its own chat), so one communication
       panel with each place's people and messages may be clearer than two panels. Decide

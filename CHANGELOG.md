@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.13.0
+- One voice panel instead of a menu opening over the conversations panel: your own controls on top and, below, the places (plaza, private conversations, rooms) with the people in each, so nobody is listed twice
+- Tapping a name in the panel offers the invitation to talk; at night it is one list, where the storyteller wakes people up and puts them back to sleep
+- A side panel on computers, opening when you join voice; the bottom panel on touch screens, opening only when asked
+- Fixed people who joined voice not being heard by those already there, sometimes for over a minute: a client now joins the room once its microphone is sending, and failed attempts to receive someone are retried on a timer
+
 ### Version 3.12.3
 - Fixed on-screen notices blocking the menu of the seats below them, so "Claim seat" only closed the menu; notices no longer catch clicks, and any click dismisses them
 - Fixed claiming a seat taking up to 30 seconds to take effect when the player connected before the Storyteller created the game
