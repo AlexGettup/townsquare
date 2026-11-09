@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.12.3",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Claiming a seat",
+      "es": "Reclamar un asiento"
+    },
+    "en": [
+      "Fixed on-screen notices getting in the way of the seat menu: \"Claim seat\" could just close the menu. Any click now dismisses them",
+      "Fixed a claimed seat taking up to 30 seconds to take effect if you joined before the Storyteller created the game",
+      "Fixed the player count showing one too many after claiming a seat"
+    ],
+    "es": [
+      "Corregido que los avisos en pantalla estorbaran en el menú de los asientos: «Reclamar asiento» podía limitarse a cerrar el menú. Ahora cualquier clic los quita",
+      "Corregido que un asiento reclamado tardara hasta 30 segundos en ocuparse si entrabas antes de que el Narrador creara la partida",
+      "Corregido que el contador de jugadores mostrara uno de más tras reclamar un asiento"
+    ]
+  },
+  {
     "version": "3.12.2",
     "date": "2026-11-09",
     "title": {
