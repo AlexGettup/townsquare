@@ -230,6 +230,15 @@
         }}</span>
       </div>
 
+      <!-- you have a note about this player -->
+      <font-awesome-icon
+        icon="sticky-note"
+        class="note-mark"
+        v-if="note"
+        :title="note"
+        @click="openNote"
+      />
+
       <!-- the player menu: next to the token, or at the bottom of the screen
            on touch screens (bigger, easier to tap) -->
       <component :is="isTouch ? 'BottomSheet' : 'transition'" name="fold">
@@ -365,6 +374,13 @@
             <li @click="addReminder">
               <font-awesome-icon icon="plus-circle" />
               {{ $t("player.addReminder") }}
+            </li>
+            <li class="note-entry" @click="openNote">
+              <font-awesome-icon icon="sticky-note" />
+              <span>
+                {{ note ? $t("player.editNote") : $t("player.addNote") }}
+                <small v-if="note">{{ note }}</small>
+              </span>
             </li>
             <!-- Players: their own seat -->
             <template v-if="isOwnSeat && player.connected">
@@ -580,6 +596,9 @@ export default {
     // role with night order texts in the chosen language
     displayRole: function () {
       return this.localizeRole(this.player.role);
+    },
+    note: function () {
+      return this.$store.getters["notes/noteOf"](this.player.name);
     },
     // voice chat state of whoever claimed this seat
     isVoiceSelf: function () {
@@ -824,6 +843,10 @@ export default {
     addReminder() {
       this.isMenuOpen = false;
       this.$emit("trigger", ["openReminderModal"]);
+    },
+    openNote() {
+      this.isMenuOpen = false;
+      this.$emit("trigger", ["openNoteModal"]);
     },
     changeRole() {
       this.isMenuOpen = false;
@@ -1525,6 +1548,40 @@ li.picking-seat .reminderHoverTarget {
 
 .player.dead > .name {
   opacity: 0.5;
+}
+
+/***** Note about the player: on the corner of the name, which it doesn't shorten *****/
+.player .note-mark {
+  position: absolute;
+  right: -4px;
+  bottom: 0.9em;
+  z-index: 3;
+  width: auto;
+  font-size: max(45%, 13px);
+  color: #f7dc6f;
+  filter: drop-shadow(0 0 2px black);
+  cursor: pointer;
+
+  &:hover {
+    color: white;
+  }
+}
+
+.menu .note-entry > span {
+  min-width: 0;
+  small {
+    display: block;
+    max-width: 14em;
+    overflow: hidden;
+    color: #bbb;
+    font-size: 75%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.bottom-sheet .menu .note-entry > span small {
+  max-width: none;
 }
 
 /***** Player menu *****/

@@ -111,6 +111,7 @@
     </div>
 
     <ReminderModal :player-index="selectedPlayer"></ReminderModal>
+    <NoteModal :player-index="selectedPlayer"></NoteModal>
     <RoleModal :player-index="selectedPlayer"></RoleModal>
   </div>
 </template>
@@ -120,6 +121,7 @@ import { mapGetters, mapState } from "vuex";
 import Player from "./Player";
 import Token from "./Token";
 import ReminderModal from "./modals/ReminderModal";
+import NoteModal from "./modals/NoteModal";
 import RoleModal from "./modals/RoleModal";
 
 export default {
@@ -128,6 +130,7 @@ export default {
     Token,
     RoleModal,
     ReminderModal,
+    NoteModal,
   },
   computed: {
     ...mapGetters({ nightOrder: "players/nightOrder" }),
@@ -179,6 +182,10 @@ export default {
     openReminderModal(playerIndex) {
       this.selectedPlayer = playerIndex;
       this.$store.commit("toggleModal", "reminder");
+    },
+    openNoteModal(playerIndex) {
+      this.selectedPlayer = playerIndex;
+      this.$store.commit("toggleModal", "note");
     },
     openRoleModal(playerIndex) {
       const player = this.players[playerIndex];

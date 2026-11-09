@@ -70,6 +70,7 @@ const faIcons = [
   "Times",
   "TimesCircle",
   "Tools",
+  "StickyNote",
   "TrashAlt",
   "Undo",
   "User",
