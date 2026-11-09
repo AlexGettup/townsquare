@@ -85,10 +85,8 @@
     cursor: pointer;
   }
 
-  .circle li .reminder.add {
-    opacity: 1;
-    translate: 0 0;
-    width: 35%;
-    padding-bottom: 35%;
+  // the player menu shows it: a tap would leave this box over the other seats
+  .circle .player .token .ability {
+    display: none;
   }
 }

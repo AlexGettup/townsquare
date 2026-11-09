@@ -30,7 +30,8 @@ export default {
   max-width: 480px;
   max-height: 70vh;
   margin: 0 auto;
-  padding: 4px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  // the close button stays at the bottom and takes the safe area itself
+  padding: 4px 12px 0;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -93,13 +94,29 @@ export default {
         color: white;
         margin-right: 6px;
       }
+    }
 
-      .close {
-        margin-left: auto;
-        padding: 8px;
-        cursor: pointer;
-        color: white;
-      }
+    &.sheet-ability {
+      min-height: 0;
+      padding: 0 6px 8px;
+      color: #ddd;
+      font-size: 85%;
+      line-height: 1.3;
+      cursor: default;
+    }
+
+    // always within reach, however long the panel is
+    &.sheet-close {
+      position: sticky;
+      bottom: 0;
+      justify-content: center;
+      margin: 0 -12px;
+      padding: 0 6px env(safe-area-inset-bottom, 0px);
+      min-height: calc(52px + env(safe-area-inset-bottom, 0px));
+      background: #1b1b1b;
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      border-bottom: 0;
+      font-weight: bold;
     }
   }
 }
