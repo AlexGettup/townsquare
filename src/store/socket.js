@@ -238,6 +238,18 @@ class LiveSession {
         if (!this._isSpectator) return;
         this._store.commit("session/setGameOver", params);
         break;
+      case "grimoire":
+        // only sent to us (Spy): the storyteller's grimoire to look at
+        if (!this._isSpectator) return;
+        this._store.commit("session/setShownGrimoire", params);
+        break;
+      case "grimoireSeen":
+        if (this._isSpectator) return;
+        this._store.commit("session/setGrimoireView", {
+          playerId: params,
+          status: "seen",
+        });
+        break;
       case "allowSelfNaming":
         if (!this._isSpectator) return;
         this._store.commit("session/setAllowSelfNaming", params);
@@ -1083,6 +1095,25 @@ class LiveSession {
     if (this._isSpectator) return;
     this._send("dayTimer", this._dayTimerToSend());
   }
+  /** Show a player (Spy) the grimoire as it is now, only to them. ST only */
+  showGrimoire(playerId) {
+    if (this._isSpectator || !playerId) return;
+    this._sendDirect(
+      playerId,
+      "grimoire",
+      this._store.getters["session/grimoireSnapshot"],
+    );
+  }
+  /** Player: tell only the storyteller we are done with the grimoire. */
+  grimoireSeen() {
+    if (!this._isSpectator) return;
+    this._sendDirect(
+      "host",
+      "grimoireSeen",
+      this._store.state.session.playerId,
+    );
+  }
+
   /** Send the end of the game (winner and grimoire), or that it's over. ST only */
   setGameOver() {
     if (this._isSpectator) return;
@@ -1319,6 +1350,15 @@ export default (store) => {
         break;
       case "toggleNight":
         session.setIsNight();
+        // the grimoire is only shown at night
+        if (!state.grimoire.isNight) {
+          if (state.session.shownGrimoire) {
+            store.commit("session/setShownGrimoire", null);
+          }
+          if (Object.keys(state.session.grimoireViews).length) {
+            store.commit("session/setGrimoireView", null);
+          }
+        }
         break;
       case "setNightCount":
         session.setNightCount();
@@ -1328,6 +1368,14 @@ export default (store) => {
         break;
       case "session/setGameOver":
         session.setGameOver();
+        break;
+      case "session/setGrimoireView":
+        if (payload && payload.status === "sent") {
+          session.showGrimoire(payload.playerId);
+        }
+        break;
+      case "session/closeShownGrimoire":
+        session.grimoireSeen();
         break;
       case "setEdition":
         session.sendEdition();

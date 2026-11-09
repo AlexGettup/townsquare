@@ -81,6 +81,15 @@ guided night, own live session server, and the rest of the catalogue.
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
       player, shows the card, collects the choice and puts them back to sleep in one tap each.
+- [x] **Show the grimoire** (next release) (Spy, Widow): at night, "Show the grimoire" in any seated
+      player's menu sends only them a snapshot of the grimoire (characters, reminders, bluffs),
+      shown on their town square until they close it or day comes. A book on their seat tells
+      the storyteller it was sent (grey) and closed (gold).
+
+Trouble Brewing reviewed (2026-11-09): every other character is covered by info cards,
+choosing players and the vote. The Drunk's token is never dealt (the storyteller seats the
+Townsfolk they think they are, with a Drunk reminder), so no feature for it. A dawn summary of
+who died at night was proposed and declined.
 
 Not planned: **Minion and demon info** *(official)* (one button giving the Demon their bluffs
 and minions, and the minions each other). The storyteller prefers to give it by hand with info

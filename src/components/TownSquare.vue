@@ -31,7 +31,7 @@
       :class="{ closed: !isBluffsOpen }"
     >
       <h3>
-        <span v-if="session.isSpectator && !session.gameOver">{{
+        <span v-if="session.isSpectator && !revealedGrimoire">{{
           $t("townSquare.otherCharacters")
         }}</span>
         <span v-else>{{ $t("townSquare.demonBluffs") }}</span>
@@ -140,10 +140,13 @@ export default {
     ...mapState(["grimoire", "roles", "session", "bluffs", "npcs"]),
     ...mapState("players", ["players"]),
     // players, once the game is over: the demon's real bluffs
+    revealedGrimoire: function () {
+      return this.$store.getters["session/revealedGrimoire"];
+    },
     shownBluffs: function () {
-      const { gameOver, isSpectator } = this.session;
-      if (!isSpectator || !gameOver || !gameOver.bluffs) return this.bluffs;
-      return gameOver.bluffs.map(
+      const grimoire = this.revealedGrimoire;
+      if (!grimoire || !grimoire.bluffs) return this.bluffs;
+      return grimoire.bluffs.map(
         (id) =>
           (id &&
             (this.roles.get(id) ||
