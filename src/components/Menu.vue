@@ -51,7 +51,7 @@
     >
       <font-awesome-icon icon="address-card" />
     </span>
-    <div class="menu" :class="{ open: grimoire.isMenuOpen }">
+    <div class="menu" ref="menu" :class="{ open: grimoire.isMenuOpen }">
       <font-awesome-icon icon="cog" @click="toggleMenu" />
       <ul>
         <li class="tabs" :class="tab">
@@ -345,8 +345,25 @@
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
+import closeOnOutsideClick from "../closeOnOutsideClick";
 
 export default {
+  mixins: [
+    closeOnOutsideClick({
+      isOpen: "grimoire.isMenuOpen",
+      inside() {
+        // other buttons that toggle the menu must not close it first, or their
+        // click would open it again
+        return [
+          this.$refs.menu,
+          ...document.querySelectorAll("[data-menu-toggle]"),
+        ];
+      },
+      close() {
+        this.toggleMenu();
+      },
+    }),
+  ],
   computed: {
     showSendCharacters: function () {
       return (

@@ -13,7 +13,7 @@
     </span>
 
     <component :is="isTouch ? 'BottomSheet' : 'div'" v-if="isOpen">
-      <ul class="menu" :class="{ floating: !isTouch }">
+      <ul class="menu" ref="menu" :class="{ floating: !isTouch }">
         <li class="sheet-header" v-if="isTouch">
           <strong>{{ $t("voice.title") }}</strong>
           <span class="close" @click="isOpen = false">
@@ -193,6 +193,7 @@ import { mapGetters, mapState } from "vuex";
 import BottomSheet from "./BottomSheet";
 import peerNames from "../voice/peerNames";
 import { isTouchScreen } from "../touch";
+import closeOnOutsideClick from "../closeOnOutsideClick";
 import {
   FIXED_ROOMS,
   PLAZA,
@@ -210,11 +211,22 @@ const ROOM_ICONS = {
  * Everything about voice chat, in one panel below the voice button: your own
  * controls and, below, the places with the people in each one. At night, one
  * list where the storyteller wakes people up and puts them back to sleep.
- * A side panel on computers, the bottom panel on touch screens.
+ * Below the button on computers, the bottom panel on touch screens.
  */
 export default {
   components: { BottomSheet },
-  mixins: [peerNames],
+  mixins: [
+    peerNames,
+    closeOnOutsideClick({
+      isOpen: "isOpen",
+      inside() {
+        return [this.$el, this.$refs.menu];
+      },
+      close() {
+        this.isOpen = false;
+      },
+    }),
+  ],
   data() {
     return {
       isOpen: false,
@@ -300,10 +312,6 @@ export default {
     },
     toggle() {
       this.isOpen = !this.isOpen;
-      // on touch screens, one panel at a time
-      if (this.isTouch && this.isOpen && this.grimoire.isMenuOpen) {
-        this.$store.commit("toggleMenu");
-      }
     },
     join() {
       this.$store.dispatch("voice/join");
@@ -376,17 +384,6 @@ export default {
     },
     cancelRequest() {
       this.$store.dispatch("voice/cancelRequest");
-    },
-  },
-  watch: {
-    // on a computer it stays open beside the game; on a touch screen it would
-    // cover the game, so it only opens when asked
-    isConnected(isConnected) {
-      if (isConnected && !this.isTouch) this.isOpen = true;
-    },
-    // opening the options menu closes the bottom panel
-    "grimoire.isMenuOpen"(isMenuOpen) {
-      if (isMenuOpen && this.isTouch) this.isOpen = false;
     },
   },
 };

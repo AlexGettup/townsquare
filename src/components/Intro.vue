@@ -32,7 +32,7 @@
 
       <i18n path="intro.offline" tag="p" class="offline">
         <template #menu>
-          <span class="button small" @click="toggleMenu">
+          <span class="button small" data-menu-toggle @click="toggleMenu">
             <font-awesome-icon icon="cog" /> {{ $t("intro.menu") }}
           </span>
         </template>

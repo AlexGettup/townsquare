@@ -422,10 +422,23 @@ import BottomSheet from "./BottomSheet";
 import Token from "./Token";
 import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
+import closeOnOutsideClick from "../closeOnOutsideClick";
 import { PLAZA, isConversation } from "../store/modules/voice";
 
 export default {
-  mixins: [peerNames],
+  mixins: [
+    peerNames,
+    // only one player menu at a time: clicking another player closes this one
+    closeOnOutsideClick({
+      isOpen: "isMenuOpen",
+      inside() {
+        return [this.$refs.player, this.$refs.menu];
+      },
+      close() {
+        this.isMenuOpen = false;
+      },
+    }),
+  ],
   components: {
     BottomSheet,
     Token,
@@ -603,23 +616,11 @@ export default {
     };
   },
   watch: {
-    // only one player menu at a time: a click anywhere else closes it
-    // (the empty square, or another player to open their menu)
     isMenuOpen(isOpen) {
       if (!isOpen) this.isSeatMenu = false;
-      if (isOpen) {
-        document.addEventListener("click", this.closeMenuOnOutsideClick, true);
-      } else {
-        document.removeEventListener(
-          "click",
-          this.closeMenuOnOutsideClick,
-          true,
-        );
-      }
     },
   },
   beforeDestroy() {
-    document.removeEventListener("click", this.closeMenuOnOutsideClick, true);
     clearTimeout(this.tapTimer);
   },
   methods: {
@@ -663,15 +664,6 @@ export default {
         this.tapTimer = null;
         this.isArming = false;
       }, 300);
-    },
-    closeMenuOnOutsideClick(event) {
-      const player = this.$refs.player;
-      // the bottom panel (touch screens) is outside the player element
-      const menu = this.$refs.menu;
-      if (menu && menu.contains(event.target)) return;
-      if (player && !player.contains(event.target)) {
-        this.isMenuOpen = false;
-      }
     },
     formatNightReminder(text) {
       return text

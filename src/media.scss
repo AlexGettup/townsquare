@@ -79,6 +79,12 @@
 
 // touch devices
 @media (hover: none) {
+  // iPhones only send a click for elements that look clickable: without this,
+  // tapping an empty part of the screen wouldn't close the open menu
+  #app {
+    cursor: pointer;
+  }
+
   .circle li .reminder.add {
     opacity: 1;
     top: 0;
