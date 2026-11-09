@@ -157,7 +157,11 @@ const chatMessage = (row) => ({
   text: row.text,
   card: row.card ? JSON.parse(row.card) : null,
   seen: row.seen || null,
+  choice: row.choice ? JSON.parse(row.choice) : null,
 });
+
+// cards the player answers by tapping seats: how many they have to pick
+const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
 
 /**
  * One VoiceRoom per game session. Every connected client has a WebSocket
@@ -201,6 +205,12 @@ export class VoiceRoom {
     // when the player said they saw an info card
     try {
       this.sql.exec(`ALTER TABLE chat ADD COLUMN seen INTEGER`);
+    } catch (e) {
+      // the column exists already
+    }
+    // who the player chose on a "choose a player" card
+    try {
+      this.sql.exec(`ALTER TABLE chat ADD COLUMN choice TEXT`);
     } catch (e) {
       // the column exists already
     }
@@ -716,6 +726,23 @@ export class VoiceRoom {
     return this.ctx.getWebSockets().filter(isChat);
   }
 
+  // an info card sent to this player, or nothing
+  ownCard(id, peerId) {
+    const row = this.sql
+      .exec(`SELECT * FROM chat WHERE id = ?`, Number(id) || 0)
+      .toArray()[0];
+    return row && row.card && row.channel === "dm:" + peerId ? row : null;
+  }
+
+  // news about a card only reach the storyteller and that player
+  sendToCardParties(peerId, out) {
+    this.chatSockets()
+      .filter((socket) =>
+        [STORYTELLER, peerId].includes(socket.deserializeAttachment().peerId),
+      )
+      .forEach((socket) => this.send(socket, out));
+  }
+
   // where a peer is: their voice location, or the plaza without voice
   locationOfPeer(peerId) {
     const voice = this.socketOf(peerId);
@@ -801,7 +828,16 @@ export class VoiceRoom {
         this.sql.exec(`DELETE FROM chat WHERE id <= ?`, id - CHAT_HISTORY);
         const out = {
           type: "chat",
-          message: { id, at, from: peerId, channel, text, card, seen: null },
+          message: {
+            id,
+            at,
+            from: peerId,
+            channel,
+            text,
+            card,
+            seen: null,
+            choice: null,
+          },
         };
         this.chatSockets()
           .filter((socket) =>
@@ -812,21 +848,30 @@ export class VoiceRoom {
       }
       case "card-seen": {
         // a player saw an info card: the storyteller gets a tick
-        const row = this.sql
-          .exec(`SELECT * FROM chat WHERE id = ?`, Number(message.id) || 0)
-          .toArray()[0];
-        if (!row || !row.card || row.seen) break;
-        if (row.channel !== "dm:" + peerId) break;
+        const row = this.ownCard(message.id, peerId);
+        if (!row || row.seen) break;
         const seen = Date.now();
         this.sql.exec(`UPDATE chat SET seen = ? WHERE id = ?`, seen, row.id);
-        const out = { type: "card-seen", id: row.id, seen };
-        this.chatSockets()
-          .filter((socket) =>
-            [STORYTELLER, peerId].includes(
-              socket.deserializeAttachment().peerId,
-            ),
-          )
-          .forEach((socket) => this.send(socket, out));
+        this.sendToCardParties(peerId, { type: "card-seen", id: row.id, seen });
+        break;
+      }
+      case "card-choice": {
+        // a player answered a "choose a player" card, once
+        const row = this.ownCard(message.id, peerId);
+        if (!row || row.choice) break;
+        const seats = SEATS_TO_CHOOSE[JSON.parse(row.card).phrase];
+        const choice = listOf(message.players, 2, 60);
+        if (!seats || choice.length !== seats) break;
+        this.sql.exec(
+          `UPDATE chat SET choice = ? WHERE id = ?`,
+          JSON.stringify(choice),
+          row.id,
+        );
+        this.sendToCardParties(peerId, {
+          type: "card-choice",
+          id: row.id,
+          choice,
+        });
         break;
       }
       case "clear-chat":

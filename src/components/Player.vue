@@ -1,10 +1,16 @@
 <template>
-  <li :style="zoom">
+  <li
+    :style="zoom"
+    :class="{ 'picking-seat': isPicking }"
+    @click.capture="onSeatPick"
+  >
     <div
       ref="player"
       class="player"
       :class="[
         {
+          picking: isPicking,
+          picked: isPicking && chat.picked.includes(player.name),
           dead: player.isDead,
           marked:
             (!session.isSpectator || session.isVoteWatchingAllowed) &&
@@ -82,7 +88,7 @@
 
       <!-- Storyteller: last info card sent to this player, and if they saw it -->
       <font-awesome-icon
-        :icon="cardStatus === 'seen' ? 'thumbs-up' : 'envelope'"
+        :icon="cardStatusIcon"
         class="card-status"
         :class="cardStatus"
         v-if="cardStatus"
@@ -409,7 +415,11 @@
         <span class="text">{{ localizeReminder(reminder) }}</span>
       </div>
     </template>
-    <div class="reminder add" @click="$emit('trigger', ['openReminderModal'])">
+    <div
+      class="reminder add"
+      v-if="!isPicking"
+      @click="$emit('trigger', ['openReminderModal'])"
+    >
       <span class="icon"></span>
     </div>
     <div class="reminderHoverTarget"></div>
@@ -454,7 +464,8 @@ export default {
   },
   computed: {
     ...mapState("players", ["players"]),
-    ...mapState(["grimoire", "session", "voice"]),
+    ...mapState(["grimoire", "session", "voice", "chat"]),
+    ...mapGetters("chat", ["isPicking"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
     // storyteller: info cards go to seated players through the chat
@@ -469,6 +480,11 @@ export default {
     cardStatus: function () {
       if (this.session.isSpectator || !this.player.id) return null;
       return this.$store.getters["chat/cardStatusOf"](this.player.id);
+    },
+    cardStatusIcon: function () {
+      return { sent: "envelope", seen: "thumbs-up", answered: "check-square" }[
+        this.cardStatus
+      ];
     },
     // storyteller: how this player's vote counts (1, 2 Banshee, 3, -1)
     voteValue: function () {
@@ -619,11 +635,25 @@ export default {
     isMenuOpen(isOpen) {
       if (!isOpen) this.isSeatMenu = false;
     },
+    isPicking(isPicking) {
+      if (isPicking) this.isMenuOpen = false;
+    },
   },
   beforeDestroy() {
     clearTimeout(this.tapTimer);
   },
   methods: {
+    // Answering a "choose a player" card: a tap on the seat picks it and does
+    // nothing else (no menu, and reminders can't be removed by mistake).
+    // Names, not seat numbers: seats can move while the player is choosing
+    onSeatPick(event) {
+      if (!this.isPicking) return;
+      event.stopPropagation();
+      event.preventDefault();
+      if (event.target.closest(".player")) {
+        this.$store.dispatch("chat/pickSeat", this.player.name);
+      }
+    },
     // Touch screens: the shroud is easy to hit by mistake, so one tap
     // anywhere on the token opens the player menu and a double tap toggles
     // death. With a mouse, the shroud toggles death and the token opens the menu.
@@ -1384,8 +1414,32 @@ li.move:not(.from) .player .overlay svg.move {
   &.sent {
     color: lightgray;
   }
-  &.seen {
+  &.seen,
+  &.answered {
     color: $fabled;
+  }
+}
+
+/****** Choosing a player for a card ********/
+// reminders reach into the neighbouring seats: only the seats take taps
+li.picking-seat .reminder,
+li.picking-seat .reminderHoverTarget {
+  pointer-events: none;
+}
+.player.picking {
+  cursor: pointer;
+  .token {
+    animation: none;
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6);
+  }
+  &.picked .token {
+    box-shadow:
+      0 0 0 4px white,
+      0 0 18px 6px white;
+  }
+  &.picked > .name {
+    color: black;
+    background: white;
   }
 }
 

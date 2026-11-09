@@ -15,6 +15,12 @@ export const tabOf = (message) =>
   message.channel.startsWith("dm:") ? message.channel : PLACE_TAB;
 // a card telling a player their character: the latest one is the valid one
 export const isRoleCard = ({ card }) => !!card && card.phrase === "youAre";
+// cards the player answers by tapping seats: how many they have to pick
+const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
+const seatsToChoose = ({ card }) => (card && SEATS_TO_CHOOSE[card.phrase]) || 0;
+// without an answer from the server by then, the player can try again
+const ANSWER_TIMEOUT = 5 * 1000;
+let answerTimer = null;
 
 const state = () => ({
   status: "off", // off | connecting | connected | error
@@ -27,6 +33,10 @@ const state = () => ({
   error: "",
   // info card on screen (a chat message with a card)
   shownCard: null,
+  // player answering a "choose a player" card: names picked so far, and
+  // what happened to the answer: "" | "sending" | "failed"
+  picked: [],
+  answerStatus: "",
   // storyteller: player ID we are writing an info card for
   composingFor: null,
   // storyteller: card ticks only show for cards sent after this (each
@@ -66,7 +76,7 @@ const getters = {
   },
   /**
    * Storyteller: the last info card sent to a player in this phase:
-   * "sent" (not seen yet), "seen" or null (none).
+   * "sent" (not seen yet), "seen", "answered" or null (none).
    */
   cardStatusOf: (state) => (playerId) => {
     const channel = dmTab(playerId);
@@ -74,13 +84,42 @@ const getters = {
       const message = state.messages[i];
       if (message.at < state.cardsSince) return null;
       if (message.channel === channel && message.card) {
+        if (message.choice) return "answered";
         return message.seen ? "seen" : "sent";
       }
     }
     return null;
   },
+  // the card on screen, up to date with its answer
+  shownMessage: (state) =>
+    state.shownCard
+      ? state.messages.find(({ id }) => id === state.shownCard.id) || null
+      : null,
+  seatsToPick: (state, getters) =>
+    getters.shownMessage ? seatsToChoose(getters.shownMessage) : 0,
+  // player: the card on screen is answered on the seats, not in a window
+  isAnswering: (state, getters, rootState, rootGetters) =>
+    !!getters.seatsToPick &&
+    !getters.shownMessage.choice &&
+    rootGetters["voice/selfPeerId"] !== STORYTELLER,
+  // the seats take the taps, except during a vote: it comes first
+  isPicking: (state, getters, rootState) =>
+    getters.isAnswering && !rootState.session.nomination,
+  // player: the last "choose a player" card, if it still needs an answer
+  pendingChoice: (state, getters, rootState, rootGetters) => {
+    if (rootGetters["voice/selfPeerId"] === STORYTELLER) return null;
+    for (let i = state.messages.length - 1; i >= 0; i--) {
+      const message = state.messages[i];
+      if (seatsToChoose(message)) return message.choice ? null : message;
+    }
+    return null;
+  },
   totalUnread: (state) =>
     Object.values(state.unread).reduce((total, count) => total + count, 0),
+};
+
+const addUnread = (state, tab) => {
+  state.unread = { ...state.unread, [tab]: (state.unread[tab] || 0) + 1 };
 };
 
 const mutations = {
@@ -94,22 +133,24 @@ const mutations = {
   addMessage(state, { message, unread }) {
     if (state.messages.some(({ id }) => id === message.id)) return;
     state.messages = [...state.messages, message].slice(-500);
-    if (unread) {
-      const tab = tabOf(message);
-      state.unread = { ...state.unread, [tab]: (state.unread[tab] || 0) + 1 };
-    }
+    if (unread) addUnread(state, tabOf(message));
   },
-  setSeen(state, { id, seen }) {
+  // a card was seen or answered
+  updateMessage(state, { id, ...fields }) {
     state.messages = state.messages.map((message) =>
-      message.id === id ? { ...message, seen } : message,
+      message.id === id ? { ...message, ...fields } : message,
     );
   },
+  addUnread,
   resetCardStatus(state) {
     state.cardsSince = Date.now();
   },
   clear(state) {
     state.messages = [];
     state.unread = {};
+    state.shownCard = null;
+    state.picked = [];
+    state.answerStatus = "";
   },
   setOpen(state, isOpen) {
     state.isOpen = isOpen;
@@ -124,9 +165,19 @@ const mutations = {
   },
   showCard(state, message) {
     state.shownCard = message;
+    state.picked = [];
+    state.answerStatus = "";
   },
   hideCard(state) {
     state.shownCard = null;
+    state.picked = [];
+    state.answerStatus = "";
+  },
+  setPicked(state, picked) {
+    state.picked = picked;
+  },
+  setAnswerStatus(state, answerStatus) {
+    state.answerStatus = answerStatus;
   },
   composeCard(state, playerId) {
     state.composingFor = playerId;
@@ -171,9 +222,46 @@ const actions = {
       });
     });
   },
+  /** Player: tap a seat. Tapping it again unpicks it; the oldest gives way. */
+  pickSeat({ state, getters, commit }, name) {
+    commit(
+      "setPicked",
+      state.picked.includes(name)
+        ? state.picked.filter((picked) => picked !== name)
+        : [...state.picked, name].slice(-getters.seatsToPick),
+    );
+  },
+  /**
+   * Player: send the seats picked as the answer to the card on screen. The
+   * card closes when the server confirms it (see onChoice in store/chat.js).
+   */
+  answerCard({ state, getters, commit, rootState }) {
+    if (
+      !getters.isPicking ||
+      !getters.isConnected ||
+      state.answerStatus === "sending"
+    ) {
+      return;
+    }
+    // the storyteller may have removed a seat in the meantime
+    const names = rootState.players.players.map(({ name }) => name);
+    const picked = state.picked.filter((name) => names.includes(name));
+    commit("setPicked", picked);
+    if (picked.length !== getters.seatsToPick) return;
+    const { id } = getters.shownMessage;
+    commit("setAnswerStatus", "sending");
+    this.$chat.answerCard(id, picked);
+    clearTimeout(answerTimer);
+    answerTimer = setTimeout(() => {
+      const { shownCard, answerStatus } = state;
+      if (answerStatus === "sending" && shownCard && shownCard.id === id) {
+        commit("setAnswerStatus", "failed");
+      }
+    }, ANSWER_TIMEOUT);
+  },
   /** Player: close an info card, telling the storyteller we saw it. */
-  closeCard({ state, commit, rootGetters }) {
-    const message = state.shownCard;
+  closeCard({ getters, commit, rootGetters }) {
+    const message = getters.shownMessage;
     commit("hideCard");
     if (
       message &&

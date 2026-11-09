@@ -143,6 +143,12 @@
     "choiceHint": "Escribe tu elección al Narrador en el chat privado",
     "sent": "Información enviada, aún sin ver",
     "seen": "El jugador ha visto la información",
+    "answered": "El jugador ha respondido",
+    "tapSeat": "Pulsa los asientos",
+    "confirm": "Confirmar",
+    "later": "Más tarde",
+    "notSent": "No ha llegado. Inténtalo de nuevo",
+    "chosen": "Elegido: {players}",
     "phrases": {
       "youAre": "Tú eres",
       "thisIsTheDemon": "Este es el Demonio",

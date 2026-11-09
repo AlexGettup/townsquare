@@ -143,6 +143,12 @@
     "choiceHint": "Write your choice to the Storyteller in the private chat",
     "sent": "Information sent, not seen yet",
     "seen": "The player saw the information",
+    "answered": "The player answered",
+    "tapSeat": "Tap the seats",
+    "confirm": "Confirm",
+    "later": "Later",
+    "notSent": "It didn't arrive. Try again",
+    "chosen": "Chosen: {players}",
     "phrases": {
       "youAre": "You are",
       "thisIsTheDemon": "This is the Demon",
