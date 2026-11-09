@@ -83,6 +83,16 @@
           <font-awesome-icon icon="random" />
           {{ $t("modals.roles.shuffle") }}
         </div>
+        <div
+          class="button clear"
+          :class="{ disabled: !selectedRoles }"
+          :title="$t('modals.roles.clear')"
+          :aria-label="$t('modals.roles.clear')"
+          role="button"
+          @click="clearSelection"
+        >
+          <font-awesome-icon icon="trash-alt" />
+        </div>
       </div>
       <div class="illegal warning" v-if="isIllegalTokenSelected">
         <font-awesome-icon icon="exclamation-triangle" />
@@ -164,6 +174,13 @@ export default {
           }
         }
       });
+    },
+    clearSelection() {
+      Object.values(this.roleSelection).forEach((roles) =>
+        roles.forEach((role) => {
+          role.selected = 0;
+        }),
+      );
     },
     assignRoles() {
       if (
@@ -397,6 +414,18 @@ ul.tokens {
     display: flex;
     justify-content: center;
     align-items: center;
+    // phones: the buttons don't fit in one row
+    @media screen and (max-width: 767.98px) {
+      .button-group {
+        flex-wrap: wrap;
+        gap: 6px;
+        .button {
+          margin: 0;
+          padding: 6px 10px;
+          border-radius: 15px;
+        }
+      }
+    }
     .warning {
       position: absolute;
       bottom: 20px;
