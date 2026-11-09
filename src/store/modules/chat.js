@@ -13,6 +13,8 @@ export const PLACE_TAB = "place";
 export const dmTab = (playerId) => "dm:" + playerId;
 export const tabOf = (message) =>
   message.channel.startsWith("dm:") ? message.channel : PLACE_TAB;
+// a card telling a player their character: the latest one is the valid one
+export const isRoleCard = ({ card }) => !!card && card.phrase === "youAre";
 
 const state = () => ({
   status: "off", // off | connecting | connected | error
@@ -147,6 +149,27 @@ const actions = {
   sendCard({ rootGetters }, { to, card }) {
     if (rootGetters["voice/selfPeerId"] !== STORYTELLER || !to) return;
     this.$chat.sendCard(to, card);
+  },
+  /**
+   * Storyteller only: when dealing, tell each seated player their character.
+   * Dealing again sends everyone a new card, also those who got the same
+   * character: it's how they know the storyteller dealt again.
+   */
+  sendRoleCards({ dispatch, rootState }) {
+    rootState.players.players.forEach(({ id, role }) => {
+      if (!id || !role || !role.id) return;
+      dispatch("sendCard", {
+        to: id,
+        card: {
+          phrase: "youAre",
+          text: "",
+          roles: [role.id],
+          players: [],
+          number: null,
+          answer: null,
+        },
+      });
+    });
   },
   /** Player: close an info card, telling the storyteller we saw it. */
   closeCard({ state, commit, rootGetters }) {
