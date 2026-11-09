@@ -41,6 +41,8 @@ const state = () => ({
   // the devices chosen, "" is the system's default (saved on this device)
   inputId: "",
   outputId: "",
+  // noise suppression (RNNoise) and voice gate, like Discord. Per device
+  processing: { denoise: true, auto: true, threshold: -50 },
   // invitations received: [{ from, at }]
   invitations: [],
   // short messages ("X declined your invitation"): [{ id, key, peerId }]
@@ -174,6 +176,10 @@ const mutations = {
   setOutputId(state, deviceId) {
     state.outputId = deviceId;
   },
+  /** Change some of { denoise, auto, threshold }. */
+  setProcessing(state, changes) {
+    state.processing = { ...state.processing, ...changes };
+  },
   setVolumes(state, volumes) {
     state.volumes = volumes;
   },
@@ -243,6 +249,10 @@ const actions = {
       commit("addNotice", { key: "voice.deviceFailed" });
       return false;
     }
+  },
+  setProcessing({ commit, state }, changes) {
+    commit("setProcessing", changes);
+    this.$voice.setProcessing(state.processing);
   },
   toggleMute({ commit, state }) {
     commit("setMuted", !state.muted);

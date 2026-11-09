@@ -165,6 +165,11 @@ Ranked with the same criteria as the [next steps](#next-steps).
       follows the places (a private conversation has its own chat), so one communication
       panel with each place's people and messages may be clearer than two panels. Decide
       once the voice panel is in use.
+- [x] **Background noise, like Discord** (unreleased): RNNoise noise suppression plus a voice
+      gate that sends silence while nobody talks, with automatic sensitivity or a manual
+      threshold on a live meter in the voice panel (saved per device). Errs on the side of
+      letting noise through: a soft voice must never be cut. Firefox may fall back to the gate
+      alone. Untested with real voices and phones.
 - [ ] **Push-to-talk**: the microphone only sends while a key or an on-screen button is held.
       Useful with background noise; optional, since it has to be learnt (and holding a button
       while talking is awkward on a phone).

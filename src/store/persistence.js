@@ -126,6 +126,12 @@ module.exports = (store) => {
   }
   store.commit("voice/setInputId", localStorage.getItem("voiceInput") || "");
   store.commit("voice/setOutputId", localStorage.getItem("voiceOutput") || "");
+  if (localStorage.voiceProcessing !== undefined) {
+    store.commit(
+      "voice/setProcessing",
+      JSON.parse(localStorage.voiceProcessing),
+    );
+  }
   updatePagetitle(store.state.grimoire.isPublic);
   if (localStorage.roles !== undefined) {
     store.commit("setCustomRoles", JSON.parse(localStorage.roles));
@@ -229,6 +235,12 @@ module.exports = (store) => {
         break;
       case "voice/setOutputId":
         localStorage.setItem("voiceOutput", payload);
+        break;
+      case "voice/setProcessing":
+        localStorage.setItem(
+          "voiceProcessing",
+          JSON.stringify(state.voice.processing),
+        );
         break;
       case "voice/setVolume":
         localStorage.setItem(

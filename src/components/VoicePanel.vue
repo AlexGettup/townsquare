@@ -70,6 +70,15 @@
             {{ $t("voice.leave") }}
             <em><font-awesome-icon icon="sign-out-alt" /></em>
           </li>
+          <li class="action" @click="isNoise = !isNoise">
+            {{ $t("voice.noise") }}
+            <em>
+              <font-awesome-icon
+                :icon="isNoise ? 'chevron-down' : 'chevron-right'"
+              />
+            </em>
+          </li>
+          <VoiceNoise v-if="isNoise" />
           <template v-if="!isTouch">
             <li class="action" @click="isDevices = !isDevices">
               {{ $t("voice.devices") }}
@@ -238,6 +247,7 @@ import { mapGetters, mapState } from "vuex";
 import BottomSheet from "./BottomSheet";
 import VoiceVolume from "./VoiceVolume";
 import VoiceDevices from "./VoiceDevices";
+import VoiceNoise from "./VoiceNoise";
 import peerNames from "../voice/peerNames";
 import { isTouchScreen } from "../touch";
 import closeOnOutsideClick from "../closeOnOutsideClick";
@@ -261,7 +271,7 @@ const ROOM_ICONS = {
  * Below the button on computers, the bottom panel on touch screens.
  */
 export default {
-  components: { BottomSheet, VoiceVolume, VoiceDevices },
+  components: { BottomSheet, VoiceVolume, VoiceDevices, VoiceNoise },
   mixins: [
     peerNames,
     closeOnOutsideClick({
@@ -284,6 +294,7 @@ export default {
       optionsFor: null,
       // computers: the microphone and speaker choices are showing
       isDevices: false,
+      isNoise: false,
     };
   },
   computed: {

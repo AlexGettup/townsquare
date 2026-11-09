@@ -17,7 +17,12 @@
  * - onForceMute()             the storyteller muted us
  * - onEvent(message)          invite / request / declined / gather
  * - onMicrophoneLost()        our microphone was unplugged
+ *
+ * What we send goes through MicProcessor (noise suppression and voice gate,
+ * like Discord) when the browser can run it, and is the raw microphone
+ * otherwise.
  */
+import MicProcessor, { isSupported as canProcessMic } from "./MicProcessor";
 
 const TRACK_NAME = "microphone";
 const PING_INTERVAL = 30 * 1000;
@@ -58,6 +63,8 @@ export default class VoiceClient {
     this.outputId = "";
     // peerId -> how loud we play them (1 = as they come). Kept between calls
     this.volumes = new Map();
+    // noise suppression and voice gate: { denoise, auto, threshold (dB) }
+    this.processing = { denoise: true, auto: true, threshold: -50 };
     this._reset();
   }
 
@@ -71,6 +78,8 @@ export default class VoiceClient {
     this.peerId = null;
     this.muted = false;
     this.stream = null;
+    // what we send: the microphone after noise suppression and the voice gate
+    this.processor = null;
     this.micSender = null;
     this.micRequest = 0;
     this.pc = null;
@@ -126,7 +135,9 @@ export default class VoiceClient {
         window.webkitAudioContext)();
       this._applyContextOutput();
       await this.audioContext.resume();
-      this.local = this._watchVolume(this.stream);
+      this.processor = await this._startProcessor(this.stream);
+      // our own "speaking" ring: what the others get, after the voice gate
+      this.local = this._watchVolume(new MediaStream([this._sentTrack()]));
 
       this.pc = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.cloudflare.com:3478" }],
@@ -164,6 +175,7 @@ export default class VoiceClient {
     }
     this.remotes.forEach((remote) => this._disposeRemote(remote));
     if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
+    if (this.processor) this.processor.dispose();
     if (this.pc) this.pc.close();
     if (this.audioContext) this.audioContext.close().catch(() => {});
     this._reset();
@@ -197,6 +209,21 @@ export default class VoiceClient {
     this._applyOutput(peerId);
   }
 
+  /** Noise suppression and voice gate: { denoise, auto, threshold }. */
+  setProcessing(processing) {
+    this.processing = { ...processing };
+    if (this.processor) this.processor.setOptions(this.processing);
+  }
+
+  /**
+   * For the level meter: { level, threshold (dB), open, canDenoise }, or
+   * null when not in voice chat or not processing the microphone.
+   */
+  getMicLevel() {
+    if (!this.processor || !this.processor.level) return null;
+    return { ...this.processor.level, canDenoise: this.processor.canDenoise };
+  }
+
   /** How loud to play a peer: 1 is as they come, up to 2. */
   setVolume(peerId, volume) {
     this.volumes.set(peerId, volume);
@@ -221,7 +248,9 @@ export default class VoiceClient {
         stream.getTracks().forEach((track) => track.stop());
         return;
       }
-      await this.micSender.replaceTrack(stream.getAudioTracks()[0]);
+      // with the processor, what we send stays the same track
+      if (this.processor) this.processor.setInput(stream);
+      else await this.micSender.replaceTrack(stream.getAudioTracks()[0]);
     } catch (error) {
       if (stream) stream.getTracks().forEach((track) => track.stop());
       if (request === this.micRequest) this.inputId = previousId;
@@ -231,6 +260,7 @@ export default class VoiceClient {
     this.stream = stream;
     this._watchMicrophoneEnd();
     this._applyMute();
+    if (this.processor) return;
     const { speaking, lastSound, source } = this.local;
     source.disconnect();
     this.local = { ...this._watchVolume(stream), speaking, lastSound };
@@ -247,6 +277,26 @@ export default class VoiceClient {
   }
 
   // --- internals -----------------------------------------------------------
+
+  /** The microphone through MicProcessor, or null to send it raw. */
+  async _startProcessor(stream) {
+    if (!canProcessMic()) return null;
+    const processor = new MicProcessor(this.processing);
+    try {
+      await processor.start(stream);
+      return processor;
+    } catch (error) {
+      console.warn("Voice chat: sending the microphone unprocessed", error);
+      processor.dispose();
+      return null;
+    }
+  }
+
+  _sentTrack() {
+    return this.processor
+      ? this.processor.track
+      : this.stream.getAudioTracks()[0];
+  }
 
   /** Exactly the device chosen: browsers may ignore a mere preference. */
   _openMicrophone(deviceId = this.inputId) {
@@ -327,12 +377,9 @@ export default class VoiceClient {
 
   /** Send our microphone to the SFU. */
   async _push() {
-    const transceiver = this.pc.addTransceiver(
-      this.stream.getAudioTracks()[0],
-      {
-        direction: "sendonly",
-      },
-    );
+    const transceiver = this.pc.addTransceiver(this._sentTrack(), {
+      direction: "sendonly",
+    });
     this.micSender = transceiver.sender;
     await this.pc.setLocalDescription(await this.pc.createOffer());
     const response = await this._api(

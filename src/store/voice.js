@@ -80,6 +80,7 @@ export default (store) => {
   store.$voice = client;
   client.inputId = store.state.voice.inputId;
   client.outputId = store.state.voice.outputId;
+  client.setProcessing(store.state.voice.processing);
   setSoundsOutput(client.outputId);
 
   // silence locally whoever we must not hear (night rules, other rooms), and
