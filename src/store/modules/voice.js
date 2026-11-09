@@ -36,6 +36,8 @@ const state = () => ({
   // storyteller only, the source of the night state shared with players
   awake: [],
   broadcast: false,
+  // peerId -> how loud we play them, for those not at 1 (saved on this device)
+  volumes: {},
   // invitations received: [{ from, at }]
   invitations: [],
   // short messages ("X declined your invitation"): [{ id, key, peerId }]
@@ -63,6 +65,8 @@ const getters = {
       : { awake: [], broadcast: false };
   },
   isAwake: (state, getters) => (peerId) => getters.night.awake.includes(peerId),
+  volumeOf: (state) => (peerId) =>
+    state.volumes[peerId] === undefined ? 1 : state.volumes[peerId],
   /** Can we hear this peer right now? */
   canHear: (state, getters, rootState) => (peerId) => {
     if (!rootState.grimoire.isNight) {
@@ -160,6 +164,14 @@ const mutations = {
   setNight(state, { awake, broadcast }) {
     state.awake = awake;
     state.broadcast = broadcast;
+  },
+  setVolumes(state, volumes) {
+    state.volumes = volumes;
+  },
+  setVolume(state, { peerId, volume }) {
+    const volumes = { ...state.volumes, [peerId]: volume };
+    if (volume === 1) delete volumes[peerId];
+    state.volumes = volumes;
   },
   addInvitation(state, from) {
     state.invitations = [

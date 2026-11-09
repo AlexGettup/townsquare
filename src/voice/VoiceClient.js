@@ -50,6 +50,8 @@ export default class VoiceClient {
     this.onSpeaking = onSpeaking;
     this.onForceMute = onForceMute;
     this.onEvent = onEvent;
+    // peerId -> how loud we play them (1 = as they come). Kept between calls
+    this.volumes = new Map();
     this._reset();
   }
 
@@ -188,8 +190,13 @@ export default class VoiceClient {
    */
   setAudible(peerId, audible) {
     this.audible.set(peerId, audible);
-    const remote = this.remotes.get(peerId);
-    if (remote && remote.audio) remote.audio.muted = !audible;
+    this._applyOutput(peerId);
+  }
+
+  /** How loud to play a peer: 1 is as they come, up to 2. */
+  setVolume(peerId, volume) {
+    this.volumes.set(peerId, volume);
+    this._applyOutput(peerId);
   }
 
   // --- internals -----------------------------------------------------------
@@ -462,6 +469,30 @@ export default class VoiceClient {
     audio.play().catch(() => {});
     remote.audio = audio;
     Object.assign(remote, this._watchVolume(stream));
+    this._applyOutput(remote.peerId);
+  }
+
+  /**
+   * Play a peer as they should sound now. At their normal volume they stay on
+   * the audio element alone, which browsers cancel the echo of most reliably.
+   * Any other volume goes through Web Audio: iPhones ignore an element's
+   * volume, and nothing else can go above 100%. The element has to stay
+   * attached, muted, or Chrome stops delivering the stream.
+   */
+  _applyOutput(peerId) {
+    const remote = this.remotes.get(peerId);
+    if (!remote || !remote.audio) return;
+    const audible = this.audible.get(peerId) !== false;
+    const volume = this.volumes.has(peerId) ? this.volumes.get(peerId) : 1;
+    const isAdjusted = volume !== 1;
+    if (isAdjusted && !remote.gain) {
+      remote.gain = this.audioContext.createGain();
+      remote.source.connect(remote.gain);
+      remote.gain.connect(this.audioContext.destination);
+    }
+    remote.audio.muted = isAdjusted || !audible;
+    if (remote.gain)
+      remote.gain.gain.value = isAdjusted && audible ? volume : 0;
   }
 
   _disposeRemote(remote) {
@@ -470,6 +501,7 @@ export default class VoiceClient {
       remote.audio.srcObject = null;
     }
     if (remote.source) remote.source.disconnect();
+    if (remote.gain) remote.gain.disconnect();
   }
 
   /**
