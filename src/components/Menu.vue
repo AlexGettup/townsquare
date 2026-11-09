@@ -119,6 +119,14 @@
               />
             </em>
           </li>
+          <template v-if="players.length && !session.isSpectator">
+            <li v-if="!session.gameOver" @click="toggleModal('endGame')">
+              {{ $t("menu.endGame") }}
+            </li>
+            <li v-else @click="undoEndGame">
+              {{ $t("menu.undoEndGame") }}
+            </li>
+          </template>
         </template>
 
         <template v-if="tab === 'settings'">
@@ -502,6 +510,10 @@ export default {
       if (confirm(this.$t("dialogs.removeAllRoles"))) {
         this.$store.dispatch("players/clearRoles");
       }
+    },
+    // the game didn't end after all: players see their own grimoire again
+    undoEndGame() {
+      this.$store.commit("session/setGameOver", null);
     },
     toggleNight() {
       this.$store.commit("toggleNight");

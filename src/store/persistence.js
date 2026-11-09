@@ -15,6 +15,7 @@ const hostedGameOf = ({ session, grimoire, voice, chat }) =>
         isNight: grimoire.isNight,
         nightCount: grimoire.nightCount,
         dayTimer: session.dayTimer,
+        gameOver: session.gameOver,
         nomination: session.nomination,
         votes: session.votes,
         lockedVote: session.lockedVote,
@@ -46,6 +47,7 @@ const loadHostedGame = ([isSpectator, sessionId]) => {
 const restoreHostedGame = (store, game) => {
   store.commit("toggleNight", game.isNight);
   store.commit("setNightCount", game.nightCount || 0);
+  store.commit("session/setGameOver", game.gameOver || null);
   // the timer keeps running during the reload, on this device's clock
   if (game.dayTimer && game.dayTimer.endsAt > Date.now()) {
     store.commit("session/setDayTimer", {
@@ -343,6 +345,7 @@ module.exports = (store) => {
         if (payload && !state.session.isSpectator) {
           store.commit("setNightCount", 0);
           store.commit("session/setDayTimer", null);
+          store.commit("session/setGameOver", null);
         }
         break;
       case "session/setPlayerId":

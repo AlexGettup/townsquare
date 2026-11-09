@@ -22,6 +22,8 @@
     "show": "Show",
     "switchToNight": "Switch to Night",
     "switchToDay": "Switch to Day",
+    "endGame": "End the game",
+    "undoEndGame": "Back to the game",
     "nightOrder": "Night Order",
     "zoom": "Zoom",
     "backgroundImage": "Background Image",
@@ -132,6 +134,7 @@
     "newInfo": "New information"
   },
   "cards": {
+    "to": "To",
     "send": "Send Information",
     "title": "Information for {name}",
     "card": "Information",
@@ -212,6 +215,10 @@
     "joined": "You're in! Tap a free seat and choose “Claim seat”.",
     "waiting": "Waiting for the Storyteller in session {code}. If nothing appears, check the code.",
     "footer": "This project is free and open source and can be found on {github}. It is not affiliated with The Pandemonium Institute. \"Blood on the Clocktower\" is a trademark of Steven Medway and The Pandemonium Institute."
+  },
+  "gameOver": {
+    "good": "Good wins!",
+    "evil": "Evil wins!"
   },
   "dayPhase": {
     "day": "Day {count}",
@@ -306,6 +313,12 @@
     "go": "GO"
   },
   "modals": {
+    "endGame": {
+      "title": "Who wins?",
+      "good": "Good",
+      "evil": "Evil",
+      "hint": "Everyone will see the whole grimoire."
+    },
     "edition": {
       "select": "Select an edition:",
       "custom": "Custom Script / Characters",

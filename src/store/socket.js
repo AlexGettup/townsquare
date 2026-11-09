@@ -234,6 +234,10 @@ class LiveSession {
         if (!this._isSpectator) return;
         this._store.commit("session/setDayTimer", params);
         break;
+      case "gameOver":
+        if (!this._isSpectator) return;
+        this._store.commit("session/setGameOver", params);
+        break;
       case "allowSelfNaming":
         if (!this._isSpectator) return;
         this._store.commit("session/setAllowSelfNaming", params);
@@ -414,6 +418,7 @@ class LiveSession {
         isNight: grimoire.isNight,
         nightCount: grimoire.nightCount,
         dayTimer: this._dayTimerToSend(),
+        gameOver: session.gameOver,
         allowSelfNaming: session.allowSelfNaming,
         isVoteHistoryAllowed: session.isVoteHistoryAllowed,
         isVoteWatchingAllowed: session.isVoteWatchingAllowed,
@@ -441,6 +446,7 @@ class LiveSession {
       isNight,
       nightCount,
       dayTimer,
+      gameOver,
       allowSelfNaming,
       isVoteHistoryAllowed,
       isVoteWatchingAllowed,
@@ -509,6 +515,7 @@ class LiveSession {
       this._store.commit("toggleNight", !!isNight);
       this._store.commit("setNightCount", nightCount || 0);
       this._store.commit("session/setDayTimer", dayTimer || null);
+      this._store.commit("session/setGameOver", gameOver || null);
       this._store.commit("session/setAllowSelfNaming", allowSelfNaming);
       this._store.commit("session/setVoteHistoryAllowed", isVoteHistoryAllowed);
       this._store.commit(
@@ -1076,6 +1083,11 @@ class LiveSession {
     if (this._isSpectator) return;
     this._send("dayTimer", this._dayTimerToSend());
   }
+  /** Send the end of the game (winner and grimoire), or that it's over. ST only */
+  setGameOver() {
+    if (this._isSpectator) return;
+    this._send("gameOver", this._store.state.session.gameOver);
+  }
 
   /**
    * Send the isNight status. ST only
@@ -1271,6 +1283,10 @@ export default (store) => {
       case "session/distributeRoles":
         if (payload) {
           session.distributeRoles();
+          // dealing again starts a new game: the old grimoire goes away
+          if (state.session.gameOver) {
+            store.commit("session/setGameOver", null);
+          }
         }
         break;
       case "session/nomination":
@@ -1309,6 +1325,9 @@ export default (store) => {
         break;
       case "session/setDayTimer":
         session.setDayTimer();
+        break;
+      case "session/setGameOver":
+        session.setGameOver();
         break;
       case "setEdition":
         session.sendEdition();

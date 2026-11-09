@@ -31,7 +31,7 @@
       :class="{ closed: !isBluffsOpen }"
     >
       <h3>
-        <span v-if="session.isSpectator">{{
+        <span v-if="session.isSpectator && !session.gameOver">{{
           $t("townSquare.otherCharacters")
         }}</span>
         <span v-else>{{ $t("townSquare.demonBluffs") }}</span>
@@ -44,7 +44,7 @@
           :key="index"
           @click="openRoleModal(index * -1)"
         >
-          <Token :role="bluffs[index - 1]"></Token>
+          <Token :role="shownBluffs[index - 1]"></Token>
         </li>
       </ul>
     </div>
@@ -76,6 +76,7 @@
             <em>{{ nightOrder.get(role).first }}</em>
             <span
               class="description"
+              :data-night="$t('modals.nightOrder.firstNight')"
               v-if="localizeRole(role).firstNightReminder"
             >
               <span
@@ -96,6 +97,7 @@
             <em>{{ nightOrder.get(role).other }}</em>
             <span
               class="description"
+              :data-night="$t('modals.nightOrder.otherNights')"
               v-if="localizeRole(role).otherNightReminder"
             >
               <span
@@ -137,6 +139,18 @@ export default {
     ...mapGetters(["localizeRole"]),
     ...mapState(["grimoire", "roles", "session", "bluffs", "npcs"]),
     ...mapState("players", ["players"]),
+    // players, once the game is over: the demon's real bluffs
+    shownBluffs: function () {
+      const { gameOver, isSpectator } = this.session;
+      if (!isSpectator || !gameOver || !gameOver.bluffs) return this.bluffs;
+      return gameOver.bluffs.map(
+        (id) =>
+          (id &&
+            (this.roles.get(id) ||
+              this.$store.getters.rolesJSONbyId.get(id))) ||
+          {},
+      );
+    },
   },
   data() {
     return {
@@ -727,7 +741,7 @@ export default {
       rgba(0, 0, 0, 0.5) 20%
     );
     &:before {
-      content: "First Night";
+      content: attr(data-night);
     }
     &:after {
       border-left-color: $townsfolk;
@@ -740,7 +754,7 @@ export default {
     left: 120%;
     background: linear-gradient(to right, $demon 0%, rgba(0, 0, 0, 0.5) 20%);
     &:before {
-      content: "Other Nights";
+      content: attr(data-night);
     }
     &:after {
       right: 100%;
@@ -777,7 +791,8 @@ export default {
     background: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, $demon 100%);
   }
 
-  em:hover + .description {
+  em:hover + .description,
+  .description.shown {
     opacity: 1;
   }
 

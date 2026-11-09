@@ -22,6 +22,8 @@
     "show": "Mostrar",
     "switchToNight": "Pasar a la noche",
     "switchToDay": "Pasar al día",
+    "endGame": "Terminar partida",
+    "undoEndGame": "Volver a la partida",
     "nightOrder": "Orden de noche",
     "zoom": "Zoom",
     "backgroundImage": "Imagen de fondo",
@@ -134,6 +136,7 @@
   "cards": {
     "send": "Enviar información",
     "title": "Información para {name}",
+    "to": "Para",
     "card": "Información",
     "phrase": "Frase",
     "text": "Texto (opcional)",
@@ -212,6 +215,10 @@
     "joined": "¡Ya estás dentro! Toca un asiento libre y elige «Reclamar asiento».",
     "waiting": "Esperando al Narrador en la sesión {code}. Si no aparece nada, comprueba el código.",
     "footer": "Este proyecto es gratuito y de código abierto, y puedes encontrarlo en {github}. No está afiliado a The Pandemonium Institute. «Blood on the Clocktower» es una marca registrada de Steven Medway y The Pandemonium Institute."
+  },
+  "gameOver": {
+    "good": "¡Gana el Bien!",
+    "evil": "¡Gana el Mal!"
   },
   "dayPhase": {
     "day": "Día {count}",
@@ -306,6 +313,12 @@
     "go": "¡YA!"
   },
   "modals": {
+    "endGame": {
+      "title": "¿Quién gana?",
+      "good": "El Bien",
+      "evil": "El Mal",
+      "hint": "Todos verán el grimorio completo."
+    },
     "edition": {
       "select": "Elige una edición:",
       "custom": "Guion / personajes personalizados",
