@@ -145,6 +145,9 @@ const mutations = {
   resetCardStatus(state) {
     state.cardsSince = Date.now();
   },
+  setCardsSince(state, cardsSince) {
+    state.cardsSince = cardsSince;
+  },
   clear(state) {
     state.messages = [];
     state.unread = {};

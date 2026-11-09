@@ -43,17 +43,17 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-2. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+1. **Storyteller reloads without losing anything** (Robustness): today a reload empties every
+   seat for everyone, mid-game.
+2. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+3. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-3. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+4. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-4. **Day and night counter** (For players): passive context for everyone, and labels for the
+5. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-5. **Minion and demon info** (Night without talking): one button instead of several cards on
+6. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-6. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
-   and the info cards sent when the page is reloaded mid-game.
 7. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
    storyteller explaining it out loud.
 
