@@ -46,8 +46,8 @@
         'alignment-' + player.alignmentIndex,
       ]"
     >
-      <div class="shroud" @click="onStatusClick"></div>
-      <div class="life" @click="onStatusClick"></div>
+      <div class="shroud" @click="onTokenTap"></div>
+      <div class="life" @click="onTokenTap"></div>
 
       <div
         class="night-order first"
@@ -83,7 +83,7 @@
             ? 0
             : player.alignmentIndex
         "
-        @set-role="onTokenClick"
+        @set-role="onTokenTap"
       />
 
       <!-- Storyteller: last info card sent to this player, and if they saw it -->
@@ -642,7 +642,7 @@ export default {
       isMenuOpen: false,
       // touch screens: the menu is a panel at the bottom of the screen
       isTouch: isTouchScreen(),
-      // touch screens: a double tap may still come, the panel ignores taps
+      // a double tap or click may still come, the touch panel ignores taps
       isArming: false,
       // storyteller: the "Seat" submenu of the player menu is showing
       isSeatMenu: false,
@@ -672,23 +672,8 @@ export default {
         this.$store.dispatch("chat/pickSeat", this.player.name);
       }
     },
-    // Touch screens: the shroud is easy to hit by mistake, so one tap
-    // anywhere on the token opens the player menu and a double tap toggles
-    // death. With a mouse, the shroud toggles death and the token opens the menu.
-    onStatusClick() {
-      if (isTouchScreen()) {
-        this.onTokenTap();
-      } else {
-        this.toggleStatus();
-      }
-    },
-    onTokenClick() {
-      if (isTouchScreen()) {
-        this.onTokenTap();
-      } else {
-        this.isMenuOpen = !this.isMenuOpen;
-      }
-    },
+    // The shroud is easy to hit by mistake, so one tap or click anywhere on the
+    // token opens the player menu and a double one toggles death.
     onTokenTap() {
       // players can't change deaths: open the menu right away
       if (this.session.isSpectator) {
@@ -817,7 +802,7 @@ export default {
         this.updatePlayer("voteWeight", weight);
       }
     },
-    // explicit death toggle in the menu (a double tap does it on touch screens)
+    // explicit death toggle in the menu (a double tap or click also does it)
     toggleDeath() {
       if (this.player.isDead) {
         this.updatePlayer("isDead", false);
@@ -938,7 +923,7 @@ export default {
     top: 0;
     left: 0;
     position: absolute;
-    // no double-tap zoom: a double tap toggles death on touch screens
+    // no double-tap zoom: a double tap toggles death
     touch-action: manipulation;
     width: 100%;
     height: 45%;
@@ -970,22 +955,12 @@ export default {
     #app.night & {
       pointer-events: none;
     }
-
-    #townsquare:not(.spectator) &:hover:before {
-      opacity: 0.5;
-      top: -10px;
-      transform: scale(1);
-    }
   }
 
   &.dead .shroud:before {
     opacity: 1;
     top: 0;
     transform: perspective(400px) scale(1);
-  }
-
-  #townsquare:not(.spectator) &.dead .shroud:hover:before {
-    opacity: 1;
   }
 }
 
