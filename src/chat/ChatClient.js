@@ -7,7 +7,8 @@ const RECONNECT_DELAY = 3000;
  *
  * Server messages: history (on connect), chat (a new message), cleared
  * (the storyteller emptied the chat), card-seen (a player saw an info
- * card) and chat-error.
+ * card), card-choice (a player answered a "choose a player" card) and
+ * chat-error.
  */
 export default class ChatClient {
   constructor({
@@ -18,6 +19,7 @@ export default class ChatClient {
     onCleared,
     onError,
     onSeen,
+    onChoice,
   }) {
     this.serverUrl = serverUrl;
     this.onStatus = onStatus;
@@ -26,6 +28,7 @@ export default class ChatClient {
     this.onCleared = onCleared;
     this.onError = onError;
     this.onSeen = onSeen;
+    this.onChoice = onChoice;
     this.socket = null;
     this.target = null;
     this.night = null;
@@ -80,6 +83,11 @@ export default class ChatClient {
     this._send({ type: "card-seen", id });
   }
 
+  /** Player: answer a "choose a player" card with the names picked. */
+  answerCard(id, players) {
+    this._send({ type: "card-choice", id, players });
+  }
+
   clear() {
     this._send({ type: "clear-chat" });
   }
@@ -124,6 +132,9 @@ export default class ChatClient {
           break;
         case "card-seen":
           this.onSeen(message.id, message.seen);
+          break;
+        case "card-choice":
+          this.onChoice(message.id, message.choice);
           break;
         case "chat-error":
           this.onError(message.reason);

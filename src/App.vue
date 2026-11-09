@@ -7,6 +7,7 @@
     :class="{
       night: grimoire.isNight,
       static: grimoire.isStatic,
+      picking: isPicking,
     }"
     :style="{
       backgroundImage: grimoire.background
@@ -46,13 +47,14 @@
     <AlertNotices />
     <ChatPanel v-if="players.length" />
     <InfoCardModal />
+    <ChoosePlayers />
     <InfoCardComposer />
     <span id="version">v{{ version }}</span>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { version } from "../package.json";
 import TownSquare from "./components/TownSquare";
 import TownInfo from "./components/TownInfo";
@@ -75,6 +77,7 @@ import AlertNotices from "@/components/AlertNotices";
 import ChatPanel from "@/components/ChatPanel";
 import InfoCardModal from "@/components/modals/InfoCardModal";
 import InfoCardComposer from "@/components/modals/InfoCardComposer";
+import ChoosePlayers from "@/components/ChoosePlayers";
 
 export default {
   components: {
@@ -84,6 +87,7 @@ export default {
     ChatPanel,
     InfoCardModal,
     InfoCardComposer,
+    ChoosePlayers,
     GameStateModal,
     ChangelogModal,
     VoteHistoryModal,
@@ -103,6 +107,7 @@ export default {
   computed: {
     ...mapState(["edition", "grimoire", "session"]),
     ...mapState("players", ["players"]),
+    ...mapGetters("chat", ["isPicking"]),
   },
   data() {
     return {

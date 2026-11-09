@@ -1,6 +1,13 @@
 <template>
-  <Modal class="info-card-modal" v-if="chat.shownCard" @close="close">
-    <InfoCard :card="chat.shownCard.card" />
+  <Modal
+    class="info-card-modal"
+    v-if="shownMessage && !isAnswering"
+    @close="close"
+  >
+    <InfoCard :card="shownMessage.card" />
+    <p class="chosen" v-if="shownMessage.choice">
+      {{ $t("cards.chosen", { players: shownMessage.choice.join(", ") }) }}
+    </p>
     <p class="hint" v-if="isChoice">{{ $t("cards.choiceHint") }}</p>
     <div class="button-group">
       <div class="button townsfolk" @click="close">
@@ -11,7 +18,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 import Modal from "./Modal";
 import InfoCard from "../InfoCard";
 
@@ -19,11 +26,10 @@ import InfoCard from "../InfoCard";
 export default {
   components: { Modal, InfoCard },
   computed: {
-    ...mapState(["chat"]),
-    // the player answers a "choose…" card in the private chat
+    ...mapGetters("chat", ["isAnswering", "shownMessage"]),
+    // this one is answered in the private chat; players are chosen on the seats
     isChoice: function () {
-      const { phrase } = this.chat.shownCard.card;
-      return !!phrase && phrase.startsWith("choose");
+      return this.shownMessage.card.phrase === "chooseCharacter";
     },
   },
   methods: {
@@ -47,6 +53,11 @@ export default {
 }
 .button-group {
   margin-top: 15px;
+}
+.chosen {
+  margin: 12px 0 0;
+  text-align: center;
+  font-weight: bold;
 }
 .hint {
   margin: 12px 0 0;

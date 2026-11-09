@@ -42,7 +42,23 @@ export default (store) => {
       }
     },
     onCleared: () => store.commit("chat/clear"),
-    onSeen: (id, seen) => store.commit("chat/setSeen", { id, seen }),
+    onSeen: (id, seen) => store.commit("chat/updateMessage", { id, seen }),
+    onChoice: (id, choice) => {
+      store.commit("chat/updateMessage", { id, choice });
+      if (!isStoryteller()) {
+        // the server has our answer: the square goes back to normal
+        const { shownCard } = store.state.chat;
+        if (shownCard && shownCard.id === id) store.dispatch("chat/closeCard");
+        return;
+      }
+      // the storyteller is told like a private message
+      const message = store.state.chat.messages.find((m) => m.id === id);
+      const { isOpen, tab } = store.state.chat;
+      if (message && (!isOpen || tab !== message.channel)) {
+        store.commit("chat/addUnread", message.channel);
+      }
+      if (!store.state.grimoire.isMuted) playChime();
+    },
     onError: (reason) => {
       store.commit("chat/setError", reason);
       clearTimeout(errorTimer);

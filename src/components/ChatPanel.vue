@@ -62,6 +62,9 @@
           <span v-if="message.card" class="card-details">{{
             cardDetails(message.card)
           }}</span>
+          <b v-if="message.choice" class="card-choice">
+            {{ $t("cards.chosen", { players: message.choice.join(", ") }) }}
+          </b>
           {{ message.text }}
         </p>
       </div>
