@@ -38,6 +38,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.19.0** Day and night counter; day timer
 - **3.20.0** End of game with the grimoire revealed to everyone; one info card to several
   players; tap the night order number on touch screens
+- **3.21.0** Show the grimoire to a player at night (Spy)
 
 ## Planned
 
@@ -81,7 +82,7 @@ guided night, own live session server, and the rest of the catalogue.
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
       player, shows the card, collects the choice and puts them back to sleep in one tap each.
-- [x] **Show the grimoire** (next release) (Spy, Widow): at night, "Show the grimoire" in any seated
+- [x] **Show the grimoire** (3.21.0) (Spy, Widow): at night, "Show the grimoire" in any seated
       player's menu sends only them a snapshot of the grimoire (characters, reminders, bluffs),
       shown on their town square until they close it or day comes. A book on their seat tells
       the storyteller it was sent (grey) and closed (gold).
