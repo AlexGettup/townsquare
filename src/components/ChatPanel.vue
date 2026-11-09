@@ -44,7 +44,10 @@
         <p
           v-for="message in messages"
           :key="message.id"
-          :class="{ mine: message.from === selfPeerId }"
+          :class="{
+            mine: message.from === selfPeerId,
+            replaced: isRoleCard(message) && message !== currentRoleCard,
+          }"
         >
           <small class="time">{{ time(message.at) }}</small>
           <b>{{ peerName(message.from) }}:</b>
@@ -88,7 +91,7 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
-import { PLACE_TAB } from "../store/modules/chat";
+import { PLACE_TAB, isRoleCard } from "../store/modules/chat";
 import { STORYTELLER } from "../store/modules/voice";
 
 /**
@@ -125,6 +128,9 @@ export default {
     },
     messages: function () {
       return this.messagesOf(this.chat.tab);
+    },
+    currentRoleCard: function () {
+      return this.messages.filter(isRoleCard).pop();
     },
     isStoryteller: function () {
       return this.selfPeerId === STORYTELLER;
@@ -169,6 +175,7 @@ export default {
         this.$store.dispatch("chat/clear");
       }
     },
+    isRoleCard,
     cardSummary(card) {
       if (card.phrase) return this.$t(`cards.phrases.${card.phrase}`);
       return this.$t("cards.card");
@@ -337,6 +344,14 @@ export default {
   }
   .card-details {
     user-select: text;
+  }
+  // an earlier "You are": a newer one replaced it
+  .replaced {
+    opacity: 0.5;
+    .card-link,
+    .card-details {
+      text-decoration: line-through;
+    }
   }
 }
 

@@ -82,8 +82,12 @@ export default (store) => {
   };
   sync();
 
-  store.subscribe(({ type }) => {
+  store.subscribe(({ type, payload }) => {
     switch (type) {
+      // characters really dealt (a mock assignment doesn't come through here)
+      case "session/distributeRoles":
+        if (payload) store.dispatch("chat/sendRoleCards");
+        break;
       case "session/setSessionId":
       case "session/setSpectator":
       case "session/setPlayerId":

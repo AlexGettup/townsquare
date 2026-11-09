@@ -81,7 +81,9 @@ live session server, and the rest of the catalogue.
 - [ ] **Role card when dealing**: when the storyteller really deals the characters (sending them
       to the players, not a mock assignment), each seated player also gets an info card in
       their private chat with the storyteller: "You are" plus their character. It stays there
-      to check later, and shows the storyteller whether they have seen it.
+      to check later, and shows the storyteller whether they have seen it. Dealing again sends
+      a new card to everyone, even with the same character (it's how they know), and the old
+      one is struck through.
 - [ ] **Choose targets on screen** *(official)*: the storyteller asks "choose a player" (or two)
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
