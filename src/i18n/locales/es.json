@@ -353,6 +353,7 @@
       "mockAssignment": "Asignación de prueba",
       "passOutRandomly": "Repartir {count} personajes al azar",
       "shuffle": "Barajar personajes",
+      "clear": "Borrar selección",
       "illegalWarning": "Aviso: hay personajes seleccionados que no se pueden enviar a los jugadores. No podrás repartir los personajes hasta que los quites.",
       "setupWarning": "Aviso: hay personajes seleccionados que modifican la preparación de la partida. El reparto aleatorio no los tiene en cuenta."
     },

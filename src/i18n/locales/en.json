@@ -353,6 +353,7 @@
       "mockAssignment": "Mock assignment",
       "passOutRandomly": "Pass out {count} characters randomly",
       "shuffle": "Shuffle characters",
+      "clear": "Clear selection",
       "illegalWarning": "Warning: there are characters selected cannot be sent to players! You will not be able to distribute characters until these characters are removed.",
       "setupWarning": "Warning: there are characters selected that modify the game setup! The randomizer does not account for these characters."
     },
