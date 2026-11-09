@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.13.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "One voice panel",
+      "es": "Un solo panel de voz"
+    },
+    "en": [
+      "All of voice chat is now in one panel: your microphone on top and, below, the plaza, private conversations and rooms with who is in each one",
+      "Tap a name in the panel to invite that person to talk. At night, the Storyteller wakes people up and puts them back to sleep from the same panel",
+      "On a computer it opens beside the game when you join voice; on a phone, tap the voice button to open it at the bottom of the screen",
+      "Fixed people who had just joined voice not being heard by the others"
+    ],
+    "es": [
+      "Todo el chat de voz está ahora en un solo panel: tu micrófono arriba y, debajo, la plaza, las conversaciones privadas y las salas con quién hay en cada una",
+      "Pulsa un nombre en el panel para invitar a esa persona a hablar. De noche, el Narrador despierta y duerme a la gente desde el mismo panel",
+      "En ordenador se abre junto a la partida al unirte a la voz; en el móvil, pulsa el botón de voz para abrirlo en la parte inferior de la pantalla",
+      "Corregido que no se oyera a quien acababa de entrar en la voz"
+    ]
+  },
+  {
     "version": "3.12.3",
     "date": "2026-11-09",
     "title": {
