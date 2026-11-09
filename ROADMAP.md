@@ -29,6 +29,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.14.0** "You are" card when dealing; volume per person; menus close on a click or tap
   outside; private conversations listed below the voice button on phones
 - **3.15.0** Choose players by tapping the seats
+- **3.16.0** The game survives the storyteller reloading or losing the connection; "Send
+  characters" always in the menu
 
 ## Planned
 
@@ -43,18 +45,16 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. **Storyteller reloads without losing anything** (Robustness): today a reload empties every
-   seat for everyone, mid-game.
-2. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-3. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+1. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+2. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-4. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+3. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-5. **Day and night counter** (For players): passive context for everyone, and labels for the
+4. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-6. **Minion and demon info** (Night without talking): one button instead of several cards on
+5. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-7. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+6. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
    storyteller explaining it out loud.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
@@ -140,10 +140,9 @@ Ranked with the same criteria as the [next steps](#next-steps).
 - [ ] **Own live session server**: games still sync through upstream's server
       (`clocktower.live`); if it goes away the app stops working. Move the game sync to our
       Cloudflare Worker, like voice and chat.
-- [ ] **Storyteller reloads without losing anything**: keep who sits where, the dealt characters
-      and the info cards sent across a page reload. Today every seat comes back empty for
-      everyone and players have to claim them again; "Send characters" then hands the
-      characters out again.
+- [x] **Storyteller reloads without losing anything** (3.16.0): seats, dealt characters, night,
+      who is awake, the vote under way, vote history and card ticks survive a page reload or a
+      lost connection. A game saved more than 12 hours ago counts as a new one.
 
 ### Voice chat
 

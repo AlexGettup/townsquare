@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.16.0
+- The Storyteller reloading the page or losing the connection no longer empties the seats: players stay seated without claiming them again
+- A reload also keeps the night (before, it turned to day for everyone), who is awake, the vote under way (it comes back paused, to be resumed), the vote history, the player marked for execution, the session settings, the dealt characters and the card ticks. A game saved more than 12 hours ago counts as a new one
+- A Storyteller coming back while the server still has their old connection retries instead of being thrown out of the game
+- "Send characters" is always in the Storyteller's menu, except with Tor in play, for someone who wasn't seated when dealing
+
 ### Version 3.15.0
 - "Choose a player" and "Choose 2 players" cards are answered on the town square: the player taps the seats and confirms in a small box outside the circle. They can pick themselves and dead players
 - The Storyteller gets the names in the private chat, a mark on the token, a chime and an unread count
