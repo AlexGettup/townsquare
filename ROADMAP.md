@@ -36,6 +36,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.18.0** Notes per player; choose microphone and speaker; ability in the player menu on
   touch screens; small x to close the bottom panels; no "+" on the seats on touch screens
 - **3.19.0** Day and night counter; day timer
+- **3.20.0** End of game with the grimoire revealed to everyone; one info card to several
+  players; tap the night order number on touch screens
 
 ## Planned
 
@@ -50,25 +52,17 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-Planned for 3.20.0:
-
-1. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
-   storyteller explaining it out loud. Decided: players see the whole grimoire (real
-   characters, reminders and the demon bluffs), sent only when the game ends.
-2. **One info card to several players** (Text chat): faster minion and demon info, which
-   the storyteller gives by hand.
-3. **Long press for the night order** (Phones and tablets): what computers see on hover.
-
-After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
-live session server, and the rest of the catalogue.
+Nothing planned yet. Candidates: analyse joining voice and text chat, game diary, push-to-talk,
+guided night, own live session server, and the rest of the catalogue.
 
 ### Phones and tablets
 
 - [x] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
       players don't drop from their seats.
 - [x] **Install as an app (PWA)**: home screen icon and full screen, without the browser bar.
-- [ ] **Long press for the night order** on touch screens (no hover there). A token's ability
-      is covered by "Ability in the player menu" (For players).
+- [x] **Night order on touch screens** (3.20.0): tap the night order number next to a token to
+      read its text (no hover there). Chosen over a long press, which nobody would find. A
+      token's ability is covered by "Ability in the player menu" (For players).
 - [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
       the bottom instead of floating over the seats.
 
@@ -100,9 +94,10 @@ cards, because characters like the Lunatic make an automatic version misleading.
 - [x] **Day timer** *(official)* (3.19.0): a countdown everyone sees ("5 minutes of discussion left"),
       with a sound when it ends.
 - [ ] **Ambient sounds**: dusk, dawn, executions.
-- [ ] **End of game and grimoire reveal** *(official)*: the storyteller ends the game and
+- [x] **End of game and grimoire reveal** *(official)* (3.20.0): the storyteller ends the game and
       declares the winning team (Good or Evil); everyone sees the result and the full
-      grimoire, and voice brings everyone back to the plaza to talk about it.
+      grimoire (real characters, reminders and demon bluffs), and voice brings everyone back to
+      the plaza to talk about it.
 
 ### For players
 
@@ -171,7 +166,8 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 ### Text chat
 
-- [ ] **Storyteller messages to several players at once** (e.g. all the Minions).
+- [x] **Info cards to several players at once** (3.20.0) (e.g. all the Minions): a "To" row in the
+      card window; each one gets it in their private chat.
 - [ ] **Storyteller reads every chat**, not only the place they are in (to decide).
 
 ### Security
