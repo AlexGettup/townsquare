@@ -365,11 +365,11 @@ export default {
     }),
   ],
   computed: {
+    // sends the characters in the grimoire again, without drawing new ones:
+    // for someone who wasn't really seated when they were dealt. Tor doesn't
+    // send characters (no dealing in the roles window either)
     showSendCharacters: function () {
-      return (
-        this.npcs.some((npc) => npc.id === "gardener") &&
-        !this.npcs.some((npc) => npc.id === "tor")
-      );
+      return !this.npcs.some((npc) => npc.id === "tor");
     },
     ...mapState(["grimoire", "session", "edition", "npcs", "voice"]),
     ...mapState("players", ["players"]),
