@@ -942,8 +942,11 @@ class LiveSession {
         value: true,
       });
     }
-    // update player session list as if this was a ping
-    this._handlePing([true, value, 0]);
+    // claiming a seat counts as a ping. Register it first: the check for
+    // players that went away would take the seat's "connected" straight back
+    // from a player whose first ping was sent before this storyteller arrived
+    this._players[value] = new Date().getTime();
+    this._handlePing([value]);
     // a player claiming their seat again gets the character they were dealt
     if (index >= 0) this._resendRole(value);
   }
