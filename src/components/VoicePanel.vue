@@ -12,6 +12,22 @@
       <font-awesome-icon :icon="icon" />
     </span>
 
+    <!-- touch screens: who talks in private, with the panel closed -->
+    <ul class="private-now" v-if="showPrivateNow" @click="isOpen = true">
+      <li
+        v-for="{ location } in conversations"
+        :key="location"
+        :class="{ mine: location === voice.location }"
+        :style="{ borderLeftColor: placeColor(location) }"
+      >
+        <font-awesome-icon
+          icon="comments"
+          :style="{ color: placeColor(location) }"
+        />
+        <span>{{ placeName(location) }}</span>
+      </li>
+    </ul>
+
     <component :is="isTouch ? 'BottomSheet' : 'div'" v-if="isOpen">
       <ul class="menu" ref="menu" :class="{ floating: !isTouch }">
         <li class="sheet-header" v-if="isTouch">
@@ -222,8 +238,10 @@ export default {
       inside() {
         return [this.$el, this.$refs.menu];
       },
+      // on a computer it stays open beside the game; on a touch screen it
+      // would cover the game
       close() {
-        this.isOpen = false;
+        if (this.isTouch) this.isOpen = false;
       },
     }),
   ],
@@ -243,6 +261,14 @@ export default {
     errorMessage: function () {
       const key = `voice.errors.${this.voice.error}`;
       return this.$te(key) ? this.$t(key) : this.$t("voice.errors.generic");
+    },
+    showPrivateNow: function () {
+      return (
+        this.isTouch &&
+        this.isConnected &&
+        !this.grimoire.isNight &&
+        this.conversations.length > 0
+      );
     },
     canHearHost: function () {
       return this.canHear(STORYTELLER);
@@ -386,6 +412,12 @@ export default {
       this.$store.dispatch("voice/cancelRequest");
     },
   },
+  watch: {
+    // on a computer it opens beside the game; on a touch screen only when asked
+    isConnected(isConnected) {
+      if (isConnected && !this.isTouch) this.isOpen = true;
+    },
+  },
 };
 </script>
 
@@ -442,6 +474,46 @@ export default {
   50% {
     opacity: 0.5;
     color: gray;
+  }
+}
+
+// small, in the corner: it must leave the seats alone
+.private-now {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: max-content;
+  max-width: 42vw;
+  margin: 3px 0 0;
+  padding: 0;
+  list-style-type: none;
+  font-size: 12px;
+  line-height: 1.3;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 2px 5px;
+    background: rgba(0, 0, 0, 0.7);
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+
+    &.mine {
+      background: rgba(255, 255, 255, 0.2);
+      font-weight: bold;
+    }
+    svg {
+      flex-shrink: 0;
+    }
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 }
 
