@@ -170,6 +170,7 @@
     }
   },
   "dialogs": {
+    "clearNotes": "Clear all your notes for this game?",
     "backgroundUrl": "Enter custom background URL",
     "hostChannel": "Enter a channel number / name for your session",
     "joinChannel": "Enter the channel number / name of the session you want to join",
@@ -232,6 +233,8 @@
     "markDead": "Mark as Dead",
     "revive": "Revive",
     "addReminder": "Add Reminder",
+    "addNote": "Add note",
+    "editNote": "Edit note",
     "closeMenu": "Close",
     "seat": "Seat",
     "changeRole": "Change Character",
@@ -335,6 +338,12 @@
       "title": "Night Order",
       "firstNight": "First Night",
       "otherNights": "Other Nights"
+    },
+    "note": {
+      "title": "Note about {name}",
+      "placeholder": "Claims Chef, saw a 1…",
+      "hint": "Only you can see it. Saved on this device.",
+      "clearAll": "Clear all notes"
     },
     "reminder": {
       "title": "Choose a reminder token:",

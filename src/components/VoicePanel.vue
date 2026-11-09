@@ -32,6 +32,13 @@
       <ul class="menu" ref="menu" :class="{ floating: !isTouch }">
         <li class="sheet-header" v-if="isTouch">
           <strong>{{ $t("voice.title") }}</strong>
+          <span
+            class="sheet-x"
+            :title="$t('player.closeMenu')"
+            @click="isOpen = false"
+          >
+            <font-awesome-icon icon="times" />
+          </span>
         </li>
         <li class="headline" v-else>{{ $t("voice.title") }}</li>
 
@@ -221,9 +228,6 @@
             </li>
           </template>
         </template>
-        <li class="sheet-close" v-if="isTouch" @click="isOpen = false">
-          {{ $t("player.closeMenu") }}
-        </li>
       </ul>
     </component>
   </div>

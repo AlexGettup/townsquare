@@ -4,6 +4,7 @@ import persistence from "./persistence";
 import socket from "./socket";
 import voicePlugin from "./voice";
 import chatPlugin from "./chat";
+import notesPlugin from "./notes";
 import wakeLockPlugin from "./wakeLock";
 import alertsPlugin from "./alerts";
 import players from "./modules/players";
@@ -11,6 +12,7 @@ import session from "./modules/session";
 import voice from "./modules/voice";
 import chat from "./modules/chat";
 import alerts from "./modules/alerts";
+import notes from "./modules/notes";
 import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
 import nightJSON from "../nightsheet.json";
@@ -128,6 +130,7 @@ export default new Vuex.Store({
     voice,
     chat,
     alerts,
+    notes,
   },
   state: {
     grimoire: {
@@ -150,6 +153,7 @@ export default new Vuex.Store({
       gameState: false,
       messages: false,
       nightOrder: false,
+      note: false,
       reference: false,
       reminder: false,
       role: false,
@@ -477,5 +481,6 @@ export default new Vuex.Store({
     chatPlugin,
     wakeLockPlugin,
     alertsPlugin,
+    notesPlugin,
   ],
 });

@@ -170,6 +170,7 @@
     }
   },
   "dialogs": {
+    "clearNotes": "¿Borrar todas tus notas de esta partida?",
     "backgroundUrl": "Introduce la URL de un fondo personalizado",
     "hostChannel": "Introduce un número o nombre de canal para tu sesión",
     "joinChannel": "Introduce el número o nombre del canal de la sesión a la que quieres unirte",
@@ -232,6 +233,8 @@
     "markDead": "Marcar muerto",
     "revive": "Revivir",
     "addReminder": "Añadir recordatorio",
+    "addNote": "Añadir nota",
+    "editNote": "Editar nota",
     "closeMenu": "Cerrar",
     "seat": "Asiento",
     "changeRole": "Cambiar personaje",
@@ -335,6 +338,12 @@
       "title": "Orden de noche",
       "firstNight": "Primera noche",
       "otherNights": "Otras noches"
+    },
+    "note": {
+      "title": "Nota sobre {name}",
+      "placeholder": "Dice ser el Chef, vio un 1…",
+      "hint": "Solo la ves tú. Se guarda en este dispositivo.",
+      "clearAll": "Borrar todas las notas"
     },
     "reminder": {
       "title": "Elige una ficha de recordatorio:",
