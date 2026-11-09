@@ -140,8 +140,10 @@ Ranked with the same criteria as the [next steps](#next-steps).
 - [ ] **Own live session server**: games still sync through upstream's server
       (`clocktower.live`); if it goes away the app stops working. Move the game sync to our
       Cloudflare Worker, like voice and chat.
-- [ ] **Storyteller reloads without losing anything**: keep the dealt characters and the info
-      cards sent across a page reload.
+- [ ] **Storyteller reloads without losing anything**: keep who sits where, the dealt characters
+      and the info cards sent across a page reload. Today every seat comes back empty for
+      everyone and players have to claim them again; "Send characters" then hands the
+      characters out again.
 
 ### Voice chat
 
