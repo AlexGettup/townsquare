@@ -30,8 +30,7 @@ export default {
   max-width: 480px;
   max-height: 70vh;
   margin: 0 auto;
-  // the close button stays at the bottom and takes the safe area itself
-  padding: 4px 12px 0;
+  padding: 0 12px calc(8px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -87,12 +86,33 @@ export default {
     &.sheet-header {
       cursor: default;
       color: gray;
-      font-size: 90%;
+      // the x stays within reach, however long the panel is
+      position: sticky;
+      top: 0;
+      z-index: 1;
       min-height: 40px;
+      margin: 0 -12px;
+      padding: 0 18px;
+      background: #0b0b0b;
+      border-radius: 16px 16px 0 0;
+      font-size: 90%;
 
       strong {
         color: white;
         margin-right: 6px;
+      }
+
+      // small to the eye, big enough for a finger
+      .sheet-x {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin: 0 -10px 0 auto;
+        color: white;
+        cursor: pointer;
       }
     }
 
@@ -103,20 +123,6 @@ export default {
       font-size: 85%;
       line-height: 1.3;
       cursor: default;
-    }
-
-    // always within reach, however long the panel is
-    &.sheet-close {
-      position: sticky;
-      bottom: 0;
-      justify-content: center;
-      margin: 0 -12px;
-      padding: 0 6px env(safe-area-inset-bottom, 0px);
-      min-height: calc(52px + env(safe-area-inset-bottom, 0px));
-      background: #1b1b1b;
-      border-top: 1px solid rgba(255, 255, 255, 0.25);
-      border-bottom: 0;
-      font-weight: bold;
     }
   }
 }

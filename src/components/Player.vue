@@ -251,6 +251,13 @@
           <li class="sheet-header" v-if="isTouch">
             <strong>{{ player.name }}</strong>
             <span v-if="player.role.id">{{ displayRole.name }}</span>
+            <span
+              class="sheet-x"
+              :title="$t('player.closeMenu')"
+              @click="isMenuOpen = false"
+            >
+              <font-awesome-icon icon="times" />
+            </span>
           </li>
           <!-- no hover on touch screens: what this character does -->
           <li
@@ -403,9 +410,6 @@
               <font-awesome-icon icon="chevron-right" class="submenu" />
             </li>
           </template>
-          <li class="sheet-close" v-if="isTouch" @click="isMenuOpen = false">
-            {{ $t("player.closeMenu") }}
-          </li>
         </ul>
       </component>
     </div>
