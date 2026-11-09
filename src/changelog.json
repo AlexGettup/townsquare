@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.19.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Day counter and timer",
+      "es": "Contador de días y temporizador"
+    },
+    "en": [
+      "In the middle of the town square you can see which day or night it is: \"Night 1\", \"Day 1\", \"Night 2\"…",
+      "Day timer: everyone sees the same countdown, with a sound when time is up",
+      "Storyteller: start the timer from the hourglass next to the counter. Click the counter to correct it"
+    ],
+    "es": [
+      "En el centro de la plaza ves qué día o noche es: «Noche 1», «Día 1», «Noche 2»…",
+      "Temporizador de día: todos ven la misma cuenta atrás, con un aviso sonoro cuando se acaba el tiempo",
+      "Narrador: pon el temporizador desde el reloj de arena junto al contador. Haz clic en el contador para corregirlo"
+    ]
+  },
+  {
     "version": "3.18.0",
     "date": "2026-11-09",
     "title": {
