@@ -25,6 +25,13 @@ const RECONNECT_DELAY = 2000;
 const SPEAKING_THRESHOLD = 0.02; // RMS of the signal
 const SPEAKING_HOLD = 400; // ms to keep "speaking" after the last sound
 
+// waiting to receive someone again after it failed: doubles up to the maximum
+const PULL_RETRY_DELAY = 1000;
+const PULL_RETRY_MAX_DELAY = 5 * 1000;
+// how long to wait for our microphone to reach the SFU before joining the room
+const SENDING_TIMEOUT = 8 * 1000;
+const SENDING_CHECK_INTERVAL = 150;
+
 // changes when a peer rejoins with a new connection
 const remoteKey = (peer) => `${peer.peerId}/${peer.since}`;
 
@@ -61,6 +68,11 @@ export default class VoiceClient {
     this.socket = null;
     this.pingTimer = null;
     this.reconnectTimer = null;
+    this.pullRetryTimer = null;
+    this.pullFailures = 0;
+    // the latest room state from the voice server
+    this.roomPeers = [];
+    this.hear = [];
     this.audioContext = null;
     this.vadTimer = null;
     // serializes SDP negotiations, which can't run concurrently
@@ -124,6 +136,9 @@ export default class VoiceClient {
       const { sessionId } = await this._api("POST", "sessions/new");
       this.sessionId = sessionId;
       await this._push();
+      // others pull our microphone as soon as we join the room: it has to exist
+      await this._waitUntilSending();
+      if (!this.pc) return;
       this._openSocket();
       this.vadTimer = setInterval(() => this._detectSpeaking(), 100);
       this.onStatus("connected");
@@ -135,6 +150,7 @@ export default class VoiceClient {
   async leave() {
     clearInterval(this.pingTimer);
     clearTimeout(this.reconnectTimer);
+    clearTimeout(this.pullRetryTimer);
     clearInterval(this.vadTimer);
     if (this.socket) {
       this.socket.onclose = null;
@@ -241,6 +257,27 @@ export default class VoiceClient {
   }
 
   /**
+   * Wait for the first packets of our microphone, or give up after a while:
+   * joining late is better than not joining at all.
+   */
+  async _waitUntilSending() {
+    const deadline = Date.now() + SENDING_TIMEOUT;
+    while (this.pc && Date.now() < deadline) {
+      const stats = await this.pc.getStats();
+      let packets = 0;
+      stats.forEach((report) => {
+        if (report.type === "outbound-rtp" && report.kind === "audio") {
+          packets += report.packetsSent || 0;
+        }
+      });
+      if (packets > 0) return;
+      await new Promise((resolve) =>
+        setTimeout(resolve, SENDING_CHECK_INTERVAL),
+      );
+    }
+  }
+
+  /**
    * Receive the microphone of a remote peer. The voice server only lets us
    * pull the people we may hear, naming them by peerId.
    */
@@ -268,10 +305,13 @@ export default class VoiceClient {
         }
         remote.mid = track.mid;
         await this._renegotiateIfNeeded(response);
+        this.pullFailures = 0;
       } catch (error) {
-        // not allowed (any more) or failed: try again on the next update
+        // not allowed (any more), or someone who just joined and isn't sending
+        // audio yet: nothing else may happen in the room, so try again later
         if (this.remotes.get(peer.peerId) === remote && !remote.mid) {
           this.remotes.delete(peer.peerId);
+          this._schedulePullRetry();
         }
         throw error;
       }
@@ -281,6 +321,19 @@ export default class VoiceClient {
         this.pendingStreams.delete(remote.mid);
       }
     });
+  }
+
+  _schedulePullRetry() {
+    if (this.pullRetryTimer) return;
+    const delay = Math.min(
+      PULL_RETRY_DELAY * 2 ** this.pullFailures,
+      PULL_RETRY_MAX_DELAY,
+    );
+    this.pullFailures++;
+    this.pullRetryTimer = setTimeout(() => {
+      this.pullRetryTimer = null;
+      this._syncRemotes();
+    }, delay);
   }
 
   /**
@@ -424,21 +477,10 @@ export default class VoiceClient {
    * decided by the server), stop the rest, drop who left.
    */
   _onPeers(peers, hear = []) {
-    const others = peers.filter((peer) => peer.peerId !== this.peerId);
-    others.forEach((peer) => {
-      const remote = this.remotes.get(peer.peerId);
-      if (remote && remote.key !== remoteKey(peer)) this._drop(peer.peerId);
-      if (!hear.includes(peer.peerId)) {
-        this._markClosed(peer.peerId);
-      } else if (!this.remotes.has(peer.peerId)) {
-        this._pull(peer);
-      } else if (this.remotes.get(peer.peerId).closed) {
-        this._reopen(peer);
-      }
-    });
-    [...this.remotes.keys()].forEach((peerId) => {
-      if (!others.some((peer) => peer.peerId === peerId)) this._drop(peerId);
-    });
+    this.roomPeers = peers.filter((peer) => peer.peerId !== this.peerId);
+    this.hear = hear;
+    this._syncRemotes();
+    const others = this.roomPeers;
     const visible = ({
       peerId,
       muted,
@@ -456,6 +498,27 @@ export default class VoiceClient {
     });
     const self = peers.find((peer) => peer.peerId === this.peerId);
     this.onPeers(others.map(visible), self ? visible(self) : null);
+  }
+
+  /** Match what we receive to the latest room state. */
+  _syncRemotes() {
+    if (!this.pc) return;
+    this.roomPeers.forEach((peer) => {
+      const remote = this.remotes.get(peer.peerId);
+      if (remote && remote.key !== remoteKey(peer)) this._drop(peer.peerId);
+      if (!this.hear.includes(peer.peerId)) {
+        this._markClosed(peer.peerId);
+      } else if (!this.remotes.has(peer.peerId)) {
+        this._pull(peer);
+      } else if (this.remotes.get(peer.peerId).closed) {
+        this._reopen(peer);
+      }
+    });
+    [...this.remotes.keys()].forEach((peerId) => {
+      if (!this.roomPeers.some((peer) => peer.peerId === peerId)) {
+        this._drop(peerId);
+      }
+    });
   }
 
   // --- voice activity detection --------------------------------------------
