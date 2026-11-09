@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.14.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Your character on a card, and volume per person",
+      "es": "Tu personaje en una tarjeta y volumen por persona"
+    },
+    "en": [
+      "When the Storyteller deals the characters, you get a \"You are\" card with yours, and it stays in your private chat. If they deal again you get a new one, even with the same character, and the old one is struck through",
+      "Someone too loud or too quiet? Tap their name in the voice panel and move the volume slider, from 0 to 200%",
+      "Menus now close when you click or tap outside them",
+      "On a computer the voice panel stays open while you play; on a phone, the private conversations going on are listed below the voice button"
+    ],
+    "es": [
+      "Cuando el Narrador reparte los personajes, recibes una tarjeta «Tú eres» con el tuyo, que queda en tu chat privado. Si vuelve a repartir recibes otra, aunque te toque el mismo personaje, y la anterior queda tachada",
+      "¿Alguien se oye demasiado fuerte o demasiado bajo? Pulsa su nombre en el panel de voz y mueve el control de volumen, de 0 a 200 %",
+      "Los menús se cierran ahora al hacer clic o pulsar fuera de ellos",
+      "En ordenador, el panel de voz se queda abierto mientras juegas; en el móvil, las conversaciones privadas en curso aparecen debajo del botón de voz"
+    ]
+  },
+  {
     "version": "3.13.0",
     "date": "2026-11-09",
     "title": {

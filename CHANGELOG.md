@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.14.0
+- When the characters are really dealt (from the roles window or the menu, not a mock assignment), each seated player gets an info card in their private chat with the Storyteller: "You are" and their character. Dealing again sends everyone a new card, even with the same character, and earlier ones are struck through
+- Volume per person: tapping a name in the voice panel shows a slider from 0 to 200%, saved on the device. Other than 100% it plays through Web Audio, which also works on iPhones
+- Menus close on a click or tap outside them: player menu, settings, and the voice panel on touch screens. On computers the voice panel stays open, and it opens on joining voice
+- On phones, the private conversations going on are listed in small print below the voice button during the day; tapping the list opens the panel
+
 ### Version 3.13.0
 - One voice panel instead of a menu opening over the conversations panel: your own controls on top and, below, the places (plaza, private conversations, rooms) with the people in each, so nobody is listed twice
 - Tapping a name in the panel offers the invitation to talk; at night it is one list, where the storyteller wakes people up and puts them back to sleep

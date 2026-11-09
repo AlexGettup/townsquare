@@ -26,6 +26,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.12.0** Create or join a game from the first screen
 - **3.13.0** One voice panel, with people grouped by place; people joining voice are heard
   straight away
+- **3.14.0** "You are" card when dealing; volume per person; menus close on a click or tap
+  outside; private conversations listed below the voice button on phones
 
 ## Planned
 
@@ -40,25 +42,21 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
-   a slider next to their name needs no explanation.
-2. **Role card when dealing** (Night without talking): cheap, as it reuses the info cards. Each
-   player finds their character in the private chat, with nothing to learn or ask.
-3. **Choose targets on screen** (Night without talking): players tap seats instead of typing
+1. **Choose targets on screen** (Night without talking): players tap seats instead of typing
    their choice in the chat; the last big gap for a silent night.
-4. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-5. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+2. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+3. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-6. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+4. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-7. **Day and night counter** (For players): passive context for everyone, and labels for the
+5. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-8. **Minion and demon info** (Night without talking): one button instead of several cards on
+6. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-9. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
+7. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
    and the info cards sent when the page is reloaded mid-game.
-10. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
-    storyteller explaining it out loud.
+8. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+   storyteller explaining it out loud.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
 live session server, and the rest of the catalogue.
@@ -78,7 +76,7 @@ live session server, and the rest of the catalogue.
 - [x] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
       characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
       (Fortune Teller), players. Shown on the player's device and kept in their private chat.
-- [ ] **Role card when dealing**: when the storyteller really deals the characters (sending them
+- [x] **Role card when dealing** (3.14.0): when the storyteller really deals the characters (sending them
       to the players, not a mock assignment), each seated player also gets an info card in
       their private chat with the storyteller: "You are" plus their character. It stays there
       to check later, and shows the storyteller whether they have seen it. Dealing again sends
@@ -161,7 +159,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
 - [ ] **Push-to-talk**: the microphone only sends while a key or an on-screen button is held.
       Useful with background noise; optional, since it has to be learnt (and holding a button
       while talking is awkward on a phone).
-- [ ] **Volume per person**: a slider for each participant (some people sound too loud or too quiet).
+- [x] **Volume per person** (3.14.0): a slider for each participant (some people sound too loud or too quiet).
       iPhones don't let a web page change an audio element's volume: route it through Web Audio.
 - [ ] **Choose microphone and speaker**: pick the input/output device (headphones + separate mic).
 - [ ] **Video**: optional camera with thumbnails on the seats. Estimated ~15 GB per hour for
