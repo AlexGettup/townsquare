@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.18.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "Notes on each player",
+      "es": "Notas sobre cada jugador"
+    },
+    "en": [
+      "Write notes about any player: \"Add note\" in their menu. A small mark on their name shows you have one. Only you can see them, and they stay on your device",
+      "Computer: choose your microphone and speaker in the voice panel, also in the middle of a game",
+      "Phone: tap a player to see what their character does",
+      "Phone: the bottom panels close with a small x at the top, and reminders are added from the player menu"
+    ],
+    "es": [
+      "Escribe notas sobre cualquier jugador: «Añadir nota» en su menú. Una pequeña marca en su nombre te recuerda que tienes una. Solo las ves tú y se quedan en tu dispositivo",
+      "Ordenador: elige tu micrófono y altavoz en el panel de voz, también en mitad de la partida",
+      "Móvil: toca a un jugador para ver qué hace su personaje",
+      "Móvil: los paneles de abajo se cierran con una pequeña x arriba, y los recordatorios se añaden desde el menú del jugador"
+    ]
+  },
+  {
     "version": "3.17.0",
     "date": "2026-11-09",
     "title": {

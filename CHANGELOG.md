@@ -4,6 +4,13 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.18.0
+- Notes per player: "Add note" in the player menu opens a box to write what you know or suspect. A small mark on the name shows who has a note; hovering it shows the note, and clicking or tapping it opens it. Notes are only on your device, per game session, never sent to anyone. They survive a reload, follow a player who changes name or seat, and are dropped after 12 hours
+- Computers: choose the microphone and speaker in the voice panel ("Microphone and speaker"). The microphone changes mid-call without reconnecting; an unplugged one falls back to the default, with a notice. Choices are saved on the device. The game's sounds use the chosen speaker too
+- Touch screens: the player panel shows the character's ability, and the tooltip that stayed over other seats after a tap is gone
+- Touch screens: the bottom panels close with a small x in the top right corner, which stays in place when the panel scrolls
+- Touch screens: no "+" button on the seats; reminders are added from the player menu
+
 ### Version 3.17.0
 - On computers, one click on the top of a token no longer kills: one click anywhere on the token opens the player menu and a double click toggles death, same as on touch screens. The menu entry stays, and the shroud no longer shows on hover
 - Token size now depends on the number of players and the screen, and follows rotating and resizing. Up to 12 players neither tokens nor names touch on the screen sizes measured; with more, names may touch on small screens

@@ -33,6 +33,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   characters" always in the menu
 - **3.17.0** Token size from the players and the screen; double click to kill on computers;
   trash button in the character selector; less lag at night and adding reminders
+- **3.18.0** Notes per player; choose microphone and speaker; ability in the player menu on
+  touch screens; small x to close the bottom panels; no "+" on the seats on touch screens
 
 ## Planned
 
@@ -47,16 +49,11 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-2. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
-   the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-3. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
-   so today the ability is hard to reach. Computers already show it on hover.
-4. **Day and night counter** (For players): passive context for everyone, and labels for the
+1. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-5. **Minion and demon info** (Night without talking): one button instead of several cards on
+2. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-6. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+3. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
    storyteller explaining it out loud.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
@@ -120,11 +117,11 @@ Ranked with the same criteria as the [next steps](#next-steps).
    No alerts for nominations or votes, on purpose: the countdown is enough, and the "Your vote"
    panel makes voting clear.
 
-1. [ ] **Notes per player** *(official)*: a "Notes" entry in the player menu with free text
+1. [x] **Notes per player** (3.18.0) *(official)*: a "Notes" entry in the player menu with free text
    ("claims Chef, saw a 1"), and a small icon on the token when it has a note, so they are
    found again at a glance. Only visible to you and saved on your device. The biggest gap for
    playing without paper, but it has to be discovered.
-2. [ ] **Ability in the player menu**: the bottom panel on touch screens already shows the name
+2. [x] **Ability in the player menu** (3.18.0): the bottom panel on touch screens already shows the name
    and character; add the ability text. Tapping your own token answers "what does my
    character do?" right where you look, and tapping another token explains the character you
    think they are. Only for touch screens: computers already show it on hover.
@@ -163,7 +160,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
       while talking is awkward on a phone).
 - [x] **Volume per person** (3.14.0): a slider for each participant (some people sound too loud or too quiet).
       iPhones don't let a web page change an audio element's volume: route it through Web Audio.
-- [ ] **Choose microphone and speaker**: pick the input/output device (headphones + separate mic).
+- [x] **Choose microphone and speaker** (3.18.0, computers): pick the input/output device (headphones + separate mic).
 - [ ] **Video**: optional camera with thumbnails on the seats. Estimated ~15 GB per hour for
       11 people at ~300 kbps, well inside the Cloudflare Realtime free tier (1,000 GB/month).
 
