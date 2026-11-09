@@ -1,5 +1,77 @@
 const { default: i18n, detectBrowserLocale } = require("../i18n");
 
+// a saved game older than this isn't a reload anymore, but a new game
+const HOSTED_GAME_MAX_AGE = 12 * 60 * 60 * 1000;
+
+/**
+ * What survives a page reload of the game the storyteller is hosting, or null
+ * when not hosting. It carries its session ID: a new game never inherits it.
+ */
+const hostedGameOf = ({ session, grimoire, voice, chat }) =>
+  session.isSpectator || !session.sessionId
+    ? null
+    : {
+        sessionId: session.sessionId,
+        isNight: grimoire.isNight,
+        nomination: session.nomination,
+        votes: session.votes,
+        lockedVote: session.lockedVote,
+        votingSpeed: session.votingSpeed,
+        isVoteInProgress: session.isVoteInProgress,
+        markedPlayer: session.markedPlayer,
+        allowSelfNaming: session.allowSelfNaming,
+        isVoteHistoryAllowed: session.isVoteHistoryAllowed,
+        isVoteWatchingAllowed: session.isVoteWatchingAllowed,
+        voteHistory: session.voteHistory,
+        dealtRoles: session.dealtRoles,
+        awake: voice.awake,
+        broadcast: voice.broadcast,
+        cardsSince: chat.cardsSince,
+      };
+
+/** The saved game, if it's the session we are coming back to as storyteller. */
+const loadHostedGame = ([isSpectator, sessionId]) => {
+  if (!localStorage.hostedGame) return null;
+  const game = JSON.parse(localStorage.hostedGame);
+  const isValid =
+    !isSpectator &&
+    game.sessionId === sessionId &&
+    Date.now() - game.savedAt < HOSTED_GAME_MAX_AGE;
+  if (!isValid) localStorage.removeItem("hostedGame");
+  return isValid ? game : null;
+};
+
+const restoreHostedGame = (store, game) => {
+  store.commit("toggleNight", game.isNight);
+  store.commit("session/nomination", {
+    nomination: game.nomination,
+    votes: game.votes,
+    votingSpeed: game.votingSpeed,
+    lockedVote: game.lockedVote,
+    // the vote's clock doesn't survive: a vote under way comes back paused
+    // (the storyteller resumes it), and one still counting down hasn't started
+    isVoteInProgress: game.isVoteInProgress && game.lockedVote > 0,
+  });
+  store.commit("session/setMarkedPlayer", game.markedPlayer);
+  store.commit("session/setAllowSelfNaming", game.allowSelfNaming);
+  store.commit("session/setVoteHistoryAllowed", game.isVoteHistoryAllowed);
+  store.commit("session/setVoteWatchingAllowed", game.isVoteWatchingAllowed);
+  store.commit(
+    "session/setVoteHistory",
+    game.voteHistory.map((vote) => ({
+      ...vote,
+      timestamp: new Date(vote.timestamp),
+    })),
+  );
+  store.commit("session/setDealtRoles", game.dealtRoles);
+  store.commit("voice/setNight", {
+    awake: game.awake,
+    broadcast: game.broadcast,
+  });
+  store.commit("chat/setCardsSince", game.cardsSince);
+  store.commit("session/setGameResumed", true);
+};
+
 module.exports = (store) => {
   // uses the store's locale explicitly, as vue-i18n may not be synced yet
   const updatePagetitle = (isPublic) =>
@@ -64,6 +136,14 @@ module.exports = (store) => {
       ),
     });
   }
+  // a link to a game takes over from the saved session
+  const savedSession =
+    localStorage.getItem("session") && !window.location.hash.substr(1)
+      ? JSON.parse(localStorage.getItem("session"))
+      : null;
+  // before the players: nightfall resets marks that were saved with them
+  const hostedGame = savedSession && loadHostedGame(savedSession);
+  if (hostedGame) restoreHostedGame(store, hostedGame);
   if (localStorage.players) {
     store.commit(
       "players/set",
@@ -86,11 +166,20 @@ module.exports = (store) => {
       localStorage.getItem("playerSecret"),
     );
   }
-  if (localStorage.getItem("session") && !window.location.hash.substr(1)) {
-    const [spectator, sessionId] = JSON.parse(localStorage.getItem("session"));
+  if (savedSession) {
+    const [spectator, sessionId] = savedSession;
     store.commit("session/setSpectator", spectator);
     store.commit("session/setSessionId", sessionId);
   }
+
+  store.watch(hostedGameOf, (game) => {
+    if (game) {
+      localStorage.setItem(
+        "hostedGame",
+        JSON.stringify({ ...game, savedAt: Date.now() }),
+      );
+    }
+  });
 
   // listen to mutations
   store.subscribe(({ type, payload }, state) => {
@@ -194,6 +283,7 @@ module.exports = (store) => {
           ),
         );
         break;
+      case "toggleNight": // resets marks on the players
       case "players/add":
       case "players/update":
       case "players/remove":
@@ -220,10 +310,16 @@ module.exports = (store) => {
         if (payload) {
           localStorage.setItem(
             "session",
-            JSON.stringify([state.session.isSpectator, payload]),
+            JSON.stringify([
+              state.session.isSpectator,
+              state.session.sessionId,
+            ]),
           );
         } else {
           localStorage.removeItem("session");
+        }
+        if (!payload || state.session.isSpectator) {
+          localStorage.removeItem("hostedGame");
         }
         break;
       case "session/setPlayerId":

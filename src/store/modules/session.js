@@ -31,6 +31,11 @@ const state = () => ({
   isVoteHistoryAllowed: true,
   isVoteWatchingAllowed: true,
   isRolesDistributed: false,
+  // ST: characters handed out to each player ID, so a player who was away
+  // (phone in the background…) still gets theirs
+  dealtRoles: {},
+  // ST: this page load picked up a saved game (see store/persistence.js)
+  isGameResumed: false,
   messages: [],
 });
 
@@ -59,6 +64,9 @@ const mutations = {
   setVoteWatchingAllowed: set("isVoteWatchingAllowed"),
   claimSeat: set("claimedSeat"),
   distributeRoles: set("isRolesDistributed"),
+  setDealtRoles: set("dealtRoles"),
+  setGameResumed: set("isGameResumed"),
+  setVoteHistory: set("voteHistory"),
   setSessionId(state, sessionId) {
     state.sessionId = sessionId
       .toLocaleLowerCase()

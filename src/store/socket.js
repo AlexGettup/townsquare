@@ -13,14 +13,30 @@ class LiveSession {
     this._reconnectTimer = null;
     this._players = {}; // map of players connected to a session
     this._pings = {}; // map of player IDs to ping
-    // ST: characters handed out to each player ID with "distribute", so a
-    // player who was away (phone in the background…) still gets theirs
-    this._dealtRoles = {};
+    this._hostedChannel = null; // ST: the session the seats belong to
+    this._isResuming = false; // ST: connecting to that session again
     this._notify = new Audio(require("@/assets/sounds/roles-notify.mp3"));
     // reconnect to previous session
-    if (this._store.state.session.sessionId) {
-      this.connect(this._store.state.session.sessionId);
+    const { sessionId, isGameResumed } = this._store.state.session;
+    if (sessionId) {
+      if (isGameResumed) this._resumeHosting(sessionId);
+      this.connect(sessionId);
     }
+  }
+
+  /**
+   * The storyteller reloaded the page: it's still the same game, so the seats
+   * stay. Those who were connected count as such until their ping is overdue,
+   * instead of flickering as gone in the meantime.
+   * @param channel
+   * @private
+   */
+  _resumeHosting(channel) {
+    this._hostedChannel = channel;
+    const now = new Date().getTime();
+    this._store.state.players.players.forEach(({ id, connected }) => {
+      if (id && connected) this._players[id] = now;
+    });
   }
 
   /**
@@ -46,7 +62,10 @@ class LiveSession {
       this._socket = null;
       clearInterval(this._pingTimer);
       this._pingTimer = null;
-      if (err.code !== 1000) {
+      // coming back to our own game, the host in the way is probably ourselves:
+      // the old connection, until the server notices it's dead
+      const isOwnHostInTheWay = err.code === 1000 && this._isResuming;
+      if (err.code !== 1000 || isOwnHostInTheWay) {
         // connection interrupted, reconnect after 3 seconds
         this._store.commit("session/setReconnecting", true);
         this._reconnectTimer = setTimeout(
@@ -299,8 +318,11 @@ class LiveSession {
     this._store.commit("session/setPlayerCount", 0);
     this._store.commit("session/setPing", 0);
     this._isSpectator = this._store.state.session.isSpectator;
-    if (!this._isSpectator) {
-      // clear all claimed and reserved seats when hosting a new session
+    this._isResuming = !this._isSpectator && channel === this._hostedChannel;
+    if (!this._isSpectator && !this._isResuming) {
+      // clear all claimed and reserved seats when hosting a new session, but
+      // not when reconnecting to ours (network cut, page reload)
+      this._store.commit("session/setDealtRoles", {});
       this._store.state.players.players.forEach((player) => {
         this._store.commit("players/update", {
           player: player,
@@ -314,7 +336,16 @@ class LiveSession {
         });
       });
     }
+    this._hostedChannel = this._isSpectator ? null : channel;
     this._open(channel);
+  }
+
+  /**
+   * Leave the current session for good: coming back later is a new game.
+   */
+  leave() {
+    this._hostedChannel = null;
+    this.disconnect();
   }
 
   /**
@@ -481,6 +512,9 @@ class LiveSession {
       this._store.commit("setNpcs", {
         npcs: npcs.map((f) => this._store.state.otherNpcs.get(f.id) || f),
       });
+      // the storyteller may just be back from a reload: say we're here now
+      // rather than at the next ping
+      this._ping();
     }
   }
 
@@ -489,7 +523,7 @@ class LiveSession {
    */
   sendClear() {
     if (this._isSpectator) return;
-    this._dealtRoles = {};
+    this._store.commit("session/setDealtRoles", {});
     this._send("clear");
   }
 
@@ -581,13 +615,13 @@ class LiveSession {
     if (property === "role") {
       if (value.team && value.team === "traveller") {
         // update local gamestate to remember this player as a traveller
-        this._gamestate[index].roleId = value.id;
+        if (this._gamestate[index]) this._gamestate[index].roleId = value.id;
         this._send("player", {
           index,
           property,
           value: value.id,
         });
-      } else if (this._gamestate[index].roleId) {
+      } else if (this._gamestate[index] && this._gamestate[index].roleId) {
         // player was previously a traveller
         delete this._gamestate[index].roleId;
         this._send("player", { index, property, value: "" });
@@ -843,7 +877,7 @@ class LiveSession {
    */
   _resendRole(playerId) {
     if (this._isSpectator || !playerId) return;
-    const roleId = this._dealtRoles[playerId];
+    const roleId = this._store.state.session.dealtRoles[playerId];
     if (!roleId) return;
     const index = this._store.state.players.players.findIndex(
       (player) => player.id === playerId,
@@ -958,11 +992,11 @@ class LiveSession {
   distributeRoles() {
     if (this._isSpectator) return;
     const message = {};
-    this._dealtRoles = {};
+    const dealtRoles = {};
     this._store.state.players.players.forEach((player, index) => {
       if (!player.id || !player.role || !player.role.id) return;
       // remembered for every seated player, also those away right now
-      this._dealtRoles[player.id] = player.role.id;
+      dealtRoles[player.id] = player.role.id;
       if (player.connected) {
         message[player.id] = [
           "player",
@@ -970,6 +1004,7 @@ class LiveSession {
         ];
       }
     });
+    this._store.commit("session/setDealtRoles", dealtRoles);
     if (Object.keys(message).length) {
       this._send("direct", message);
     }
@@ -1187,7 +1222,7 @@ export default (store) => {
           session.connect(state.session.sessionId);
         } else {
           window.location.hash = "";
-          session.disconnect();
+          session.leave();
         }
         break;
       case "session/claimSeat":
