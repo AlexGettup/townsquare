@@ -435,6 +435,33 @@ import peerNames from "../voice/peerNames";
 import closeOnOutsideClick from "../closeOnOutsideClick";
 import { PLAZA, isConversation } from "../store/modules/voice";
 
+// Token sizes as a share of the circle's diameter, measured on 11 screen sizes
+// so that with up to 13 players neither tokens nor names touch each other.
+// few players: the middle of the circle and the reminders need room too
+const MAX_TOKEN_SIZE = 0.19;
+// many players: below this characters can't be read or tapped, so names may
+// touch their neighbours instead
+const MIN_TOKEN_SIZE = 0.11;
+// room between neighbours, as a share of the token's width
+const TOKEN_SPACING = 1.28;
+
+/**
+ * CSS width of a token: as big as fits between its neighbours, with room for
+ * its name (see --name-room in TownSquare.vue), which doesn't shrink with it.
+ * @param playerCount
+ * @param zoom the player's own setting, in steps of 1% of the short side
+ */
+const tokenWidth = (playerCount, zoom) => {
+  const side = Math.sin(Math.PI / Math.max(playerCount, 3));
+  const fit = side / (TOKEN_SPACING + side);
+  const circle = "var(--circle-size)";
+  const size =
+    `clamp(${circle} * ${MIN_TOKEN_SIZE}, ` +
+    `${circle} * ${fit} - var(--name-room), ` +
+    `${circle} * ${MAX_TOKEN_SIZE})`;
+  return `calc(${size} + ${zoom}vmin)`;
+};
+
 export default {
   mixins: [
     peerNames,
@@ -607,16 +634,7 @@ export default {
       return indexAdjusted < session.lockedVote - 1;
     },
     zoom: function () {
-      const unit = window.innerWidth > window.innerHeight ? "vh" : "vw";
-      if (this.players.length < 7) {
-        return { width: 18 + this.grimoire.zoom + unit };
-      } else if (this.players.length <= 10) {
-        return { width: 16 + this.grimoire.zoom + unit };
-      } else if (this.players.length <= 15) {
-        return { width: 14 + this.grimoire.zoom + unit };
-      } else {
-        return { width: 12 + this.grimoire.zoom + unit };
-      }
+      return { width: tokenWidth(this.players.length, this.grimoire.zoom) };
     },
   },
   data() {
@@ -1479,7 +1497,9 @@ li.picking-seat .reminderHoverTarget {
 
 /***** Player name *****/
 .player > .name {
-  right: 10%;
+  // wider than the token, and with room for most names when the token is small
+  --name-width: max(120%, min(4.4em, 150%));
+  right: calc((var(--name-width) - 100%) / 2);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1487,7 +1507,7 @@ li.picking-seat .reminderHoverTarget {
   line-height: 120%;
   cursor: pointer;
   white-space: nowrap;
-  width: 120%;
+  width: var(--name-width);
   background: rgba(0, 0, 0, 0.5);
   border: 3px solid black;
   border-radius: 10px;

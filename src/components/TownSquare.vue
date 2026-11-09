@@ -335,9 +335,14 @@ export default {
   height: 100%;
   list-style: none;
   margin: 0;
+  // the tokens are sized from these, see Player.vue: the circle's diameter, and
+  // what to leave for a name, from its height: it follows the text size
+  --circle-size: calc(100vmin - 40px);
+  --name-room: calc((1.44em + 6px) * 0.8);
 
   @media (orientation: portrait) {
     height: 100vw;
+    --circle-size: 100vmin;
   }
 
   > li {
