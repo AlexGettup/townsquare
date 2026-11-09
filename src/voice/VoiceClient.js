@@ -16,6 +16,7 @@
  * - onSpeaking(peerId, bool)  voice activity, also for the local peer
  * - onForceMute()             the storyteller muted us
  * - onEvent(message)          invite / request / declined / gather
+ * - onMicrophoneLost()        our microphone was unplugged
  */
 
 const TRACK_NAME = "microphone";
@@ -43,6 +44,7 @@ export default class VoiceClient {
     onSpeaking,
     onForceMute,
     onEvent,
+    onMicrophoneLost,
   }) {
     this.serverUrl = serverUrl.replace(/\/$/, "");
     this.onStatus = onStatus;
@@ -50,6 +52,10 @@ export default class VoiceClient {
     this.onSpeaking = onSpeaking;
     this.onForceMute = onForceMute;
     this.onEvent = onEvent;
+    this.onMicrophoneLost = onMicrophoneLost;
+    // the devices chosen ("" is the system's default). Kept between calls
+    this.inputId = "";
+    this.outputId = "";
     // peerId -> how loud we play them (1 = as they come). Kept between calls
     this.volumes = new Map();
     this._reset();
@@ -65,6 +71,8 @@ export default class VoiceClient {
     this.peerId = null;
     this.muted = false;
     this.stream = null;
+    this.micSender = null;
+    this.micRequest = 0;
     this.pc = null;
     this.sessionId = null;
     this.socket = null;
@@ -111,16 +119,12 @@ export default class VoiceClient {
         error.name = "InsecureContext";
         throw error;
       }
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
+      this.stream = await this._openAnyMicrophone();
+      this._watchMicrophoneEnd();
       this._applyMute();
       this.audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
+      this._applyContextOutput();
       await this.audioContext.resume();
       this.local = this._watchVolume(this.stream);
 
@@ -199,7 +203,90 @@ export default class VoiceClient {
     this._applyOutput(peerId);
   }
 
+  /**
+   * Use another microphone, also in the middle of a call: nobody has to
+   * reconnect. If it can't be opened, the current one stays and this throws.
+   */
+  async setInputDevice(deviceId) {
+    const previousId = this.inputId;
+    this.inputId = deviceId;
+    if (!this.pc || !this.micSender) return;
+    const pc = this.pc;
+    const request = ++this.micRequest;
+    let stream;
+    try {
+      stream = await this._openMicrophone();
+      // left voice chat, or chose another one in the meantime
+      if (this.pc !== pc || request !== this.micRequest) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      await this.micSender.replaceTrack(stream.getAudioTracks()[0]);
+    } catch (error) {
+      if (stream) stream.getTracks().forEach((track) => track.stop());
+      if (request === this.micRequest) this.inputId = previousId;
+      throw error;
+    }
+    this.stream.getTracks().forEach((track) => track.stop());
+    this.stream = stream;
+    this._watchMicrophoneEnd();
+    this._applyMute();
+    const { speaking, lastSound, source } = this.local;
+    source.disconnect();
+    this.local = { ...this._watchVolume(stream), speaking, lastSound };
+  }
+
+  /** Play everyone through this speaker, now and from now on. */
+  async setOutputDevice(deviceId) {
+    this.outputId = deviceId;
+    this._applyContextOutput();
+    const audios = [...this.remotes.values()]
+      .map((remote) => remote.audio)
+      .filter(Boolean);
+    await Promise.all(audios.map((audio) => audio.setSinkId(deviceId)));
+  }
+
   // --- internals -----------------------------------------------------------
+
+  /** Exactly the device chosen: browsers may ignore a mere preference. */
+  _openMicrophone(deviceId = this.inputId) {
+    return navigator.mediaDevices.getUserMedia({
+      audio: {
+        ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
+  }
+
+  /** On joining, a device that is no longer there gives way to the default. */
+  async _openAnyMicrophone() {
+    try {
+      return await this._openMicrophone();
+    } catch (error) {
+      if (!this.inputId || error.name !== "OverconstrainedError") throw error;
+      return this._openMicrophone("");
+    }
+  }
+
+  _watchMicrophoneEnd() {
+    const track = this.stream.getAudioTracks()[0];
+    track.onended = () => {
+      if (this.stream && this.stream.getAudioTracks()[0] === track) {
+        this.onMicrophoneLost();
+      }
+    };
+  }
+
+  // people at another volume play through Web Audio
+  _applyContextOutput() {
+    if (this.audioContext && this.audioContext.setSinkId) {
+      this.audioContext.setSinkId(this.outputId).catch((error) => {
+        console.warn("Voice chat: can't use that speaker", error);
+      });
+    }
+  }
 
   _fail(error) {
     console.error("Voice chat error", error);
@@ -246,6 +333,7 @@ export default class VoiceClient {
         direction: "sendonly",
       },
     );
+    this.micSender = transceiver.sender;
     await this.pc.setLocalDescription(await this.pc.createOffer());
     const response = await this._api(
       "POST",
@@ -466,6 +554,11 @@ export default class VoiceClient {
     audio.autoplay = true;
     audio.muted = this.audible.get(remote.peerId) === false;
     audio.srcObject = stream;
+    if (this.outputId && audio.setSinkId) {
+      audio.setSinkId(this.outputId).catch((error) => {
+        console.warn("Voice chat: can't use that speaker", error);
+      });
+    }
     audio.play().catch(() => {});
     remote.audio = audio;
     Object.assign(remote, this._watchVolume(stream));

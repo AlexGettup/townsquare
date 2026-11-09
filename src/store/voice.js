@@ -1,5 +1,5 @@
 import VoiceClient from "../voice/VoiceClient";
-import { playChime, playGatherBell } from "../voice/sounds";
+import { playChime, playGatherBell, setSoundsOutput } from "../voice/sounds";
 
 const INVITATION_TIMEOUT = 60 * 1000;
 const NOTICE_TIMEOUT = 5 * 1000;
@@ -13,6 +13,10 @@ export default (store) => {
 
   const notify = (key, peerId) => {
     store.commit("voice/addNotice", { key, peerId });
+  };
+
+  // every notice goes away on its own, wherever it comes from
+  const scheduleNoticeRemoval = () => {
     const { id } =
       store.state.voice.notices[store.state.voice.notices.length - 1];
     setTimeout(() => store.commit("voice/removeNotice", id), NOTICE_TIMEOUT);
@@ -67,8 +71,16 @@ export default (store) => {
       if (!store.state.voice.muted) store.dispatch("voice/toggleMute");
     },
     onEvent,
+    // back to the default microphone, and say so
+    onMicrophoneLost: () => {
+      store.dispatch("voice/setInputDevice", "");
+      notify("voice.microphoneLost");
+    },
   });
   store.$voice = client;
+  client.inputId = store.state.voice.inputId;
+  client.outputId = store.state.voice.outputId;
+  setSoundsOutput(client.outputId);
 
   // silence locally whoever we must not hear (night rules, other rooms), and
   // play everyone else as loud as we chose
@@ -128,6 +140,12 @@ export default (store) => {
           }
         }
         applyAudibility();
+        break;
+      case "voice/setOutputId":
+        setSoundsOutput(store.state.voice.outputId);
+        break;
+      case "voice/addNotice":
+        scheduleNoticeRemoval();
         break;
       case "voice/setPeers":
       case "voice/setNight":

@@ -38,6 +38,9 @@ const state = () => ({
   broadcast: false,
   // peerId -> how loud we play them, for those not at 1 (saved on this device)
   volumes: {},
+  // the devices chosen, "" is the system's default (saved on this device)
+  inputId: "",
+  outputId: "",
   // invitations received: [{ from, at }]
   invitations: [],
   // short messages ("X declined your invitation"): [{ id, key, peerId }]
@@ -165,6 +168,12 @@ const mutations = {
     state.awake = awake;
     state.broadcast = broadcast;
   },
+  setInputId(state, deviceId) {
+    state.inputId = deviceId;
+  },
+  setOutputId(state, deviceId) {
+    state.outputId = deviceId;
+  },
   setVolumes(state, volumes) {
     state.volumes = volumes;
   },
@@ -209,6 +218,31 @@ const actions = {
   leave({ commit }) {
     commit("clearInvitations");
     return this.$voice.leave();
+  },
+  // both say if it worked, and otherwise leave things as they were
+  async setInputDevice({ commit }, deviceId) {
+    try {
+      await this.$voice.setInputDevice(deviceId);
+      commit("setInputId", deviceId);
+      return true;
+    } catch (error) {
+      console.warn("Voice chat: can't use that microphone", error);
+      commit("addNotice", { key: "voice.deviceFailed" });
+      return false;
+    }
+  },
+  async setOutputDevice({ commit, state }, deviceId) {
+    const previousId = state.outputId;
+    try {
+      await this.$voice.setOutputDevice(deviceId);
+      commit("setOutputId", deviceId);
+      return true;
+    } catch (error) {
+      console.warn("Voice chat: can't use that speaker", error);
+      this.$voice.setOutputDevice(previousId).catch(() => {});
+      commit("addNotice", { key: "voice.deviceFailed" });
+      return false;
+    }
   },
   toggleMute({ commit, state }) {
     commit("setMuted", !state.muted);
