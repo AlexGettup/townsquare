@@ -4,6 +4,13 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.15.0
+- "Choose a player" and "Choose 2 players" cards are answered on the town square: the player taps the seats and confirms in a small box outside the circle. They can pick themselves and dead players
+- The Storyteller gets the names in the private chat, a mark on the token, a chime and an unread count
+- The card closes when the server confirms the answer, and says so if it didn't arrive. A vote pauses the choice, and a reminder stays on screen while it is unanswered
+- While choosing, the chat and side panels hide on upright screens and those under 1200 px wide, so that they don't cover the seats
+- The voice server has to be deployed with this version
+
 ### Version 3.14.0
 - When the characters are really dealt (from the roles window or the menu, not a mock assignment), each seated player gets an info card in their private chat with the Storyteller: "You are" and their character. Dealing again sends everyone a new card, even with the same character, and earlier ones are struck through
 - Volume per person: tapping a name in the voice panel shows a slider from 0 to 200%, saved on the device. Other than 100% it plays through Web Audio, which also works on iPhones
