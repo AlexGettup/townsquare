@@ -42,21 +42,23 @@ players use each, so a feature that only helps one of them is worth half as much
 
 1. **Volume per person** (Voice chat): someone too loud or too quiet is a common complaint, and
    a slider next to their name needs no explanation.
-2. **Choose targets on screen** (Night without talking): players tap seats instead of typing
+2. **Role card when dealing** (Night without talking): cheap, as it reuses the info cards. Each
+   player finds their character in the private chat, with nothing to learn or ask.
+3. **Choose targets on screen** (Night without talking): players tap seats instead of typing
    their choice in the chat; the last big gap for a silent night.
-3. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
-4. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
+4. **Notes per player** (For players): the biggest gap for playing without paper, on any device.
+5. **Choose microphone and speaker** (Voice chat): on a computer the default device is often
    the wrong one (headset + separate mic); cheap. Phones choose it themselves.
-5. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
+6. **Ability in the player menu** (For players): cheap; on touch screens there is no hover,
    so today the ability is hard to reach. Computers already show it on hover.
-6. **Day and night counter** (For players): passive context for everyone, and labels for the
+7. **Day and night counter** (For players): passive context for everyone, and labels for the
    notes and the diary.
-7. **Minion and demon info** (Night without talking): one button instead of several cards on
+8. **Minion and demon info** (Night without talking): one button instead of several cards on
    the first night.
-8. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
+9. **Storyteller reloads without losing anything** (Robustness): keep the dealt characters
    and the info cards sent when the page is reloaded mid-game.
-9. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
-   storyteller explaining it out loud.
+10. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
+    storyteller explaining it out loud.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
 live session server, and the rest of the catalogue.
@@ -76,6 +78,10 @@ live session server, and the rest of the catalogue.
 - [x] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
       characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
       (Fortune Teller), players. Shown on the player's device and kept in their private chat.
+- [ ] **Role card when dealing**: when the storyteller really deals the characters (sending them
+      to the players, not a mock assignment), each seated player also gets an info card in
+      their private chat with the storyteller: "You are" plus their character. It stays there
+      to check later, and shows the storyteller whether they have seen it.
 - [ ] **Choose targets on screen** *(official)*: the storyteller asks "choose a player" (or two)
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
