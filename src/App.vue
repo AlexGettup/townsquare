@@ -399,21 +399,12 @@ video#background {
     content: " ";
     display: block;
     width: 100%;
-    padding-right: 2000px;
     height: 100%;
+    // still on purpose: moving them made the whole app redraw on every frame,
+    // and everything slower at night
     background: url("assets/clouds.webp") repeat;
     background-size: 2000px auto;
-    animation: move-background 120s linear infinite;
     opacity: 0.3;
-  }
-}
-
-@keyframes move-background {
-  from {
-    transform: translate3d(-2000px, 0px, 0px);
-  }
-  to {
-    transform: translate3d(0px, 0px, 0px);
   }
 }
 
