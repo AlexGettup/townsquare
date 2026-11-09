@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.21.0",
+    "date": "2026-11-09",
+    "title": {
+      "en": "The Spy's grimoire",
+      "es": "El grimorio del Espía"
+    },
+    "en": [
+      "Spy: when the Storyteller shows you the grimoire, your town square shows everyone's real character, the reminders and the Demon's bluffs until you close it",
+      "Storyteller: \"Show the grimoire\" in a player's menu at night. Only that player gets it, and a book on their seat tells you when they have closed it"
+    ],
+    "es": [
+      "Espía: cuando el Narrador te enseña el grimorio, tu plaza muestra el personaje real de cada uno, los recordatorios y los faroles del Demonio hasta que lo cierres",
+      "Narrador: «Enseñar grimorio» en el menú de un jugador, de noche. Solo lo recibe ese jugador, y un libro en su asiento te avisa cuando lo ha cerrado"
+    ]
+  },
+  {
     "version": "3.20.0",
     "date": "2026-11-09",
     "title": {

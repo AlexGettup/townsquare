@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.21.0
+- Show the grimoire (Spy, Widow): at night, "Show the grimoire" in a seated player's menu sends only that player the grimoire as it is now: real characters, reminders and the Demon's bluffs, on their town square. It goes away when they close it or day comes, and nobody else gets anything. A book on their seat tells the Storyteller it was sent (grey) and that they closed it (gold)
+
 ### Version 3.20.0
 - End of game: "End the game" in the Storyteller's menu (Grimoire tab) asks who won, Good or Evil. Everyone sees "Good wins!" or "Evil wins!" in the middle of the town square with the town bell, it turns to day, the vote and the timer stop, and voice brings everyone back to the plaza
 - Players then see the whole grimoire: everyone's real character (the Drunk shows as the Drunk), the reminders and the Demon's bluffs. Nothing of it reaches players before the end. It survives reloads, "Back to the game" undoes it, and dealing again or a new game clears it
