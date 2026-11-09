@@ -229,7 +229,7 @@ export default {
 .chat {
   position: absolute;
   right: 10px;
-  bottom: 30px;
+  bottom: 10px;
   width: 340px;
   max-width: calc(100vw - 20px);
   display: flex;
@@ -363,7 +363,6 @@ export default {
 @media screen and (max-width: 767.98px), screen and (max-height: 500px) {
   .chat {
     width: 220px;
-    bottom: 20px;
     background: rgba(0, 0, 0, 0.45);
     h3 {
       margin: 2px 6px;
