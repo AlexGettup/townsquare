@@ -36,6 +36,8 @@ const state = () => ({
   dealtRoles: {},
   // ST: this page load picked up a saved game (see store/persistence.js)
   isGameResumed: false,
+  // the day timer everyone sees: { endsAt (this device's clock), duration }
+  dayTimer: null,
   messages: [],
 });
 
@@ -66,6 +68,12 @@ const mutations = {
   distributeRoles: set("isRolesDistributed"),
   setDealtRoles: set("dealtRoles"),
   setGameResumed: set("isGameResumed"),
+  /** Start ({ remaining, duration } in ms) or stop (null) the day timer. */
+  setDayTimer(state, timer) {
+    state.dayTimer = timer
+      ? { endsAt: Date.now() + timer.remaining, duration: timer.duration }
+      : null;
+  },
   setVoteHistory: set("voteHistory"),
   setSessionId(state, sessionId) {
     state.sessionId = sessionId

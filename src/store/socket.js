@@ -226,6 +226,14 @@ class LiveSession {
         if (!this._isSpectator) return;
         this._store.commit("toggleNight", params);
         break;
+      case "nightCount":
+        if (!this._isSpectator) return;
+        this._store.commit("setNightCount", params);
+        break;
+      case "dayTimer":
+        if (!this._isSpectator) return;
+        this._store.commit("session/setDayTimer", params);
+        break;
       case "allowSelfNaming":
         if (!this._isSpectator) return;
         this._store.commit("session/setAllowSelfNaming", params);
@@ -404,6 +412,8 @@ class LiveSession {
       this._sendDirect(playerId, "gs", {
         gamestate: this._gamestate,
         isNight: grimoire.isNight,
+        nightCount: grimoire.nightCount,
+        dayTimer: this._dayTimerToSend(),
         allowSelfNaming: session.allowSelfNaming,
         isVoteHistoryAllowed: session.isVoteHistoryAllowed,
         isVoteWatchingAllowed: session.isVoteWatchingAllowed,
@@ -429,6 +439,8 @@ class LiveSession {
       gamestate,
       isLightweight,
       isNight,
+      nightCount,
+      dayTimer,
       allowSelfNaming,
       isVoteHistoryAllowed,
       isVoteWatchingAllowed,
@@ -495,6 +507,8 @@ class LiveSession {
     });
     if (!isLightweight) {
       this._store.commit("toggleNight", !!isNight);
+      this._store.commit("setNightCount", nightCount || 0);
+      this._store.commit("session/setDayTimer", dayTimer || null);
       this._store.commit("session/setAllowSelfNaming", allowSelfNaming);
       this._store.commit("session/setVoteHistoryAllowed", isVoteHistoryAllowed);
       this._store.commit(
@@ -1042,6 +1056,28 @@ class LiveSession {
   }
 
   /**
+   * The day timer as players need it: what is left, not this device's clock.
+   */
+  _dayTimerToSend() {
+    const timer = this._store.state.session.dayTimer;
+    if (!timer) return null;
+    return {
+      remaining: timer.endsAt - Date.now(),
+      duration: timer.duration,
+    };
+  }
+
+  /** Send the night count and the day timer. ST only */
+  setNightCount() {
+    if (this._isSpectator) return;
+    this._send("nightCount", this._store.state.grimoire.nightCount);
+  }
+  setDayTimer() {
+    if (this._isSpectator) return;
+    this._send("dayTimer", this._dayTimerToSend());
+  }
+
+  /**
    * Send the isNight status. ST only
    */
   setIsNight() {
@@ -1267,6 +1303,12 @@ export default (store) => {
         break;
       case "toggleNight":
         session.setIsNight();
+        break;
+      case "setNightCount":
+        session.setNightCount();
+        break;
+      case "session/setDayTimer":
+        session.setDayTimer();
         break;
       case "setEdition":
         session.sendEdition();

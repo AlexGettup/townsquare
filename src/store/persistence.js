@@ -13,6 +13,8 @@ const hostedGameOf = ({ session, grimoire, voice, chat }) =>
     : {
         sessionId: session.sessionId,
         isNight: grimoire.isNight,
+        nightCount: grimoire.nightCount,
+        dayTimer: session.dayTimer,
         nomination: session.nomination,
         votes: session.votes,
         lockedVote: session.lockedVote,
@@ -43,6 +45,14 @@ const loadHostedGame = ([isSpectator, sessionId]) => {
 
 const restoreHostedGame = (store, game) => {
   store.commit("toggleNight", game.isNight);
+  store.commit("setNightCount", game.nightCount || 0);
+  // the timer keeps running during the reload, on this device's clock
+  if (game.dayTimer && game.dayTimer.endsAt > Date.now()) {
+    store.commit("session/setDayTimer", {
+      remaining: game.dayTimer.endsAt - Date.now(),
+      duration: game.dayTimer.duration,
+    });
+  }
   store.commit("session/nomination", {
     nomination: game.nomination,
     votes: game.votes,
@@ -328,6 +338,11 @@ module.exports = (store) => {
         }
         if (!payload || state.session.isSpectator) {
           localStorage.removeItem("hostedGame");
+        }
+        // a new game as storyteller starts before the first night
+        if (payload && !state.session.isSpectator) {
+          store.commit("setNightCount", 0);
+          store.commit("session/setDayTimer", null);
         }
         break;
       case "session/setPlayerId":

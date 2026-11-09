@@ -507,6 +507,10 @@ export default {
       this.$store.commit("toggleNight");
       if (this.grimoire.isNight) {
         this.$store.commit("session/setMarkedPlayer", -1);
+        this.$store.commit("setNightCount", this.grimoire.nightCount + 1);
+        if (this.session.dayTimer) {
+          this.$store.commit("session/setDayTimer", null);
+        }
       }
     },
     toggleSelfNaming() {

@@ -135,6 +135,8 @@ export default new Vuex.Store({
   state: {
     grimoire: {
       isNight: false,
+      // nights so far: "Night 2", and the day after it "Day 2" (0: setting up)
+      nightCount: 0,
       isNightOrder: true,
       isPublic: false,
       isMenuOpen: false,
@@ -275,6 +277,9 @@ export default new Vuex.Store({
     toggleMuted: toggle("isMuted"),
     toggleMenu: toggle("isMenuOpen"),
     toggleNightOrder: toggle("isNightOrder"),
+    setNightCount({ grimoire }, count) {
+      grimoire.nightCount = count;
+    },
     toggleStatic: toggle("isStatic"),
     toggleNight({ grimoire, players }, val) {
       // Reset the hasResponded var for the next night.
