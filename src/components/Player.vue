@@ -899,7 +899,7 @@ export default {
 
 .fold-enter-active,
 .fold-leave-active {
-  transition: transform 250ms ease-in-out;
+  transition: transform 150ms ease-out;
   transform-origin: left center;
   transform: perspective(200px);
 }
@@ -1623,7 +1623,10 @@ li.picking-seat .reminderHoverTarget {
   border-radius: 50%;
   border: 3px solid black;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  transition: all 200ms;
+  // only what the graphics card can animate without redrawing the page
+  transition:
+    opacity 150ms,
+    translate 150ms;
   cursor: pointer;
 
   .text {
@@ -1667,7 +1670,7 @@ li.picking-seat .reminderHoverTarget {
 
   &.add {
     opacity: 0;
-    top: 30px;
+    translate: 0 30px;
 
     &:after {
       display: none;
@@ -1720,7 +1723,7 @@ li.picking-seat .reminderHoverTarget {
 
 .circle li:hover .reminder.add {
   opacity: 1;
-  top: 0;
+  translate: 0 0;
 }
 
 .circle li:hover .reminder.add:before {

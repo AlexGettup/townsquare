@@ -238,7 +238,9 @@ ul.reminders .reminder {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   line-height: 100%;
-  transition: transform 500ms ease;
+  transition: transform 120ms ease-out;
+  // own layer: growing on hover doesn't redraw the rest of the window
+  will-change: transform;
 
   .icon {
     position: absolute;
