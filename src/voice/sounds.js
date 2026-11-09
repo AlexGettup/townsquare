@@ -2,12 +2,26 @@
  * Small synthesized sounds for the voice chat (no audio files needed).
  */
 let context = null;
+let outputId = "";
+
+const applyOutput = () => {
+  if (context && context.setSinkId) {
+    context.setSinkId(outputId).catch(() => {});
+  }
+};
+
+/** Play through the speaker chosen for voice chat. */
+export const setSoundsOutput = (deviceId) => {
+  outputId = deviceId;
+  applyOutput();
+};
 
 const getContext = () => {
   if (!context) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return null;
     context = new AudioContext();
+    if (outputId) applyOutput();
   }
   if (context.state === "suspended") context.resume().catch(() => {});
   return context;

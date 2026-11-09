@@ -673,6 +673,10 @@ class LiveSession {
           this._store.dispatch("players/clearRoles");
           if (!this._store.state.grimoire.isMuted) {
             this._notify.currentTime = 0;
+            if (this._notify.setSinkId) {
+              const { outputId } = this._store.state.voice;
+              this._notify.setSinkId(outputId).catch(() => {});
+            }
             this._notify.play().catch((err) => {
               console.warn("Audio play prevented by browser policy - ", err);
             });

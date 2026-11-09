@@ -112,6 +112,8 @@ module.exports = (store) => {
   if (localStorage.voiceVolumes !== undefined) {
     store.commit("voice/setVolumes", JSON.parse(localStorage.voiceVolumes));
   }
+  store.commit("voice/setInputId", localStorage.getItem("voiceInput") || "");
+  store.commit("voice/setOutputId", localStorage.getItem("voiceOutput") || "");
   updatePagetitle(store.state.grimoire.isPublic);
   if (localStorage.roles !== undefined) {
     store.commit("setCustomRoles", JSON.parse(localStorage.roles));
@@ -209,6 +211,12 @@ module.exports = (store) => {
         } else {
           localStorage.removeItem("muted");
         }
+        break;
+      case "voice/setInputId":
+        localStorage.setItem("voiceInput", payload);
+        break;
+      case "voice/setOutputId":
+        localStorage.setItem("voiceOutput", payload);
         break;
       case "voice/setVolume":
         localStorage.setItem(

@@ -63,6 +63,17 @@
             {{ $t("voice.leave") }}
             <em><font-awesome-icon icon="sign-out-alt" /></em>
           </li>
+          <template v-if="!isTouch">
+            <li class="action" @click="isDevices = !isDevices">
+              {{ $t("voice.devices") }}
+              <em>
+                <font-awesome-icon
+                  :icon="isDevices ? 'chevron-down' : 'chevron-right'"
+                />
+              </em>
+            </li>
+            <VoiceDevices v-if="isDevices" />
+          </template>
 
           <!-- Night: one list, where the storyteller wakes people up -->
           <template v-if="grimoire.isNight">
@@ -222,6 +233,7 @@
 import { mapGetters, mapState } from "vuex";
 import BottomSheet from "./BottomSheet";
 import VoiceVolume from "./VoiceVolume";
+import VoiceDevices from "./VoiceDevices";
 import peerNames from "../voice/peerNames";
 import { isTouchScreen } from "../touch";
 import closeOnOutsideClick from "../closeOnOutsideClick";
@@ -245,7 +257,7 @@ const ROOM_ICONS = {
  * Below the button on computers, the bottom panel on touch screens.
  */
 export default {
-  components: { BottomSheet, VoiceVolume },
+  components: { BottomSheet, VoiceVolume, VoiceDevices },
   mixins: [
     peerNames,
     closeOnOutsideClick({
@@ -266,6 +278,8 @@ export default {
       isTouch: isTouchScreen(),
       // the person whose options are showing
       optionsFor: null,
+      // computers: the microphone and speaker choices are showing
+      isDevices: false,
     };
   },
   computed: {

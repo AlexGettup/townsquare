@@ -19,6 +19,7 @@ const faIcons = [
   "Chair",
   "CheckSquare",
   "ChevronLeft",
+  "ChevronDown",
   "ChevronRight",
   "CloudMoon",
   "Cog",
