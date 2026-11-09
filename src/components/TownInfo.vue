@@ -70,6 +70,7 @@
     </li>
     <DayPhase />
     <GameOver />
+    <ShownGrimoire />
   </ul>
 </template>
 
@@ -78,9 +79,10 @@ import gameJSON from "./../counts.json";
 import { mapState } from "vuex";
 import DayPhase from "./DayPhase";
 import GameOver from "./GameOver";
+import ShownGrimoire from "./ShownGrimoire";
 
 export default {
-  components: { DayPhase, GameOver },
+  components: { DayPhase, GameOver, ShownGrimoire },
   computed: {
     teams: function () {
       const { players } = this.$store.state.players;

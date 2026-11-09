@@ -42,33 +42,43 @@ const state = () => ({
   // alignmentIndex, reminders }] by seat, bluffs: [roleId] }. Players see
   // this grimoire instead of their own until the storyteller deals again
   gameOver: null,
+  // player: the storyteller's grimoire they were shown (Spy), same shape as
+  // gameOver without the winner. Until they close it or day comes
+  shownGrimoire: null,
+  // ST: player ID -> "sent" | "seen", the grimoire shown to them tonight
+  grimoireViews: {},
   messages: [],
 });
 
-const getters = {};
+const getters = {
+  /** ST: the grimoire as it is now, as players get to see it. */
+  grimoireSnapshot: (state, getters, rootState) => ({
+    players: rootState.players.players.map(
+      ({ role, alignmentIndex, reminders }) => ({
+        roleId: (role && role.id) || "",
+        alignmentIndex: alignmentIndex || 0,
+        reminders: reminders.map((reminder) => ({ ...reminder })),
+      }),
+    ),
+    bluffs: rootState.bluffs.map((role) => (role && role.id) || ""),
+  }),
+  /** Players: the grimoire to show instead of theirs, if any. */
+  revealedGrimoire: (state) =>
+    state.isSpectator ? state.gameOver || state.shownGrimoire : null,
+};
 
 const actions = {
   /**
    * Storyteller: end the game. Everyone sees the winner and the grimoire as it
    * is now, by day, back in the plaza.
    */
-  endGame({ state, commit, dispatch, rootState }, winner) {
+  endGame({ state, commit, dispatch, getters, rootState }, winner) {
     if (state.isSpectator) return;
     if (state.nomination) commit("nomination");
     if (state.dayTimer) commit("setDayTimer", null);
     if (rootState.grimoire.isNight)
       commit("toggleNight", false, { root: true });
-    commit("setGameOver", {
-      winner,
-      players: rootState.players.players.map(
-        ({ role, alignmentIndex, reminders }) => ({
-          roleId: (role && role.id) || "",
-          alignmentIndex: alignmentIndex || 0,
-          reminders: reminders.map((reminder) => ({ ...reminder })),
-        }),
-      ),
-      bluffs: rootState.bluffs.map((role) => (role && role.id) || ""),
-    });
+    commit("setGameOver", { winner, ...getters.grimoireSnapshot });
     dispatch("voice/gather", { sound: false }, { root: true });
   },
 };
@@ -98,6 +108,17 @@ const mutations = {
   setGameResumed: set("isGameResumed"),
   /** Start ({ remaining, duration } in ms) or stop (null) the day timer. */
   setGameOver: set("gameOver"),
+  setShownGrimoire: set("shownGrimoire"),
+  /** Player: done looking at the grimoire (tells the storyteller). */
+  closeShownGrimoire(state) {
+    state.shownGrimoire = null;
+  },
+  /** ST: { playerId, status: "sent" | "seen" }, or null to forget them all. */
+  setGrimoireView(state, view) {
+    state.grimoireViews = view
+      ? { ...state.grimoireViews, [view.playerId]: view.status }
+      : {};
+  },
   setDayTimer(state, timer) {
     state.dayTimer = timer
       ? { endsAt: Date.now() + timer.remaining, duration: timer.duration }

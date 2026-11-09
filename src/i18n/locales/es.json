@@ -220,6 +220,9 @@
     "good": "¡Gana el Bien!",
     "evil": "¡Gana el Mal!"
   },
+  "shownGrimoire": {
+    "title": "Grimorio del Narrador"
+  },
   "dayPhase": {
     "day": "Día {count}",
     "night": "Noche {count}",
@@ -253,6 +256,9 @@
     "markDead": "Marcar muerto",
     "revive": "Revivir",
     "addReminder": "Añadir recordatorio",
+    "showGrimoire": "Enseñar grimorio",
+    "grimoire_sent": "Grimorio enseñado, aún no lo ha cerrado",
+    "grimoire_seen": "Ha visto el grimorio",
     "addNote": "Añadir nota",
     "editNote": "Editar nota",
     "closeMenu": "Cerrar",

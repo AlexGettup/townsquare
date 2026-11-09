@@ -220,6 +220,9 @@
     "good": "Good wins!",
     "evil": "Evil wins!"
   },
+  "shownGrimoire": {
+    "title": "Storyteller's grimoire"
+  },
   "dayPhase": {
     "day": "Day {count}",
     "night": "Night {count}",
@@ -253,6 +256,9 @@
     "markDead": "Mark as Dead",
     "revive": "Revive",
     "addReminder": "Add Reminder",
+    "showGrimoire": "Show the grimoire",
+    "grimoire_sent": "Grimoire shown, not closed yet",
+    "grimoire_seen": "Saw the grimoire",
     "addNote": "Add note",
     "editNote": "Edit note",
     "closeMenu": "Close",

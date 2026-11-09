@@ -109,6 +109,15 @@
         :title="$t(`cards.${cardStatus}`)"
       />
 
+      <!-- Storyteller: grimoire shown to this player (Spy), and if they saw it -->
+      <font-awesome-icon
+        icon="book-open"
+        class="grimoire-status"
+        :class="grimoireView"
+        v-if="grimoireView"
+        :title="$t(`player.grimoire_${grimoireView}`)"
+      />
+
       <!-- Today: nominated someone (bottom left) / was nominated (bottom right) -->
       <font-awesome-icon
         icon="hand-point-right"
@@ -351,6 +360,10 @@
                 <li @click="sendInfoCard" v-if="canSendInfoCard">
                   <font-awesome-icon icon="address-card" />
                   {{ $t("cards.send") }}
+                </li>
+                <li @click="showGrimoire" v-if="session.sessionId && player.id">
+                  <font-awesome-icon icon="book-open" />
+                  {{ $t("player.showGrimoire") }}
                 </li>
               </template>
               <template v-else>
@@ -616,10 +629,17 @@ export default {
       return this.localizeRole(this.shownRole);
     },
     // players, once the game is over: this seat in the storyteller's grimoire
+    // players, once the game is over or when shown it (Spy): this seat in the
+    // storyteller's grimoire
     revealed: function () {
-      const { gameOver, isSpectator } = this.session;
-      if (!isSpectator || !gameOver || !gameOver.players) return null;
-      return gameOver.players[this.players.indexOf(this.player)] || null;
+      const grimoire = this.$store.getters["session/revealedGrimoire"];
+      if (!grimoire || !grimoire.players) return null;
+      return grimoire.players[this.players.indexOf(this.player)] || null;
+    },
+    // storyteller: the grimoire shown to this player tonight, and if they saw it
+    grimoireView: function () {
+      if (this.session.isSpectator || !this.player.id) return null;
+      return this.session.grimoireViews[this.player.id] || null;
     },
     shownRole: function () {
       if (!this.revealed) return this.player.role;
@@ -930,6 +950,13 @@ export default {
     sendInfoCard() {
       this.isMenuOpen = false;
       this.$store.commit("chat/composeCard", this.player.id);
+    },
+    showGrimoire() {
+      this.isMenuOpen = false;
+      this.$store.commit("session/setGrimoireView", {
+        playerId: this.player.id,
+        status: "sent",
+      });
     },
     inviteToTalk() {
       this.isMenuOpen = false;
@@ -1507,6 +1534,20 @@ li.move:not(.from) .player .overlay svg.move {
   }
   &.seen,
   &.answered {
+    color: $fabled;
+  }
+}
+
+.player .grimoire-status {
+  position: absolute;
+  left: -5px;
+  margin-top: -100%;
+  font-size: 130%;
+  filter: drop-shadow(0 0 3px black);
+  z-index: 2;
+  pointer-events: none;
+  color: lightgray;
+  &.seen {
     color: $fabled;
   }
 }
