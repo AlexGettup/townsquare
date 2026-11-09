@@ -50,8 +50,14 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
+Planned for 3.20.0:
+
 1. **End of game and grimoire reveal** (Day and votes): a clear ending instead of the
-   storyteller explaining it out loud.
+   storyteller explaining it out loud. Decided: players see the whole grimoire (real
+   characters, reminders and the demon bluffs), sent only when the game ends.
+2. **One info card to several players** (Text chat): faster minion and demon info, which
+   the storyteller gives by hand.
+3. **Long press for the night order** (Phones and tablets): what computers see on hover.
 
 After these: analyse joining voice and text chat, game diary, push-to-talk, guided night, own
 live session server, and the rest of the catalogue.
