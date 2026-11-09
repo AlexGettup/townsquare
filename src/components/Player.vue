@@ -242,11 +242,13 @@
           <li class="sheet-header" v-if="isTouch">
             <strong>{{ player.name }}</strong>
             <span v-if="player.role.id">{{ displayRole.name }}</span>
-            <font-awesome-icon
-              icon="times"
-              class="close"
-              @click="isMenuOpen = false"
-            />
+          </li>
+          <!-- no hover on touch screens: what this character does -->
+          <li
+            class="sheet-ability"
+            v-if="isTouch && !isSeatMenu && displayRole.ability"
+          >
+            {{ displayRole.ability }}
           </li>
           <!-- Storyteller: setting up the seat, behind "Seat ▸" -->
           <template v-if="isSeatMenu">
@@ -385,6 +387,9 @@
               <font-awesome-icon icon="chevron-right" class="submenu" />
             </li>
           </template>
+          <li class="sheet-close" v-if="isTouch" @click="isMenuOpen = false">
+            {{ $t("player.closeMenu") }}
+          </li>
         </ul>
       </component>
     </div>
@@ -415,14 +420,17 @@
         <span class="text">{{ localizeReminder(reminder) }}</span>
       </div>
     </template>
-    <div
-      class="reminder add"
-      v-if="!isPicking"
-      @click="$emit('trigger', ['openReminderModal'])"
-    >
-      <span class="icon"></span>
-    </div>
-    <div class="reminderHoverTarget"></div>
+    <!-- touch screens add reminders from the player menu -->
+    <template v-if="!isTouch">
+      <div
+        class="reminder add"
+        v-if="!isPicking"
+        @click="$emit('trigger', ['openReminderModal'])"
+      >
+        <span class="icon"></span>
+      </div>
+      <div class="reminderHoverTarget"></div>
+    </template>
   </li>
 </template>
 
