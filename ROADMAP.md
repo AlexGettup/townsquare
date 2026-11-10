@@ -59,8 +59,12 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-Nothing planned yet. Candidates: analyse joining voice and text chat, game diary, push-to-talk,
-own live session server, and the rest of the catalogue.
+1. [ ] **Storyteller's night summary** (in [Night without talking](#night-without-talking)),
+   chosen by the owner on 2026-11-10.
+
+Other candidates: own live session server, quiet nominations with a speaking queue, portrait
+layout, analyse joining voice and text chat, game diary, push-to-talk, and the rest of the
+catalogue.
 
 Added 2026-11-10 from the official app (its tutorial video and the special features of its
 character data). Done in 3.25.0: cards that fill themselves, quick answers for players,
@@ -141,6 +145,11 @@ panels you can drag around the screen.
       Partly covered by the guided night.
 - [ ] **Open eyes at night** *(official)* (Wraith): let one player keep their eyes open at
       night, fully or peeking: they see who is awake and the cards sent, as the character says.
+- [ ] **Storyteller's night summary**: at dawn (and reopenable during the day) one list of
+      what the storyteller sent and got back that night, player by player: the cards, the
+      seats or characters chosen, the quick answers and the grimoire shown. Today it is spread
+      over each player's private chat. It is the storyteller's record of the night, not a
+      summary of who died (that was proposed and declined).
 
 Trouble Brewing reviewed (2026-11-09): every other character is covered by info cards,
 choosing players and the vote. The Drunk's token is never dealt (the storyteller seats the
