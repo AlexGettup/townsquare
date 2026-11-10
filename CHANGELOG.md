@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.24.0
+- Guided night for the Storyteller: at nightfall a panel steps through tonight's night order, only the characters in play with their players (dead ones skipped unless their ability is about dying), and the current seat glows on the town square. Each step: wake, open the info card window for those players, see their answers as they come, then sleep and next. Top right on computers, a bottom sheet on phones; it folds, hides for the night, and can be turned off in Menu > Grimoire
+- Info cards built line by line, like the official app: each info token tapped starts a new line, and the characters, players or number picked next go into it, so one card can say "These are your minions: Ana, Belén" and "These characters are not in play: …". Up to 6 lines, at most one of them a choice
+- Info cards: character tokens are really centred now (also in the practice game's "What Ana sees")
+
 ### Version 3.23.1
 - Info cards: character tokens and player names are centred again (they were pushed to the right, also in the practice game's "What Ana sees")
 - First screen: removed the line about preparing a game without connecting from the menu, which read as if the practice game was there
