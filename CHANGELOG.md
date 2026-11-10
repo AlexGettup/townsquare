@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.22.0
+- Background noise in voice chat, like Discord: noise suppression removes fans, keyboards and similar noise, and a voice gate sends silence while you aren't talking. Both are on by default, in the voice panel under "Background noise". Sensitivity is automatic; untick it to set the threshold by hand on a live level meter. Settings are saved on the device. It favours letting some noise through over cutting a soft voice. Browsers that can't run the noise suppression (possibly Firefox) keep only the voice gate
+
 ### Version 3.21.0
 - Show the grimoire (Spy, Widow): at night, "Show the grimoire" in a seated player's menu sends only that player the grimoire as it is now: real characters, reminders and the Demon's bluffs, on their town square. It goes away when they close it or day comes, and nobody else gets anything. A book on their seat tells the Storyteller it was sent (grey) and that they closed it (gold)
 
