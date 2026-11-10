@@ -56,7 +56,7 @@ game without Discord and by cost. **Computers and phones count the same**: about
 players use each, so a feature that only helps one of them is worth half as much.
 
 Nothing planned yet. Candidates: analyse joining voice and text chat, game diary, push-to-talk,
-guided night, own live session server, and the rest of the catalogue.
+own live session server, and the rest of the catalogue.
 
 ### Phones and tablets
 
@@ -92,8 +92,14 @@ guided night, own live session server, and the rest of the catalogue.
       one is struck through.
 - [x] **Choose targets on screen** *(official)* (3.15.0): the storyteller asks "choose a player" (or two)
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
-- [ ] **Guided night for the storyteller**: step through the night order; each step wakes the
-      player, shows the card, collects the choice and puts them back to sleep in one tap each.
+- [x] **Guided night for the storyteller** (unreleased): at nightfall a panel steps through
+      tonight's night order, only the characters in play with their players (dead ones skipped
+      unless their text is about dying). Each step: wake, the card window filled in from the
+      character's text (choose 1 or 2 players or a character, the info tokens it names, the
+      grimoire for the Spy), the answers as they come, then sleep and next. The current seat
+      glows on the town square. First night: minion and demon info come prepared, the
+      storyteller decides what to send. Top right on computers, a bottom sheet on phones;
+      folds, hides for the night, off in Menu > Grimoire. Reminders and deaths stay by hand.
 - [x] **Show the grimoire** (3.21.0) (Spy, Widow): at night, "Show the grimoire" in any seated
       player's menu sends only them a snapshot of the grimoire (characters, reminders, bluffs),
       shown on their town square until they close it or day comes. A book on their seat tells

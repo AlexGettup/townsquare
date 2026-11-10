@@ -107,6 +107,9 @@ module.exports = (store) => {
   if (localStorage.getItem("static")) {
     store.commit("toggleStatic", true);
   }
+  if (localStorage.getItem("noGuidedNight")) {
+    store.commit("toggleGuidedNight", false);
+  }
   // mock assignments no longer need a setting (always available)
   localStorage.removeItem("mockAssignments");
   if (localStorage.getItem("unofficial")) {
@@ -223,6 +226,13 @@ module.exports = (store) => {
           localStorage.setItem("background", payload);
         } else {
           localStorage.removeItem("background");
+        }
+        break;
+      case "toggleGuidedNight":
+        if (state.grimoire.isGuidedNight) {
+          localStorage.removeItem("noGuidedNight");
+        } else {
+          localStorage.setItem("noGuidedNight", 1);
         }
         break;
       case "toggleMuted":

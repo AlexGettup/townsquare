@@ -141,6 +141,8 @@ export default new Vuex.Store({
       // nights so far: "Night 2", and the day after it "Day 2" (0: setting up)
       nightCount: 0,
       isNightOrder: true,
+      // storyteller: the guided night panel shows at nightfall
+      isGuidedNight: true,
       isPublic: false,
       isMenuOpen: false,
       isStatic: false,
@@ -170,6 +172,8 @@ export default new Vuex.Store({
     roles: getRolesByEdition(),
     npcs: [],
     bluffs: [{}, {}, {}],
+    // storyteller: the players of the guided night's current step
+    guidedPlayers: [],
     otherTravellers: getTravellersNotInEdition(),
     otherNpcs: getNpcs(),
     jinxes,
@@ -281,6 +285,10 @@ export default new Vuex.Store({
     toggleMuted: toggle("isMuted"),
     toggleMenu: toggle("isMenuOpen"),
     toggleNightOrder: toggle("isNightOrder"),
+    toggleGuidedNight: toggle("isGuidedNight"),
+    setGuidedPlayers(state, ids) {
+      state.guidedPlayers = ids;
+    },
     setNightCount({ grimoire }, count) {
       grimoire.nightCount = count;
     },

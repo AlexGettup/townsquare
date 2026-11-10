@@ -124,6 +124,7 @@
 
 <script>
 import Modal from "./Modal";
+import { nightOrder } from "../../nightOrder";
 import { mapGetters, mapMutations, mapState } from "vuex";
 
 export default {
@@ -132,173 +133,10 @@ export default {
   },
   computed: {
     rolesFirstNight: function () {
-      const rolesFirstNight = [];
-      // add dusk and dawn to first night order sheet
-      const duskIndex = this.edition.firstNight
-        ? this.edition.firstNight.indexOf("dusk") + 1
-        : this.getFirstNightOrder("dusk");
-      const dawnIndex = this.edition.firstNight
-        ? this.edition.firstNight.indexOf("dawn") + 1
-        : this.getFirstNightOrder("dawn");
-      if (duskIndex > 0) {
-        rolesFirstNight.push({
-          id: "dusk",
-          name: "Dusk",
-          firstNight: duskIndex,
-          firstNightReminder: "Start the Night Phase.",
-          players: [],
-        });
-      }
-      if (dawnIndex > 0) {
-        rolesFirstNight.push({
-          id: "dawn",
-          name: "Dawn",
-          firstNight: dawnIndex,
-          firstNightReminder: "Wait a few seconds. End the Night Phase.",
-          players: [],
-        });
-      }
-      // add minion / demon infos to night order sheet
-      if (this.players.length > 6) {
-        const minionIndex = this.edition.firstNight
-          ? this.edition.firstNight.indexOf("minioninfo") + 1
-          : this.getFirstNightOrder("minioninfo");
-        const demonIndex = this.edition.firstNight
-          ? this.edition.firstNight.indexOf("demoninfo") + 1
-          : this.getFirstNightOrder("demoninfo");
-        if (minionIndex > 0) {
-          rolesFirstNight.push({
-            id: "minioninfo",
-            name: "Minion info",
-            firstNight: minionIndex,
-            team: "minion",
-            players: this.players.filter((p) => p.role.team === "minion"),
-            firstNightReminder:
-              "If there are 7 or more players, wake all Minions: Show the *THIS IS THE DEMON* token. Point to the Demon. Show the *THESE ARE YOUR MINIONS* token. Point to the other Minions.",
-          });
-        }
-        if (demonIndex > 0) {
-          rolesFirstNight.push({
-            id: "demoninfo",
-            name: "Demon info & bluffs",
-            firstNight: demonIndex,
-            team: "demon",
-            players: this.players.filter((p) => p.role.team === "demon"),
-            firstNightReminder:
-              "If there are 7 or more players, wake the Demon: Show the *THESE ARE YOUR MINIONS* token. Point to all Minions. Show the *THESE CHARACTERS ARE NOT IN PLAY* token. Show 3 not-in-play good character tokens.",
-          });
-        }
-      }
-      const adjustedRoles = new Map(this.roles);
-      adjustedRoles.forEach((role) => {
-        if (this.edition.firstNight) {
-          const newFirstNight = this.edition.firstNight.indexOf(role.id) + 1;
-          role = Object.assign({}, role, { firstNight: newFirstNight });
-        }
-        const players = this.players.filter((p) => p.role.id === role.id);
-        if (role.firstNight && (role.team !== "traveller" || players.length)) {
-          rolesFirstNight.push(Object.assign({ players }, role));
-        }
-      });
-      this.otherTravellers.forEach((role) => {
-        const players = this.players.filter((p) => p.role.id === role.id);
-        if (role.firstNight && players.length) {
-          const newFirstNight = this.edition.firstNight
-            ? this.edition.firstNight.indexOf("dusk") + 1.2
-            : role.firstNight;
-          rolesFirstNight.push(
-            Object.assign({ players }, role, { firstNight: newFirstNight }),
-          );
-        }
-      });
-      this.npcs
-        .filter(
-          (npc) =>
-            npc.firstNight ||
-            (this.edition.firstNight &&
-              this.edition.firstNight.includes(npc.id)),
-        )
-        .forEach((npc) => {
-          const newFirstNight = this.edition.firstNight
-            ? this.edition.firstNight.includes(npc.id)
-              ? this.edition.firstNight.indexOf(npc.id) + 1
-              : this.edition.firstNight.indexOf("dusk") + 1.1
-            : npc.firstNight;
-          rolesFirstNight.push(
-            Object.assign({ players: [] }, npc, { firstNight: newFirstNight }),
-          );
-        });
-      rolesFirstNight.sort((a, b) => a.firstNight - b.firstNight);
-      return rolesFirstNight.map((role) => this.localizeRole(role));
+      return nightOrder(true, this).map((role) => this.localizeRole(role));
     },
     rolesOtherNight: function () {
-      const rolesOtherNight = [];
-      // add dusk and dawn to other night order sheet
-      const duskIndex = this.edition.otherNight
-        ? this.edition.otherNight.indexOf("dusk") + 1
-        : this.getOtherNightOrder("dusk");
-      const dawnIndex = this.edition.otherNight
-        ? this.edition.otherNight.indexOf("dawn") + 1
-        : this.getOtherNightOrder("dawn");
-      if (duskIndex > 0) {
-        rolesOtherNight.push({
-          id: "dusk",
-          name: "Dusk",
-          otherNight: duskIndex,
-          otherNightReminder: "Start the Night Phase.",
-          players: [],
-        });
-      }
-      if (dawnIndex > 0) {
-        rolesOtherNight.push({
-          id: "dawn",
-          name: "Dawn",
-          otherNight: dawnIndex,
-          otherNightReminder: "Wait for a few seconds. End the Night Phase.",
-          players: [],
-        });
-      }
-      const adjustedRoles = new Map(this.roles);
-      adjustedRoles.forEach((role) => {
-        if (this.edition.otherNight) {
-          const newOtherNight = this.edition.otherNight.indexOf(role.id) + 1;
-          role = Object.assign({}, role, { otherNight: newOtherNight });
-        }
-        const players = this.players.filter((p) => p.role.id === role.id);
-        if (role.otherNight && (role.team !== "traveller" || players.length)) {
-          rolesOtherNight.push(Object.assign({ players }, role));
-        }
-      });
-      this.otherTravellers.forEach((role) => {
-        const players = this.players.filter((p) => p.role.id === role.id);
-        if (role.otherNight && players.length) {
-          const newOtherNight = this.edition.otherNight
-            ? this.edition.otherNight.indexOf("dusk") + 1.2
-            : role.otherNight;
-          rolesOtherNight.push(
-            Object.assign({ players }, role, { otherNight: newOtherNight }),
-          );
-        }
-      });
-      this.npcs
-        .filter(
-          (npc) =>
-            npc.otherNight ||
-            (this.edition.otherNight &&
-              this.edition.otherNight.includes(npc.id)),
-        )
-        .forEach((npc) => {
-          const newOtherNight = this.edition.otherNight
-            ? this.edition.otherNight.includes(npc.id)
-              ? this.edition.otherNight.indexOf(npc.id) + 1
-              : this.edition.otherNight.indexOf("dusk") + 1.1
-            : npc.otherNight;
-          rolesOtherNight.push(
-            Object.assign({ players: [] }, npc, { otherNight: newOtherNight }),
-          );
-        });
-      rolesOtherNight.sort((a, b) => a.otherNight - b.otherNight);
-      return rolesOtherNight.map((role) => this.localizeRole(role));
+      return nightOrder(false, this).map((role) => this.localizeRole(role));
     },
     ...mapGetters([
       "getImage",

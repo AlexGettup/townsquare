@@ -48,6 +48,7 @@
     <ChatPanel v-if="players.length" />
     <InfoCardModal />
     <ChoosePlayers />
+    <GuidedNight />
     <InfoCardComposer />
     <EndGameModal />
     <PracticeBadge />
@@ -81,6 +82,7 @@ import InfoCardComposer from "@/components/modals/InfoCardComposer";
 import EndGameModal from "@/components/modals/EndGameModal";
 import PracticeBadge from "@/components/PracticeBadge";
 import PracticeInbox from "@/components/modals/PracticeInbox";
+import GuidedNight from "@/components/GuidedNight";
 import ChoosePlayers from "@/components/ChoosePlayers";
 
 export default {
@@ -94,6 +96,7 @@ export default {
     EndGameModal,
     PracticeBadge,
     PracticeInbox,
+    GuidedNight,
     ChoosePlayers,
     GameStateModal,
     ChangelogModal,

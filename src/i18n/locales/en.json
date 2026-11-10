@@ -25,6 +25,7 @@
     "endGame": "End the game",
     "undoEndGame": "Back to the game",
     "nightOrder": "Night Order",
+    "guidedNight": "Guided night",
     "zoom": "Zoom",
     "backgroundImage": "Background Image",
     "useUnofficialArt": "Use Unofficial Art",
@@ -435,6 +436,26 @@
       "exile": "Exile",
       "execution": "Execution"
     }
+  },
+  "guidedNight": {
+    "title": "Guided night",
+    "night": "Night {night}",
+    "stepOf": "step {step} of {total}",
+    "allDone": "all done",
+    "done": "Night {night} done",
+    "toDay": "Switch to day",
+    "restart": "Back to the first step",
+    "wake": "Wake",
+    "awake": "Awake",
+    "sendCard": "Send info",
+    "byHand": "You give this one: the cards come ready and you decide what to send.",
+    "sleepNext": "Sleep and next",
+    "next": "Next",
+    "skip": "Skip",
+    "seen": "seen",
+    "waiting": "waiting…",
+    "fold": "Fold",
+    "hide": "Hide tonight"
   },
   "practice": {
     "names": "Alice,Ben,Clara,Dan,Emma,Finn,Grace,Harry,Isla,Jack,Kate,Leo,Mia,Noah,Olivia,Paul,Quinn,Rose,Sam,Tom",

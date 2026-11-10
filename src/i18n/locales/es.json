@@ -25,6 +25,7 @@
     "endGame": "Terminar partida",
     "undoEndGame": "Volver a la partida",
     "nightOrder": "Orden de noche",
+    "guidedNight": "Noche guiada",
     "zoom": "Zoom",
     "backgroundImage": "Imagen de fondo",
     "useUnofficialArt": "Usar arte no oficial",
@@ -435,6 +436,26 @@
       "exile": "Exilio",
       "execution": "Ejecución"
     }
+  },
+  "guidedNight": {
+    "title": "Noche guiada",
+    "night": "Noche {night}",
+    "stepOf": "paso {step} de {total}",
+    "allDone": "todo hecho",
+    "done": "Noche {night} terminada",
+    "toDay": "Hacer de día",
+    "restart": "Volver al primer paso",
+    "wake": "Despertar",
+    "awake": "Despierto",
+    "sendCard": "Enviar información",
+    "byHand": "Lo das tú: las tarjetas salen preparadas y decides qué envías.",
+    "sleepNext": "Dormir y siguiente",
+    "next": "Siguiente",
+    "skip": "Saltar",
+    "seen": "visto",
+    "waiting": "esperando…",
+    "fold": "Plegar",
+    "hide": "Ocultar esta noche"
   },
   "practice": {
     "names": "Ana,Bruno,Carla,David,Elena,Fran,Gema,Hugo,Irene,Javi,Laura,Mario,Nuria,Óscar,Paula,Quique,Rosa,Sergio,Tere,Víctor",
