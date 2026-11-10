@@ -58,7 +58,7 @@ const listOf = (devices, kind, fallbackLabel, defaultLabel) => {
 };
 
 /**
- * Which microphone and speaker to use, in the voice panel on computers: phones
+ * Which microphone and speaker to use, in Settings > Audio on computers: phones
  * choose them themselves, and most can't change the speaker from a web page.
  * Browsers only name the devices once the microphone is allowed, that is once
  * in voice chat.
