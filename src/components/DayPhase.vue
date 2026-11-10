@@ -142,10 +142,12 @@ export default {
   gap: 4px 14px;
   margin-top: 2px;
   // above the circle of seats and their reminders, which reach the middle
-  // (seats go up to 20), but below a seat under the mouse (25) and its menu.
-  // Only the parts you can click catch clicks
+  // (seats go up to 20), also above a seat under the mouse (25): its "add
+  // reminder" button and hover area reach the middle and covered the timer.
+  // Below a seat with its menu open (27). Only the parts you can click catch
+  // clicks
   position: relative;
-  z-index: 21;
+  z-index: 26;
   pointer-events: none;
 
   .phase.editable,
