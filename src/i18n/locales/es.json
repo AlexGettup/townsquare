@@ -60,6 +60,7 @@
     "gameStateJson": "Estado de partida (JSON)",
     "whatsNew": "Novedades",
     "settings": "Ajustes",
+    "audio": "Audio",
     "copySessionCode": "Copiar código de sesión",
     "sourceCode": "Código fuente"
   },
@@ -80,6 +81,7 @@
     "autoSensitivity": "Sensibilidad automática",
     "sensitivity": "Sensibilidad del micrófono",
     "sensitivityHint": "Solo se envía lo que pasa de la línea: verde mientras te oyen.",
+    "meterOffline": "El medidor se mueve cuando estás en el chat de voz.",
     "devices": "Micrófono y altavoz",
     "microphone": "Micrófono",
     "speaker": "Altavoz",

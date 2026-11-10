@@ -197,6 +197,29 @@
               >
             </em>
           </li>
+
+          <!-- Audio: voice chat settings (muting stays in the voice panel) -->
+          <li class="headline">{{ $t("menu.audio") }}</li>
+          <li @click="isNoise = !isNoise">
+            {{ $t("voice.noise") }}
+            <em>
+              <font-awesome-icon
+                :icon="isNoise ? 'chevron-down' : 'chevron-right'"
+              />
+            </em>
+          </li>
+          <VoiceNoise v-if="isNoise" />
+          <template v-if="!isTouch">
+            <li @click="isDevices = !isDevices">
+              {{ $t("voice.devices") }}
+              <em>
+                <font-awesome-icon
+                  :icon="isDevices ? 'chevron-down' : 'chevron-right'"
+                />
+              </em>
+            </li>
+            <VoiceDevices v-if="isDevices" />
+          </template>
         </template>
 
         <template v-if="tab === 'session'">
@@ -354,8 +377,12 @@
 import { mapGetters, mapMutations, mapState } from "vuex";
 import { LOCALES } from "../i18n";
 import closeOnOutsideClick from "../closeOnOutsideClick";
+import { isTouchScreen } from "../touch";
+import VoiceDevices from "./VoiceDevices";
+import VoiceNoise from "./VoiceNoise";
 
 export default {
+  components: { VoiceDevices, VoiceNoise },
   mixins: [
     closeOnOutsideClick({
       isOpen: "grimoire.isMenuOpen",
@@ -387,6 +414,10 @@ export default {
     return {
       tab: "grimoire",
       locales: LOCALES,
+      isNoise: false,
+      isDevices: false,
+      // phones choose their microphone and speaker themselves
+      isTouch: isTouchScreen(),
     };
   },
   methods: {
@@ -747,7 +778,7 @@ export default {
         }
       }
 
-      &:not(.headline):not(.tabs):hover {
+      &:not(.headline):not(.tabs):not(.voice-noise):not(.voice-devices):hover {
         cursor: pointer;
         color: red;
       }

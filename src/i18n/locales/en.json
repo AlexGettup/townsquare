@@ -60,6 +60,7 @@
     "gameStateJson": "Game State JSON",
     "whatsNew": "What's New",
     "settings": "Settings",
+    "audio": "Audio",
     "copySessionCode": "Copy Session Code",
     "sourceCode": "Source Code"
   },
@@ -80,6 +81,7 @@
     "autoSensitivity": "Automatic sensitivity",
     "sensitivity": "Input sensitivity",
     "sensitivityHint": "Only what goes past the line is sent: green while they hear you.",
+    "meterOffline": "The meter moves while you are in voice chat.",
     "devices": "Microphone and speaker",
     "microphone": "Microphone",
     "speaker": "Speaker",

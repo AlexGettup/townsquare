@@ -43,6 +43,9 @@
         />
       </div>
       <small class="hint">{{ $t("voice.sensitivityHint") }}</small>
+      <small class="hint" v-if="voice.status !== 'connected'">
+        {{ $t("voice.meterOffline") }}
+      </small>
     </div>
   </li>
 </template>
@@ -109,6 +112,8 @@ export default {
 .voice-noise {
   display: flex;
   flex-direction: column;
+  // the menu's rows centre their content
+  align-items: stretch !important;
   gap: 6px;
   padding: 4px 10px 8px;
   cursor: default;
