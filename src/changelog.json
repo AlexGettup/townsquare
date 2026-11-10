@@ -1,5 +1,33 @@
 [
   {
+    "version": "3.25.0",
+    "date": "2026-11-10",
+    "title": {
+      "en": "Votes and cards like the official app",
+      "es": "Votos y tarjetas como en la app oficial"
+    },
+    "en": [
+      "Info cards: answer with one tap (Got it, Yes, No, players, characters or a few words). The Storyteller gets it in the private chat",
+      "Storyteller: \"This is the Demon\", \"These are your minions\", \"Not in play\" and \"You are\" come filled in from the grimoire, and you can change them before sending",
+      "Storyteller: before showing the grimoire (Spy, Widow) you can change what that player will see, without touching yours",
+      "Secret vote (Organ Grinder): only the Storyteller sees the hands and the count. It turns on by itself when an Organ Grinder is in play",
+      "Pointing vote (Boomdandy, Fiddler): everyone points at a player on the town square, in secret until the Storyteller reveals it",
+      "The Bureaucrat's, Thief's and Banshee's reminders change that player's vote by themselves, and the Ferryman can give back ghost votes from the Players menu",
+      "Voice chat: the people who can't hear you right now look dimmed on the town square",
+      "Practice game: random nominations, and answers at random for the made-up players"
+    ],
+    "es": [
+      "Tarjetas de información: se contestan con un toque (Entendido, Sí, No, jugadores, personajes o unas palabras). El Narrador lo recibe en el chat privado",
+      "Narrador: «Este es el Demonio», «Estos son tus Esbirros», «No están en juego» y «Tú eres» salen rellenas con el grimorio, y puedes cambiarlas antes de enviar",
+      "Narrador: antes de enseñar el grimorio (Espía, Viuda) puedes cambiar lo que verá ese jugador, sin tocar el tuyo",
+      "Voto secreto (Organillero): solo el Narrador ve las manos y el recuento. Se activa solo si hay un Organillero en juego",
+      "Votación señalando (Explosivo, Violinista): todos señalan a un jugador en la plaza, en secreto hasta que el Narrador lo revela",
+      "Los recordatorios del Burócrata, el Ladrón y la Banshee cambian el voto de ese jugador solos, y el Barquero puede devolver los votos fantasma desde el menú Jugadores",
+      "Chat de voz: quienes no te oyen ahora mismo se ven oscurecidos en la plaza",
+      "Partida de práctica: nominaciones al azar y respuestas al azar de los jugadores inventados"
+    ]
+  },
+  {
     "version": "3.24.0",
     "date": "2026-11-10",
     "title": {

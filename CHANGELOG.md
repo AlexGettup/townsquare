@@ -4,6 +4,17 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.25.0
+- Info cards fill themselves: "This is the Demon", "These are your minions", "These characters are not in play" and "You are" come with the players or characters from the grimoire, as a suggestion the Storyteller can change before sending
+- Quick answers on info cards, like the official app: players answer with one tap (Got it, Yes, No, players, characters or a few words). The answer goes to the Storyteller's private chat and the card counts as answered
+- Show the grimoire edited: before showing it to a player (Spy, Widow) the Storyteller can change characters, remove reminders and change the bluffs in the copy sent, without touching the real grimoire
+- Secret vote (Organ Grinder): only the Storyteller sees the hands, the count and the history. Turned on by itself when an Organ Grinder is seated, or with "Secret vote" before the vote starts
+- Pointing vote (Boomdandy, Fiddler): every player points at a player on the town square, in secret until the Storyteller reveals who pointed at whom
+- Vote value from reminders: the Bureaucrat's, Thief's and Banshee's reminders set that player's vote value by themselves
+- "Give back ghost votes" in the Players menu (Ferryman)
+- Voice chat: the seats of the people who can't hear you right now are dimmed. At night players see everyone dimmed, and the Storyteller sees lit only the players they woke
+- Practice game: "Random nomination" makes a made-up player nominate another, and "At random" / "All at random" answer cards for the made-up players (seats, a character, yes or no)
+
 ### Version 3.24.0
 - Guided night for the Storyteller: at nightfall a panel steps through tonight's night order, only the characters in play with their players (dead ones skipped unless their ability is about dying), and the current seat glows on the town square. Each step: wake, open the info card window for those players, see their answers as they come, then sleep and next. Top right on computers, a bottom sheet on phones; it folds, hides for the night, and can be turned off in Menu > Grimoire
 - Info cards built line by line, like the official app: each info token tapped starts a new line, and the characters, players or number picked next go into it, so one card can say "These are your minions: Ana, Belén" and "These characters are not in play: …". Up to 6 lines, at most one of them a choice

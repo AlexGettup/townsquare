@@ -42,6 +42,9 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.22.0** Background noise suppression and voice gate in voice chat, like Discord
 - **3.23.0** Practice game; info cards like the official app; audio settings in the menu
 - **3.24.0** Guided night for the storyteller; info cards built line by line
+- **3.25.0** Info cards that fill themselves and quick answers; edit the grimoire before
+  showing it; secret and pointing votes, vote value from reminders, ghost votes back; dim
+  who can't hear you; random nominations and answers in the practice game
 
 ## Planned
 
@@ -60,11 +63,10 @@ Nothing planned yet. Candidates: analyse joining voice and text chat, game diary
 own live session server, and the rest of the catalogue.
 
 Added 2026-11-10 from the official app (its tutorial video and the special features of its
-character data). Done for the next release: cards that fill themselves, quick answers for
-players, edit the grimoire before showing it, pointing and hidden votes, vote multiplier from
-a reminder, give back ghost votes, the owner's idea of dimming who isn't with you, and (also
-his) random nominations and answers in the practice game. Not
-decided yet: marks on the night order sheet, open eyes at night, public reminders, character
+character data). Done in 3.25.0: cards that fill themselves, quick answers for players,
+edit the grimoire before showing it, pointing and hidden votes, vote multiplier from a
+reminder, give back ghost votes, the owner's idea of dimming who isn't with you, and (also
+his) random nominations and answers in the practice game. Not decided yet: marks on the night order sheet, open eyes at night, public reminders, character
 selection rules, a key to call everyone to the plaza.
 
 Discarded 2026-11-10: "thinks they are…" for the Lunatic, Drunk and Marionette (the
@@ -124,15 +126,15 @@ panels you can drag around the screen.
       shown on their town square until they close it or day comes. A book on their seat tells
       the storyteller it was sent (grey) and closed (gold).
 
-- [x] **Cards that fill themselves** *(official)* (next release): picking "This is the Demon" puts in the
+- [x] **Cards that fill themselves** *(official)* (3.25.0): picking "This is the Demon" puts in the
       Demon's player, "These are your minions" the Minions, "These characters are not in
       play" the Demon's bluffs. Only a suggestion the storyteller can change before sending:
       the Lunatic gets made-up minions. Saves most of the first night's taps.
-- [x] **Quick answers for players** *(official)* (next release): buttons on the card to answer without typing
+- [x] **Quick answers for players** *(official)* (3.25.0): buttons on the card to answer without typing
       (Got it, Yes, No, players, characters, a few words), the same on every card, as in the
       official app. The answer goes to the storyteller's private chat. The official app also
       lets a script add its own answers and its own storyteller cards (not done).
-- [x] **Edit the grimoire before showing it** *(official)* (Spy, Widow) (next release): change characters
+- [x] **Edit the grimoire before showing it** *(official)* (Spy, Widow) (3.25.0): change characters
       or reminders in the copy sent, without touching the real grimoire.
 - [ ] **Marks on the night order sheet** *(official)*: tap next to a character on the night
       order to mark it as pending, and take the mark away when it dies or uses its ability.
@@ -157,15 +159,15 @@ cards, because characters like the Lunatic make an automatic version misleading.
 - [x] **Day timer** *(official)* (3.19.0): a countdown everyone sees ("5 minutes of discussion left"),
       with a sound when it ends.
 - [ ] **Ambient sounds**: dusk, dawn, executions.
-- [x] **Pointing vote** *(official)* (Boomdandy, Fiddler) (next release): everyone points at a player
+- [x] **Pointing vote** *(official)* (Boomdandy, Fiddler) (3.25.0): everyone points at a player
       instead of raising a hand, and the storyteller sees who points at whom. Secret until
       the storyteller reveals it to everyone.
-- [x] **Hidden vote** *(official)* (Organ Grinder) (next release): only the storyteller sees who voted and
+- [x] **Hidden vote** *(official)* (Organ Grinder) (3.25.0): only the storyteller sees who voted and
       the count. Turned on by itself when an Organ Grinder is seated, or by hand.
-- [x] **Vote multiplier from a reminder** *(official)* (Bureaucrat, Thief, Banshee) (next release): putting the
+- [x] **Vote multiplier from a reminder** *(official)* (Bureaucrat, Thief, Banshee) (3.25.0): putting the
       character's reminder on a seat changes that player's vote value by itself. Today the
       storyteller sets the value by hand (3.11.0).
-- [x] **Give back ghost votes** *(official)* (Ferryman) (next release): one button returns the spent ghost
+- [x] **Give back ghost votes** *(official)* (Ferryman) (3.25.0): one button returns the spent ghost
       vote to every dead player.
 - [ ] **Public reminders** *(official)*: some characters' reminders are seen by every player
       (only the storyteller places them).
@@ -234,7 +236,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
       place; at night the same list wakes and puts to sleep. A side panel that folds on
       computers, the bottom panel on touch screens. Volume goes in a name's options, and
       the choice of microphone and speaker in the controls on top.
-- [x] **Dim who isn't with you** (next release): the seats of the people who aren't in your place right now
+- [x] **Dim who isn't with you** (3.25.0): the seats of the people who aren't in your place right now
       are dimmed on the town square, whether they left for a private conversation or room, or
       you are in one and they stayed in the plaza. Shows at a glance who can hear you. At
       night players see everyone dimmed; the storyteller sees whoever they woke.
