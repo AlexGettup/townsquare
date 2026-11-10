@@ -2,7 +2,7 @@
   <div class="info-card">
     <!-- the info token, in its colour -->
     <div
-      class="token"
+      class="info-token"
       v-if="card.phrase"
       :style="{ '--card-color': look.color }"
     >
@@ -87,7 +87,7 @@ export default {
   overflow-wrap: anywhere;
 }
 
-.token {
+.info-token {
   display: flex;
   flex-direction: column;
   align-items: center;
