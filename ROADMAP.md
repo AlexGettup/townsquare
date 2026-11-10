@@ -59,7 +59,11 @@ The order to build in, across all the sections below (which are the full catalog
 game without Discord and by cost. **Computers and phones count the same**: about half the
 players use each, so a feature that only helps one of them is worth half as much.
 
-1. [ ] **Storyteller's night summary** (in [Night without talking](#night-without-talking)),
+1. [ ] **Send one player their new character**, with **alignment on cards** (both in
+   [Night without talking](#night-without-talking)): without them Sects & Violets can't be
+   played well. Put first by the owner on 2026-11-10, after reviewing that script and Bad Moon
+   Rising.
+2. [ ] **Storyteller's night summary** (in [Night without talking](#night-without-talking)),
    chosen by the owner on 2026-11-10.
 
 Other candidates: own live session server, quiet nominations with a speaking queue, portrait
@@ -150,11 +154,33 @@ panels you can drag around the screen.
       seats or characters chosen, the quick answers and the grimoire shown. Today it is spread
       over each player's private chat. It is the storyteller's record of the night, not a
       summary of who died (that was proposed and declined).
+- [ ] **Send one player their new character** (Snake Charmer, Pit-Hag, Barber, Fang Gu, and
+      the Imp passing the Demon to a Minion in Trouble Brewing): "Send their character" in a
+      seat's menu changes only that player's token, sends them the "You are" card and is kept
+      for reloads. Today "Send characters" deals to everyone again (the whole table learns
+      something changed), and a "You are" card alone leaves their token as it was, and a
+      reload brings back the dealt character.
+- [ ] **Alignment on cards** (Snake Charmer, Fang Gu, Goon): Good or Evil as a choice on the
+      "You are" line, so the card says "You are: Evil" the way it shows a character. Today it
+      can only be written as free text. Goes with the item above.
+- [ ] **Guided night with dead players who act** (Vigormortis, Bone Collector): Minions killed
+      by the Vigormortis keep their ability, and so does the dead player the Bone Collector
+      picks, but the guided night skips them because they are dead. They can be woken by hand.
+      No priority.
 
 Trouble Brewing reviewed (2026-11-09): every other character is covered by info cards,
 choosing players and the vote. The Drunk's token is never dealt (the storyteller seats the
 Townsfolk they think they are, with a Drunk reminder), so no feature for it. A dawn summary of
 who died at night was proposed and declined.
+
+Bad Moon Rising and Sects & Violets reviewed (2026-11-10), travellers included: the only real
+gap is changing one player's character (and alignment) privately, above. Everything else is
+covered: choices of one or two players or a character by cards (the Po's three, or none, with
+the quick answers), numbers and yes/no (the vote history keeps voters and nominators for the
+Flowergirl and Town Crier), visits by day (Savant, Artist) in a private chat or conversation,
+madness and public claims by voice, and the rest is the storyteller's grimoire. Smaller gaps,
+no priority: the guided night skipping dead players who act, the Matron and the Voudon (Day
+and votes, Voice chat).
 
 Not planned: **Minion and demon info** *(official)* (one button giving the Demon their bluffs
 and minions, and the minions each other). The storyteller prefers to give it by hand with info
@@ -178,6 +204,9 @@ cards, because characters like the Lunatic make an automatic version misleading.
       storyteller sets the value by hand (3.11.0).
 - [x] **Give back ghost votes** *(official)* (Ferryman) (3.25.0): one button returns the spent ghost
       vote to every dead player.
+- [ ] **Voudon vote** (traveller, rare): only the Voudon and the dead vote, and no majority
+      is needed. The storyteller can adjust it by hand, but the count and majority shown would
+      be wrong. No priority.
 - [ ] **Public reminders** *(official)*: some characters' reminders are seen by every player
       (only the storyteller places them).
 - [ ] **Key to call everyone to the plaza** *(official)*: the "Call to the plaza" button
@@ -258,6 +287,9 @@ Ranked with the same criteria as the [next steps](#next-steps).
       threshold on a live meter in the voice panel (saved per device). Errs on the side of
       letting noise through: a soft voice must never be cut. Firefox may fall back to the gate
       alone. Untested with real voices and phones.
+- [ ] **Block private conversations** (Matron, rare traveller): a storyteller switch that
+      stops players from starting private conversations or leaving the plaza. Today it has
+      to be asked for out loud. No priority.
 - [ ] **Push-to-talk**: the microphone only sends while a key or an on-screen button is held.
       Useful with background noise; optional, since it has to be learnt (and holding a button
       while talking is awkward on a phone).
