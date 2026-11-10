@@ -38,6 +38,21 @@
       />
     </section>
 
+    <!-- not cards from the game: the player answers on the seats or in chat -->
+    <section>
+      <h4>{{ $t("cards.askToChoose") }}</h4>
+      <ul class="chips">
+        <li
+          v-for="key in choices"
+          :key="key"
+          :class="{ selected: phrase === key }"
+          @click="phrase = phrase === key ? null : key"
+        >
+          {{ $t(`cards.choices.${key}`) }}
+        </li>
+      </ul>
+    </section>
+
     <section>
       <h4>{{ $t("cards.characters") }}</h4>
       <ul class="tokens">
@@ -117,6 +132,7 @@ import { mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
 
+// the game's info tokens ("youLearn" is gone, but old cards still show it)
 const PHRASES = [
   "youAre",
   "thisIsTheDemon",
@@ -124,12 +140,11 @@ const PHRASES = [
   "notInPlay",
   "thisPlayerIs",
   "characterSelectedYou",
-  "youLearn",
   "useAbility",
-  "choosePlayer",
-  "chooseTwoPlayers",
-  "chooseCharacter",
 ];
+// asking the player to choose, apart from the game's tokens: they answer by
+// tapping seats (see ChoosePlayers.vue) or, for a character, in the chat
+const CHOICES = ["choosePlayer", "chooseTwoPlayers", "chooseCharacter"];
 
 /**
  * Storyteller: write an info card for a player (phrase, characters,
@@ -140,6 +155,7 @@ export default {
   data() {
     return {
       phrases: PHRASES,
+      choices: CHOICES,
       ...this.emptyCard(),
     };
   },

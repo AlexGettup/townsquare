@@ -166,6 +166,12 @@
     "later": "Más tarde",
     "notSent": "No ha llegado. Inténtalo de nuevo",
     "chosen": "Elegido: {players}",
+    "askToChoose": "Pedir que elija",
+    "choices": {
+      "choosePlayer": "1 jugador",
+      "chooseTwoPlayers": "2 jugadores",
+      "chooseCharacter": "Un personaje"
+    },
     "phrases": {
       "youAre": "Tú eres",
       "thisIsTheDemon": "Este es el Demonio",

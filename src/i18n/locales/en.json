@@ -166,6 +166,12 @@
     "later": "Later",
     "notSent": "It didn't arrive. Try again",
     "chosen": "Chosen: {players}",
+    "askToChoose": "Ask them to choose",
+    "choices": {
+      "choosePlayer": "1 player",
+      "chooseTwoPlayers": "2 players",
+      "chooseCharacter": "A character"
+    },
     "phrases": {
       "youAre": "You are",
       "thisIsTheDemon": "This is the Demon",
