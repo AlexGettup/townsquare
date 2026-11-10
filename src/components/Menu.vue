@@ -119,6 +119,20 @@
               />
             </em>
           </li>
+          <li
+            @click="toggleGuidedNight"
+            v-if="players.length && !session.isSpectator"
+          >
+            {{ $t("menu.guidedNight") }}
+            <em>
+              <font-awesome-icon
+                :icon="[
+                  'fas',
+                  grimoire.isGuidedNight ? 'check-square' : 'square',
+                ]"
+              />
+            </em>
+          </li>
           <template v-if="players.length && !session.isSpectator">
             <li v-if="!session.gameOver" @click="toggleModal('endGame')">
               {{ $t("menu.endGame") }}
@@ -582,6 +596,7 @@ export default {
       "toggleImageOptIn",
       "toggleMuted",
       "toggleNightOrder",
+      "toggleGuidedNight",
       "toggleStatic",
       "setZoom",
       "setLocale",

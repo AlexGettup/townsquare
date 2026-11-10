@@ -39,6 +39,8 @@ const state = () => ({
   answerStatus: "",
   // storyteller: player ID we are writing an info card for
   composingFor: null,
+  // and what the card window opens with (guided night): { to: [ids], card }
+  composePreset: null,
   // storyteller: card ticks only show for cards sent after this (each
   // nightfall and dawn starts afresh)
   cardsSince: 0,
@@ -182,8 +184,11 @@ const mutations = {
   setAnswerStatus(state, answerStatus) {
     state.answerStatus = answerStatus;
   },
-  composeCard(state, playerId) {
-    state.composingFor = playerId;
+  /** Open the card window for a player ID, or { to: [ids], card } filled in. */
+  composeCard(state, target) {
+    const preset = target && typeof target === "object" ? target : null;
+    state.composePreset = preset;
+    state.composingFor = preset ? preset.to[0] : target;
   },
 };
 

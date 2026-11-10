@@ -12,6 +12,8 @@
           picking: isPicking,
           picked: isPicking && chat.picked.includes(player.name),
           dead: player.isDead,
+          // the guided night's current step
+          guided: player.id && $store.state.guidedPlayers.includes(player.id),
           marked:
             (!session.isSpectator || session.isVoteWatchingAllowed) &&
             session.markedPlayer === index,
@@ -1403,6 +1405,13 @@ li.move:not(.from) .player .overlay svg.move {
 
 .player.you .token {
   animation: townsfolk-glow 5s ease-in-out infinite;
+}
+
+/****** Guided night: whose turn it is ******/
+.player.guided .token {
+  box-shadow:
+    0 0 0 4px #e8b04a,
+    0 0 20px #e8b04a;
 }
 
 /****** Marked icon ******/

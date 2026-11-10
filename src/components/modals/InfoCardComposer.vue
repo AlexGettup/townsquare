@@ -265,6 +265,9 @@ export default {
     playerId() {
       Object.assign(this, this.emptyCard());
     },
+    "chat.composePreset"() {
+      Object.assign(this, this.emptyCard());
+    },
   },
   mounted() {
     window.addEventListener("keydown", this.onKeydown);
@@ -302,15 +305,21 @@ export default {
     },
     emptyCard() {
       // also called from data(), before the computed properties exist
-      const { composingFor } = this.$store.state.chat;
+      const { composingFor, composePreset } = this.$store.state.chat;
+      // the guided night opens it filled in, maybe for several players
+      const card = (composePreset && composePreset.card) || {};
       return {
-        recipients: composingFor ? [composingFor] : [],
-        phrase: null,
-        text: "",
-        roles: [],
-        chosenPlayers: [],
-        number: null,
-        answer: null,
+        recipients: composePreset
+          ? [...composePreset.to]
+          : composingFor
+            ? [composingFor]
+            : [],
+        phrase: card.phrase || null,
+        text: card.text || "",
+        roles: [...(card.roles || [])],
+        chosenPlayers: [...(card.players || [])],
+        number: card.number === undefined ? null : card.number,
+        answer: card.answer || null,
       };
     },
     // Enter sends the card, anywhere in the window
