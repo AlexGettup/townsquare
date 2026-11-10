@@ -62,7 +62,8 @@ own live session server, and the rest of the catalogue.
 Added 2026-11-10 from the official app (its tutorial video and the special features of its
 character data). Done for the next release: cards that fill themselves, quick answers for
 players, edit the grimoire before showing it, pointing and hidden votes, vote multiplier from
-a reminder, give back ghost votes, and the owner's idea of dimming who isn't with you. Not
+a reminder, give back ghost votes, the owner's idea of dimming who isn't with you, and (also
+his) random nominations and answers in the practice game. Not
 decided yet: marks on the night order sheet, open eyes at night, public reminders, character
 selection rules, a key to call everyone to the plaza.
 

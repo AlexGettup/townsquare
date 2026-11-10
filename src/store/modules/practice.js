@@ -12,6 +12,23 @@ export const isPracticeId = (id) => !!id && id.startsWith(PRACTICE_ID);
 
 let nextItem = 1;
 
+export const pickAtRandom = (list) =>
+  list[Math.floor(Math.random() * list.length)];
+
+/**
+ * Who can nominate (alive, hasn't nominated today) and who can be nominated
+ * (not nominated today), as seat indexes.
+ */
+const nominationOptions = (players) => {
+  const seats = players.map((player, index) => ({ player, index }));
+  return {
+    nominators: seats.filter(
+      ({ player }) => !player.isDead && !player.hasNominated,
+    ),
+    nominees: seats.filter(({ player }) => !player.wasNominated),
+  };
+};
+
 const state = () => ({
   active: false,
   // what the made-up players received and haven't closed yet, oldest first:
@@ -21,6 +38,17 @@ const state = () => ({
 
 const getters = {
   current: (state) => state.inbox[0] || null,
+  // a random nomination can be made: by day, no nomination going on, and
+  // someone left who can nominate someone else
+  canNominate: (state, getters, rootState) => {
+    const { session, grimoire, players } = rootState;
+    if (!state.active || grimoire.isNight || session.gameOver) return false;
+    if (session.nomination) return false;
+    const { nominators, nominees } = nominationOptions(players.players);
+    return nominators.some(({ index }) =>
+      nominees.some((nominee) => nominee.index !== index),
+    );
+  },
 };
 
 const mutations = {
@@ -68,6 +96,22 @@ const actions = {
       );
     });
     commit("setActive", true);
+  },
+  /** A made-up player nominates another, both picked at random. */
+  randomNomination({ getters, dispatch, rootState }) {
+    if (!getters.canNominate) return;
+    const { nominators, nominees } = nominationOptions(
+      rootState.players.players,
+    );
+    const from = pickAtRandom(
+      nominators.filter(({ index }) =>
+        nominees.some((nominee) => nominee.index !== index),
+      ),
+    ).index;
+    const to = pickAtRandom(
+      nominees.filter(({ index }) => index !== from),
+    ).index;
+    dispatch("session/nominate", [from, to], { root: true });
   },
   /** Leave the practice game: back to the first screen. */
   stop({ commit, rootState }) {
