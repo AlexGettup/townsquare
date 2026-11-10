@@ -59,6 +59,15 @@ players use each, so a feature that only helps one of them is worth half as much
 Nothing planned yet. Candidates: analyse joining voice and text chat, game diary, push-to-talk,
 own live session server, and the rest of the catalogue.
 
+Added 2026-11-10 from the official app (its tutorial video and the special features of its
+character data), not decided yet: cards that fill themselves, "thinks they are…" (Lunatic,
+Drunk, Marionette), quick answers for players, edit the grimoire before showing it, marks on
+the night order sheet, open eyes at night, pointing and hidden votes, vote multiplier from a
+reminder, give back ghost votes, public reminders, end-of-game reveal from a reminder,
+whispers between neighbours, character selection rules, a key to call everyone to the plaza.
+My suggested order: cards that fill themselves, "thinks they are…", quick answers, edit the
+grimoire, then the votes.
+
 ### Phones and tablets
 
 - [x] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
@@ -111,6 +120,28 @@ own live session server, and the rest of the catalogue.
       shown on their town square until they close it or day comes. A book on their seat tells
       the storyteller it was sent (grey) and closed (gold).
 
+- [ ] **Cards that fill themselves** *(official)*: picking "This is the Demon" puts in the
+      Demon's player, "These are your minions" the Minions, "These characters are not in
+      play" the Demon's bluffs. Only a suggestion the storyteller can change before sending:
+      the Lunatic gets made-up minions. Saves most of the first night's taps.
+- [ ] **"Thinks they are…"** (Lunatic, Drunk, Marionette): an entry in the seat menu. The
+      grimoire keeps the real token (Lunatic) with "thinks they are: Imp" under it, and
+      sending characters, reconnecting or dealing again always sends that player what they
+      think they are. Today it works only in the right order (Demon token on the seat, send,
+      change it to Lunatic), and "Deal and send" or sending characters again tells the
+      Lunatic the truth. Minimum version: a warning when sending would change what a player
+      was told ("Ana will get Lunatic, she got Imp before").
+- [ ] **Quick answers for players** *(official)*: buttons on the card to answer without typing
+      (Got it, Yes/No, Good/Evil, Clockwise/Anticlockwise, 0–5, a player, a character). The
+      official app also lets a script add its own answers and its own storyteller cards.
+- [ ] **Edit the grimoire before showing it** *(official)* (Spy, Widow): change characters
+      or reminders in the copy sent, without touching the real grimoire.
+- [ ] **Marks on the night order sheet** *(official)*: tap next to a character on the night
+      order to mark it as pending, and take the mark away when it dies or uses its ability.
+      Partly covered by the guided night.
+- [ ] **Open eyes at night** *(official)* (Wraith): let one player keep their eyes open at
+      night, fully or peeking: they see who is awake and the cards sent, as the character says.
+
 Trouble Brewing reviewed (2026-11-09): every other character is covered by info cards,
 choosing players and the vote. The Drunk's token is never dealt (the storyteller seats the
 Townsfolk they think they are, with a Drunk reminder), so no feature for it. A dawn summary of
@@ -128,10 +159,30 @@ cards, because characters like the Lunatic make an automatic version misleading.
 - [x] **Day timer** *(official)* (3.19.0): a countdown everyone sees ("5 minutes of discussion left"),
       with a sound when it ends.
 - [ ] **Ambient sounds**: dusk, dawn, executions.
+- [ ] **Pointing vote** *(official)* (Boomdandy, Fiddler): everyone points at a player
+      instead of raising a hand, and the storyteller sees who points at whom.
+- [ ] **Hidden vote** *(official)* (Organ Grinder): only the storyteller sees who voted and
+      the count.
+- [ ] **Vote multiplier from a reminder** *(official)* (Bureaucrat, Thief): putting the
+      character's reminder on a seat changes that player's vote value by itself. Today the
+      storyteller sets the value by hand (3.11.0).
+- [ ] **Give back ghost votes** *(official)* (Ferryman): one button returns the spent ghost
+      vote to every dead player.
+- [ ] **Public reminders** *(official)*: some characters' reminders are seen by every player
+      (only the storyteller places them).
+- [ ] **Whispers between neighbours** *(official)*: by day a player can only send a private
+      text message to the players sitting next to them, and everyone sees an envelope fly
+      between the two seats, without the text, like a whisper in a game in person. Changes how
+      the game is played: to decide.
+- [ ] **Key to call everyone to the plaza** *(official)*: the "Call to the plaza" button
+      exists; the official app also has a key (R). Our R opens the reference sheet.
 - [x] **End of game and grimoire reveal** *(official)* (3.20.0): the storyteller ends the game and
       declares the winning team (Good or Evil); everyone sees the result and the full
       grimoire (real characters, reminders and demon bluffs), and voice brings everyone back to
       the plaza to talk about it.
+- [ ] **Reveal from a reminder** *(official)* (Drunk, Philosopher): a reminder such as "Is
+      the Drunk" or "Is the Philosopher" makes the end-of-game grimoire show that character
+      instead of the token on the seat. Check first what 3.20.0 already does with the Drunk.
 
 ### For players
 
@@ -168,6 +219,12 @@ Ranked with the same criteria as the [next steps](#next-steps).
    claims it, so a double claim stands out. Hard to find and overlaps with the notes: better
    as a later extension of them than as a separate feature.
 
+### Storyteller setup
+
+- [ ] **Character selection rules** *(official)*: characters that can't go in the bag (Drunk,
+      Marionette) and characters that can go in more than once (Legion, Riot; with the
+      Atheist or Pope, any character). Check first what the character selector already does.
+
 ### Robustness
 
 - [ ] **Own live session server**: games still sync through upstream's server
@@ -200,8 +257,11 @@ Ranked with the same criteria as the [next steps](#next-steps).
 - [x] **Volume per person** (3.14.0): a slider for each participant (some people sound too loud or too quiet).
       iPhones don't let a web page change an audio element's volume: route it through Web Audio.
 - [x] **Choose microphone and speaker** (3.18.0, computers): pick the input/output device (headphones + separate mic).
-- [ ] **Video**: optional camera with thumbnails on the seats. Estimated ~15 GB per hour for
-      11 people at ~300 kbps, well inside the Cloudflare Realtime free tier (1,000 GB/month).
+- [ ] **Video** *(official)*: optional camera with thumbnails on the seats. Estimated
+      ~15 GB per hour for 11 people at ~300 kbps, well inside the Cloudflare Realtime free
+      tier (1,000 GB/month).
+      The official app hides the cameras at night (only avatars), so nobody sees reactions.
+      Heavy on phones' data and battery.
 
 ### Text chat
 
@@ -219,6 +279,9 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 - [x] Red Herring reminder: official data says "Pista falsa" (token) but "SEÑUELO" (night text).
       Decided to keep the official translations as they are.
+
+Not planned: **panels you can drag around the screen** *(official)* (chat, voice, bluffs,
+fabled). They don't help on phones, where the panels are bottom sheets.
 
 ## Notes
 
