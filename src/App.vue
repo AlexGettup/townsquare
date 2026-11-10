@@ -50,6 +50,8 @@
     <ChoosePlayers />
     <InfoCardComposer />
     <EndGameModal />
+    <PracticeBadge />
+    <PracticeInbox />
   </div>
 </template>
 
@@ -77,6 +79,8 @@ import ChatPanel from "@/components/ChatPanel";
 import InfoCardModal from "@/components/modals/InfoCardModal";
 import InfoCardComposer from "@/components/modals/InfoCardComposer";
 import EndGameModal from "@/components/modals/EndGameModal";
+import PracticeBadge from "@/components/PracticeBadge";
+import PracticeInbox from "@/components/modals/PracticeInbox";
 import ChoosePlayers from "@/components/ChoosePlayers";
 
 export default {
@@ -88,6 +92,8 @@ export default {
     InfoCardModal,
     InfoCardComposer,
     EndGameModal,
+    PracticeBadge,
+    PracticeInbox,
     ChoosePlayers,
     GameStateModal,
     ChangelogModal,

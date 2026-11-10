@@ -1,4 +1,5 @@
 import ChatClient from "../chat/ChatClient";
+import PracticeChat from "../chat/PracticeChat";
 import { PLACE_TAB, dmTab, tabOf } from "./modules/chat";
 import { STORYTELLER } from "./modules/voice";
 import { playChime } from "../voice/sounds";
@@ -9,7 +10,9 @@ const ERROR_TIMEOUT = 4 * 1000;
 
 /**
  * Store plugin connecting the text chat to Vuex. Everyone in a live session
- * is connected to its chat (no microphone needed).
+ * is connected to its chat (no microphone needed). A practice game uses a
+ * stand-in on this device instead (PracticeChat): store.$chat is whichever
+ * is in use.
  */
 export default (store) => {
   const serverUrl = process.env.VUE_APP_VOICE_URL || "";
@@ -17,8 +20,7 @@ export default (store) => {
   const isStoryteller = () => selfPeerId() === STORYTELLER;
   let errorTimer = null;
 
-  const client = new ChatClient({
-    serverUrl,
+  const callbacks = {
     onStatus: (status) => store.commit("chat/setStatus", status),
     onHistory: (messages) => store.commit("chat/setHistory", messages),
     onMessage: (message) => {
@@ -67,6 +69,17 @@ export default (store) => {
         ERROR_TIMEOUT,
       );
     },
+  };
+  const client = new ChatClient({ serverUrl, ...callbacks });
+  const practice = new PracticeChat({
+    ...callbacks,
+    // a made-up player got an info card: the storyteller sees it for them
+    onDelivered: (message) =>
+      store.commit("practice/receive", {
+        playerId: message.channel.slice("dm:".length),
+        kind: "card",
+        messageId: message.id,
+      }),
   });
   store.$chat = client;
 
@@ -75,6 +88,14 @@ export default (store) => {
   const sync = () => {
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => {
+      if (store.state.practice.active) {
+        client.disconnect();
+        store.$chat = practice;
+        practice.connect();
+        return;
+      }
+      practice.disconnect();
+      store.$chat = client;
       const { sessionId } = store.state.session;
       // a player gets their ID a moment after joining: wait for it
       if (!serverUrl || !sessionId || !selfPeerId()) {
@@ -103,6 +124,12 @@ export default (store) => {
       // characters really dealt (a mock assignment doesn't come through here)
       case "session/distributeRoles":
         if (payload) store.dispatch("chat/sendRoleCards");
+        break;
+      case "practice/setActive":
+        // each practice game starts with an empty chat
+        practice.messages = [];
+        practice.disconnect();
+        sync();
         break;
       case "session/setSessionId":
       case "session/setSpectator":

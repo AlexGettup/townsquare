@@ -70,6 +70,11 @@ guided night, own live session server, and the rest of the catalogue.
 
 ### Night without talking
 
+- [x] **Practice game** (unreleased): "Practice" on the first screen sets up a game with
+      made-up players, for the storyteller to rehearse alone. Info cards and the grimoire
+      sent to them show up as "What Ana sees", and the storyteller answers for them (seats
+      chosen, a reply in the private chat); ticks and the book icon work as in a real game.
+      In votes they raise hands at random. The chat of a practice game is lost on reload.
 - [x] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
       characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
       (Fortune Teller), players. Shown on the player's device and kept in their private chat.

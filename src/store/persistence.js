@@ -126,6 +126,8 @@ module.exports = (store) => {
   }
   store.commit("voice/setInputId", localStorage.getItem("voiceInput") || "");
   store.commit("voice/setOutputId", localStorage.getItem("voiceOutput") || "");
+  // a practice game goes on after a reload (its chat doesn't)
+  if (localStorage.practice === "1") store.commit("practice/setActive", true);
   if (localStorage.voiceProcessing !== undefined) {
     store.commit(
       "voice/setProcessing",
@@ -235,6 +237,10 @@ module.exports = (store) => {
         break;
       case "voice/setOutputId":
         localStorage.setItem("voiceOutput", payload);
+        break;
+      case "practice/setActive":
+        if (payload) localStorage.setItem("practice", "1");
+        else localStorage.removeItem("practice");
         break;
       case "voice/setProcessing":
         localStorage.setItem(

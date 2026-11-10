@@ -76,6 +76,7 @@ const faIcons = [
   "TrashAlt",
   "Undo",
   "User",
+  "UserGraduate",
   "UserEdit",
   "UserPlus",
   "UserFriends",

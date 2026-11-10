@@ -28,6 +28,14 @@
           </span>
           <small>{{ $t("intro.joinHint") }}</small>
         </div>
+        <!-- a row of its own: the two above are how real games start -->
+        <div class="option practice">
+          <span class="button" @click="practice">
+            <font-awesome-icon icon="user-graduate" />
+            {{ $t("intro.practice") }}
+          </span>
+          <small>{{ $t("intro.practiceHint") }}</small>
+        </div>
       </div>
 
       <i18n path="intro.offline" tag="p" class="offline">
@@ -96,15 +104,21 @@ export default {
         NOTICE_TIMEOUT,
       );
     },
-    // storyteller: how many players, the session code, then the seats
-    host() {
+    // how many players, or null if cancelled
+    askPlayerCount() {
       const answer = prompt(this.$t("dialogs.playerCount"), "8");
-      if (answer === null) return;
+      if (answer === null) return null;
       const count = parseInt(answer, 10);
       if (!(count >= 1 && count <= MAX_PLAYERS)) {
         alert(this.$t("dialogs.playerCountInvalid", { max: MAX_PLAYERS }));
-        return;
+        return null;
       }
+      return count;
+    },
+    // storyteller: how many players, the session code, then the seats
+    host() {
+      const count = this.askPlayerCount();
+      if (!count) return;
       const sessionId = prompt(
         this.$t("dialogs.hostChannel"),
         Math.round(Math.random() * 10000),
@@ -125,6 +139,16 @@ export default {
         navigator.clipboard.writeText(link).catch(() => {});
       }
       this.notify("intro.hosted", "book-open");
+    },
+    // storyteller alone: a practice game with made-up players
+    practice() {
+      const count = this.askPlayerCount();
+      if (!count) return;
+      const names = this.$t("practice.names")
+        .split(",")
+        .map((name) => name.trim());
+      this.$store.dispatch("practice/start", { count, names });
+      this.notify("practice.started", "user-graduate");
     },
     // player: the code or link from the storyteller. A session saved from
     // before (a wrong code, a game that never started) is simply replaced
@@ -244,6 +268,9 @@ export default {
 
   .option {
     flex: 1 1 200px;
+    &.practice {
+      flex-basis: 100%;
+    }
     display: flex;
     flex-direction: column;
     align-items: center;
