@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.22.0",
+    "date": "2026-11-10",
+    "title": {
+      "en": "Less background noise",
+      "es": "Menos ruido de fondo"
+    },
+    "en": [
+      "Voice chat removes background noise (fans, keyboards…) and sends silence while you aren't talking, like Discord. It's on by default",
+      "Under \"Background noise\" in the voice panel you can turn it off, or untick \"Automatic sensitivity\" and choose on the level meter from what volume your microphone gets through",
+      "A soft voice comes first: it would rather let some noise through than cut you off"
+    ],
+    "es": [
+      "El chat de voz quita el ruido de fondo (ventiladores, teclado…) y envía silencio mientras no hablas, como Discord. Viene activado",
+      "En «Ruido de fondo», en el panel de voz, puedes desactivarlo, o quitar «Sensibilidad automática» y elegir en el medidor a partir de qué volumen se envía tu micrófono",
+      "Primero va tu voz aunque hables bajito: prefiere dejar pasar algo de ruido antes que cortarte"
+    ]
+  },
+  {
     "version": "3.21.0",
     "date": "2026-11-09",
     "title": {

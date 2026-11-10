@@ -39,6 +39,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.20.0** End of game with the grimoire revealed to everyone; one info card to several
   players; tap the night order number on touch screens
 - **3.21.0** Show the grimoire to a player at night (Spy)
+- **3.22.0** Background noise suppression and voice gate in voice chat, like Discord
 
 ## Planned
 
@@ -165,7 +166,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
       follows the places (a private conversation has its own chat), so one communication
       panel with each place's people and messages may be clearer than two panels. Decide
       once the voice panel is in use.
-- [x] **Background noise, like Discord** (unreleased): RNNoise noise suppression plus a voice
+- [x] **Background noise, like Discord** (3.22.0): RNNoise noise suppression plus a voice
       gate that sends silence while nobody talks, with automatic sensitivity or a manual
       threshold on a live meter in the voice panel (saved per device). Errs on the side of
       letting noise through: a soft voice must never be cut. Firefox may fall back to the gate
