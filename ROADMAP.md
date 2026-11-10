@@ -94,12 +94,12 @@ own live session server, and the rest of the catalogue.
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
 - [x] **Guided night for the storyteller** (unreleased): at nightfall a panel steps through
       tonight's night order, only the characters in play with their players (dead ones skipped
-      unless their text is about dying). Each step: wake, the card window filled in from the
-      character's text (choose 1 or 2 players or a character, the info tokens it names, the
-      grimoire for the Spy), the answers as they come, then sleep and next. The current seat
-      glows on the town square. First night: minion and demon info come prepared, the
-      storyteller decides what to send. Top right on computers, a bottom sheet on phones;
-      folds, hides for the night, off in Menu > Grimoire. Reminders and deaths stay by hand.
+      unless their text is about dying); the current seat glows on the town square. Each step:
+      wake, open the card window for them (empty: the storyteller decides what to send), the
+      grimoire for the Spy, the answers as they come, then sleep and next. A first version
+      also filled the card in from the character's text; dropped because characters like the
+      Lunatic make that guess wrong in bigger scripts. Top right on computers, a bottom sheet
+      on phones; folds, hides for the night, off in Menu > Grimoire.
 - [x] **Show the grimoire** (3.21.0) (Spy, Widow): at night, "Show the grimoire" in any seated
       player's menu sends only them a snapshot of the grimoire (characters, reminders, bluffs),
       shown on their town square until they close it or day comes. A book on their seat tells

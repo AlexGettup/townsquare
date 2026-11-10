@@ -73,7 +73,6 @@
           >
         </h4>
         <p class="reminder" v-if="reminder" v-html="reminder"></p>
-        <p class="hint" v-if="step.byHand">{{ $t("guidedNight.byHand") }}</p>
 
         <div class="actions">
           <span
@@ -85,17 +84,11 @@
             <font-awesome-icon icon="eye" />
             {{ isAwake ? $t("guidedNight.awake") : $t("guidedNight.wake") }}
           </span>
-          <span
-            v-for="(item, i) in step.cards"
-            :key="i"
-            class="button send"
-            :style="{ '--card-color': lookOf(item.card.phrase).color }"
-            @click="compose(item.card)"
-          >
-            <font-awesome-icon :icon="lookOf(item.card.phrase).icon" />
-            {{ cardLabel(item) }}
+          <span class="button" @click="compose">
+            <font-awesome-icon icon="comment-dots" />
+            {{ $t("guidedNight.sendCard") }}
           </span>
-          <span v-if="step.grimoire" class="button send" @click="showGrimoire">
+          <span v-if="step.grimoire" class="button" @click="showGrimoire">
             <font-awesome-icon icon="book-open" />
             {{ $t("player.showGrimoire") }}
           </span>
@@ -124,7 +117,6 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import { nightSteps } from "../guidedNight";
-import { lookOf, tokenOf } from "../cards";
 import { STORYTELLER } from "../store/modules/voice";
 
 // where we are, so a reload doesn't start the night again
@@ -132,9 +124,10 @@ const STORAGE_KEY = "guidedNight";
 
 /**
  * Storyteller: step through tonight's night order. Each step names the
- * character and its player, wakes them, opens the info card window filled
- * in (or shows the grimoire), shows what they answered, and puts them back
- * to sleep. Nothing happens without a tap: reminders and deaths stay by hand.
+ * character and its player, lights up their seat, wakes them, opens the info
+ * card window for them (empty: what to send is up to the storyteller), shows
+ * what they answered, and puts them back to sleep. Nothing happens without a
+ * tap: reminders, deaths and odd characters (Lunatic…) stay by hand.
  */
 export default {
   data() {
@@ -154,7 +147,6 @@ export default {
       "roles",
       "otherTravellers",
       "npcs",
-      "bluffs",
       "chat",
     ]),
     ...mapState("players", ["players"]),
@@ -301,7 +293,6 @@ export default {
     }
   },
   methods: {
-    lookOf,
     save() {
       try {
         localStorage.setItem(
@@ -345,19 +336,12 @@ export default {
         if (awake.includes(id)) this.$store.dispatch("voice/toggleAwake", id);
       });
     },
-    compose(card) {
+    // the card window, empty, for this step's players: what to send is
+    // the storyteller's call (no guessing from the character's text)
+    compose() {
       this.$store.commit("chat/composeCard", {
         to: this.step.players.map(({ id }) => id),
-        card,
       });
-    },
-    cardLabel(item) {
-      const { phrase } = item.card;
-      if (!phrase) return this.$t("guidedNight.sendCard");
-      const token = this.$t(`cards.phrases.${tokenOf(phrase)}`);
-      return tokenOf(phrase) === phrase
-        ? token
-        : `${token}: ${this.$t(`cards.choices.${phrase}`)}`;
     },
     showGrimoire() {
       this.step.players.forEach(({ id }) => {
@@ -504,13 +488,6 @@ h4 {
     font-size: 90%;
     &.on {
       background: rgba(255, 255, 255, 0.2);
-    }
-    &.send {
-      background: linear-gradient(
-        to bottom,
-        var(--card-color, #444) 0%,
-        rgba(0, 0, 0, 0.6) 100%
-      );
     }
     svg {
       margin-right: 4px;
