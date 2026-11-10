@@ -63,7 +63,10 @@
     "settings": "Settings",
     "audio": "Audio",
     "copySessionCode": "Copy Session Code",
-    "sourceCode": "Source Code"
+    "sourceCode": "Source Code",
+    "returnGhostVotes": "Return Ghost Votes",
+    "pointing": "Pointing Vote",
+    "pointingHint": "Everyone points at a player (Boomdandy)"
   },
   "voice": {
     "title": "Voice Chat",
@@ -158,7 +161,6 @@
     "no": "No",
     "sendButton": "Send",
     "gotIt": "Got It",
-    "choiceHint": "Write your choice to the Storyteller in the private chat",
     "sent": "Information sent, not seen yet",
     "seen": "The player saw the information",
     "answered": "The player answered",
@@ -189,8 +191,15 @@
       "makeChoice": "Make a choice",
       "choosePlayer": "Choose a player",
       "chooseTwoPlayers": "Choose 2 players",
-      "chooseCharacter": "Choose a character"
-    }
+      "chooseCharacter": "Choose a character",
+      "pointAtPlayer": "Point at a player"
+    },
+    "replyPlayer": "Player",
+    "replyCharacter": "Character",
+    "replyCustom": "Custom",
+    "replyPlaceholder": "Write your answer",
+    "replyBack": "Back",
+    "replySend": "Answer"
   },
   "dialogs": {
     "dayCount": "Which day is it?",
@@ -336,7 +345,10 @@
     "ghostVoteHint": "You are dead: voting yes uses your ghost vote.",
     "claimSeatToVote": "Please claim a seat to vote.",
     "reclaimSeatToVote": "Please reclaim your seat to vote.",
-    "go": "GO"
+    "go": "GO",
+    "hidden": "Secret vote",
+    "hiddenST": "Only you see the hands and the count",
+    "hiddenPlayer": "Secret vote: only the Storyteller sees the hands"
   },
   "modals": {
     "endGame": {
@@ -475,5 +487,24 @@
     "grimoire": "{name} sees the grimoire as you have it now: everyone's real character, the reminders and the Demon's bluffs, until they close it or day comes.",
     "closeAs": "Close as {name}",
     "seeAll": "Close all as seen"
+  },
+  "pointing": {
+    "title": "Pointing vote",
+    "progress": "{done} of {total} have pointed",
+    "revealed": "Who pointed at whom",
+    "reveal": "Reveal",
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "grimoireEditor": {
+    "title": "Grimoire for {name}",
+    "hint": "This is what they will see. Changes here don't touch your grimoire.",
+    "changeCharacter": "Change character",
+    "removeReminder": "Remove",
+    "bluffs": "Demon bluffs",
+    "pickCharacter": "Pick the character",
+    "noCharacter": "None",
+    "reset": "Undo changes",
+    "send": "Show the grimoire"
   }
 }

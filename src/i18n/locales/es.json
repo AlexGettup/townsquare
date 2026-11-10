@@ -63,7 +63,10 @@
     "settings": "Ajustes",
     "audio": "Audio",
     "copySessionCode": "Copiar código de sesión",
-    "sourceCode": "Código fuente"
+    "sourceCode": "Código fuente",
+    "returnGhostVotes": "Devolver votos fantasma",
+    "pointing": "Votación señalando",
+    "pointingHint": "Todos señalan a un jugador (Boomdandy)"
   },
   "voice": {
     "title": "Chat de voz",
@@ -158,7 +161,6 @@
     "no": "No",
     "sendButton": "Enviar",
     "gotIt": "Entendido",
-    "choiceHint": "Escribe tu elección al Narrador en el chat privado",
     "sent": "Información enviada, aún sin ver",
     "seen": "El jugador ha visto la información",
     "answered": "El jugador ha respondido",
@@ -189,8 +191,15 @@
       "makeChoice": "Haz una elección",
       "choosePlayer": "Elige un jugador",
       "chooseTwoPlayers": "Elige 2 jugadores",
-      "chooseCharacter": "Elige un personaje"
-    }
+      "chooseCharacter": "Elige un personaje",
+      "pointAtPlayer": "Señala a un jugador"
+    },
+    "replyPlayer": "Jugador",
+    "replyCharacter": "Personaje",
+    "replyCustom": "Otra cosa",
+    "replyPlaceholder": "Escribe tu respuesta",
+    "replyBack": "Volver",
+    "replySend": "Responder"
   },
   "dialogs": {
     "dayCount": "¿Qué día es?",
@@ -336,7 +345,10 @@
     "ghostVoteHint": "Estás muerto: si votas SÍ, gastarás tu voto fantasma.",
     "claimSeatToVote": "Reclama un asiento para votar.",
     "reclaimSeatToVote": "Vuelve a reclamar tu asiento para votar.",
-    "go": "¡YA!"
+    "go": "¡YA!",
+    "hidden": "Voto secreto",
+    "hiddenST": "Solo tú ves las manos y el recuento",
+    "hiddenPlayer": "Voto secreto: solo el Narrador ve las manos"
   },
   "modals": {
     "endGame": {
@@ -475,5 +487,24 @@
     "grimoire": "{name} ve el grimorio como lo tienes ahora: el personaje real de cada uno, los recordatorios y los faroles del Demonio, hasta que lo cierre o se haga de día.",
     "closeAs": "Cerrar como {name}",
     "seeAll": "Cerrar todo como visto"
+  },
+  "pointing": {
+    "title": "Votación señalando",
+    "progress": "Han señalado {done} de {total}",
+    "revealed": "Quién ha señalado a quién",
+    "reveal": "Revelar",
+    "close": "Cerrar",
+    "cancel": "Cancelar"
+  },
+  "grimoireEditor": {
+    "title": "Grimorio para {name}",
+    "hint": "Es lo que verá. Lo que cambies aquí no toca tu grimorio.",
+    "changeCharacter": "Cambiar personaje",
+    "removeReminder": "Quitar",
+    "bluffs": "Faroles del Demonio",
+    "pickCharacter": "Elige el personaje",
+    "noCharacter": "Ninguno",
+    "reset": "Deshacer cambios",
+    "send": "Enseñar grimorio"
   }
 }

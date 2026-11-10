@@ -182,7 +182,12 @@ const chatMessage = (row) => ({
 });
 
 // cards the player answers by tapping seats: how many they have to pick
-const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
+const SEATS_TO_CHOOSE = {
+  choosePlayer: 1,
+  chooseTwoPlayers: 2,
+  // the pointing vote (Boomdandy)
+  pointAtPlayer: 1,
+};
 
 /**
  * One VoiceRoom per game session. Every connected client has a WebSocket

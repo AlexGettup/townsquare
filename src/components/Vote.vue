@@ -18,8 +18,9 @@
       <template
         v-if="
           !session.isSpectator ||
-          session.isVoteWatchingAllowed ||
-          (!session.isVoteInProgress && session.lockedVote < 1)
+          (!session.isVoteHidden &&
+            (session.isVoteWatchingAllowed ||
+              (!session.isVoteInProgress && session.lockedVote < 1)))
         "
       >
         <em class="blue">
@@ -27,7 +28,15 @@
         </em>
         {{ $t("vote.inFavor") }}
       </template>
-      <template v-else> {{ $t("vote.secret") }} </template>
+      <template v-else-if="!session.isVoteHidden">
+        {{ $t("vote.secret") }}
+      </template>
+      <div class="secret" v-if="session.isVoteHidden">
+        <font-awesome-icon icon="eye-slash" />
+        {{
+          session.isSpectator ? $t("vote.hiddenPlayer") : $t("vote.hiddenST")
+        }}
+      </div>
       <em v-if="nominee.role.team !== 'traveller'">
         {{ $t("vote.majority", { count: Math.ceil(alive / 2) }) }}
       </em>
@@ -50,6 +59,17 @@
             @mousedown.prevent="setVotingSpeed(100)"
             icon="plus-circle"
           />
+        </div>
+        <!-- before it starts: a secret vote (Organ Grinder) -->
+        <div
+          v-if="!session.isVoteInProgress && session.lockedVote < 1"
+          class="buttons hidden-toggle"
+          @click="toggleHidden"
+        >
+          <font-awesome-icon
+            :icon="session.isVoteHidden ? 'check-square' : 'square'"
+          />
+          {{ $t("vote.hidden") }}
         </div>
         <div
           v-if="
@@ -271,6 +291,9 @@ export default {
         this.$store.commit("session/setVotingSpeed", speed);
       }
     },
+    toggleHidden() {
+      this.$store.commit("session/setVoteHidden", !this.session.isVoteHidden);
+    },
     setMarked() {
       this.$store.commit("session/setMarkedPlayer", this.session.nomination[1]);
     },
@@ -300,6 +323,22 @@ export default {
     0 -1px 2px #000000,
     1px 0 2px #000000,
     -1px 0 2px #000000;
+
+  .secret {
+    font-size: 85%;
+    color: lightgray;
+    svg {
+      margin-right: 4px;
+    }
+  }
+
+  .hidden-toggle {
+    cursor: pointer;
+    font-size: 85%;
+    svg {
+      margin-right: 4px;
+    }
+  }
 
   .mark .button {
     font-size: 75%;

@@ -300,7 +300,7 @@ export default {
         (!this.text.trim() && this.lines.every(isEmptyPart))
       );
     },
-    ...mapState(["chat", "grimoire"]),
+    ...mapState(["chat", "grimoire", "bluffs"]),
     ...mapGetters(["localizeRole", "rolesJSONbyId"]),
     ...mapState({ roleMap: "roles" }),
     ...mapState("players", ["players"]),
@@ -347,9 +347,49 @@ export default {
       }
       if (!line.phrase && !hasContent) {
         line.phrase = phrase;
+        this.suggest(line);
       } else if (this.lines.length < MAX_PARTS) {
         this.lines.push(emptyPart(phrase));
         this.current = this.lines.length - 1;
+        this.suggest(this.line);
+      }
+    },
+    /**
+     * A new line comes filled in from the grimoire, like the official app:
+     * "This is the Demon" with the Demon's player, "These are your minions"
+     * with the Minions, "Not in play" with the Demon's bluffs, "You are" with
+     * the recipient's character. Only a suggestion: tapping changes it, and
+     * a Lunatic gets made-up minions.
+     */
+    suggest(line) {
+      // to one player, the others; to several (all the Minions), everyone
+      const single = this.recipients.length === 1 ? this.recipients[0] : null;
+      const ofTeam = (team) =>
+        this.players
+          .filter(
+            ({ id, role }) =>
+              role && role.team === team && (!id || id !== single),
+          )
+          .map(({ name }) => name);
+      switch (line.phrase) {
+        case "thisIsTheDemon":
+          line.players = ofTeam("demon");
+          break;
+        case "theseAreYourMinions":
+          line.players = ofTeam("minion");
+          break;
+        case "notInPlay":
+          line.roles = this.bluffs
+            .map((role) => role && role.id)
+            .filter(Boolean);
+          break;
+        case "youAre": {
+          if (!single) break;
+          const player = this.players.find(({ id }) => id === single);
+          if (player && player.role && player.role.id)
+            line.roles = [player.role.id];
+          break;
+        }
       }
     },
     removeLine(index) {

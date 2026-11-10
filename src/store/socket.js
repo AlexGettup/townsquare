@@ -197,8 +197,8 @@ class LiveSession {
         break;
       case "nomination":
         if (!this._isSpectator) return;
-        if (!params) {
-          // create vote history record
+        // create vote history record (a secret vote isn't known to players)
+        if (!params && !this._store.state.session.isVoteHidden) {
           this._store.commit(
             "session/addHistory",
             this._store.state.players.players,
@@ -274,6 +274,14 @@ class LiveSession {
       case "isVoteInProgress":
         if (!this._isSpectator) return;
         this._store.commit("session/setVoteInProgress", params);
+        break;
+      case "pointing":
+        if (!this._isSpectator) return;
+        this._store.commit("session/setPointing", params || null);
+        break;
+      case "isVoteHidden":
+        if (!this._isSpectator) return;
+        this._store.commit("session/setVoteHidden", !!params);
         break;
       case "vote":
         this._handleVote(params);
@@ -438,9 +446,14 @@ class LiveSession {
         votingSpeed: session.votingSpeed,
         lockedVote: session.lockedVote,
         isVoteInProgress: session.isVoteInProgress,
+        isVoteHidden: session.isVoteHidden,
+        pointing: session.pointing,
         markedPlayer: session.markedPlayer,
         npcs: npcs.map((f) => (f.isCustom ? f : { id: f.id })),
-        ...(session.nomination ? { votes: session.votes } : {}),
+        // a secret vote's hands stay with the storyteller
+        ...(session.nomination && !session.isVoteHidden
+          ? { votes: session.votes }
+          : {}),
       });
     }
   }
@@ -467,6 +480,8 @@ class LiveSession {
       votes,
       lockedVote,
       isVoteInProgress,
+      isVoteHidden,
+      pointing,
       markedPlayer,
       npcs,
     } = data;
@@ -541,6 +556,8 @@ class LiveSession {
         lockedVote,
         isVoteInProgress,
       });
+      this._store.commit("session/setVoteHidden", !!isVoteHidden);
+      this._store.commit("session/setPointing", pointing || null);
       this._store.commit("session/setMarkedPlayer", markedPlayer);
       this._store.commit("setNpcs", {
         npcs: npcs.map((f) => this._store.state.otherNpcs.get(f.id) || f),
@@ -1066,6 +1083,18 @@ class LiveSession {
     }
   }
 
+  /** Tell players about the pointing vote (open, revealed, over). ST only */
+  setPointing() {
+    if (this._isSpectator) return;
+    this._send("pointing", this._store.state.session.pointing);
+  }
+
+  /** Tell players whether this vote is secret. ST only */
+  setVoteHidden() {
+    if (this._isSpectator) return;
+    this._send("isVoteHidden", this._store.state.session.isVoteHidden);
+  }
+
   /**
    * Set the isVoteInProgress status. ST only
    */
@@ -1095,13 +1124,16 @@ class LiveSession {
     if (this._isSpectator) return;
     this._send("dayTimer", this._dayTimerToSend());
   }
-  /** Show a player (Spy) the grimoire as it is now, only to them. ST only */
-  showGrimoire(playerId) {
+  /**
+   * Show a player (Spy) the grimoire, only to them: as it is now, or as the
+   * storyteller edited it for them. ST only
+   */
+  showGrimoire(playerId, grimoire) {
     if (this._isSpectator || !playerId) return;
     this._sendDirect(
       playerId,
       "grimoire",
-      this._store.getters["session/grimoireSnapshot"],
+      grimoire || this._store.getters["session/grimoireSnapshot"],
     );
   }
   /** Player: tell only the storyteller we are done with the grimoire. */
@@ -1198,11 +1230,20 @@ class LiveSession {
       !this._isSpectator
     ) {
       // send vote only if it is your own vote or you are the storyteller
-      this._send("vote", [
+      const message = [
         index,
         this._store.state.session.votes[index],
         !this._isSpectator,
-      ]);
+      ];
+      if (!this._store.state.session.isVoteHidden) {
+        this._send("vote", message);
+      } else if (this._isSpectator) {
+        // secret vote: only the storyteller gets our hand
+        this._sendDirect("host", "vote", message);
+      } else if (player.id) {
+        // and the storyteller changing it tells only that player
+        this._sendDirect(player.id, "vote", message);
+      }
     }
   }
 
@@ -1230,7 +1271,13 @@ class LiveSession {
     const { lockedVote, votes, nomination } = this._store.state.session;
     const { players } = this._store.state.players;
     const index = (nomination[1] + lockedVote - 1) % players.length;
-    this._send("lock", [this._store.state.session.lockedVote, votes[index]]);
+    // a secret vote's hands aren't told as the clock hand passes them
+    this._send(
+      "lock",
+      this._store.state.session.isVoteHidden
+        ? [lockedVote]
+        : [lockedVote, votes[index]],
+    );
   }
 
   /**
@@ -1242,7 +1289,7 @@ class LiveSession {
   _handleLock([lock, vote]) {
     if (!this._isSpectator) return;
     this._store.commit("session/lockVote", lock);
-    if (lock > 1) {
+    if (lock > 1 && vote !== undefined) {
       const { lockedVote, nomination } = this._store.state.session;
       const { players } = this._store.state.players;
       const index = (nomination[1] + lockedVote - 1) % players.length;
@@ -1327,6 +1374,12 @@ export default (store) => {
       case "session/setVoteInProgress":
         session.setVoteInProgress(payload);
         break;
+      case "session/setVoteHidden":
+        session.setVoteHidden();
+        break;
+      case "session/setPointing":
+        session.setPointing();
+        break;
       case "session/voteSync":
         session.vote(payload);
         break;
@@ -1371,7 +1424,7 @@ export default (store) => {
         break;
       case "session/setGrimoireView":
         if (payload && payload.status === "sent") {
-          session.showGrimoire(payload.playerId);
+          session.showGrimoire(payload.playerId, payload.grimoire);
         }
         break;
       case "session/closeShownGrimoire":

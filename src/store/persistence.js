@@ -21,6 +21,8 @@ const hostedGameOf = ({ session, grimoire, voice, chat }) =>
         lockedVote: session.lockedVote,
         votingSpeed: session.votingSpeed,
         isVoteInProgress: session.isVoteInProgress,
+        isVoteHidden: session.isVoteHidden,
+        pointing: session.pointing,
         markedPlayer: session.markedPlayer,
         allowSelfNaming: session.allowSelfNaming,
         isVoteHistoryAllowed: session.isVoteHistoryAllowed,
@@ -64,6 +66,8 @@ const restoreHostedGame = (store, game) => {
     // (the storyteller resumes it), and one still counting down hasn't started
     isVoteInProgress: game.isVoteInProgress && game.lockedVote > 0,
   });
+  store.commit("session/setVoteHidden", !!game.isVoteHidden);
+  store.commit("session/setPointing", game.pointing || null);
   store.commit("session/setMarkedPlayer", game.markedPlayer);
   store.commit("session/setAllowSelfNaming", game.allowSelfNaming);
   store.commit("session/setVoteHistoryAllowed", game.isVoteHistoryAllowed);

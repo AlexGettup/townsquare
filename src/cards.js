@@ -9,6 +9,12 @@
  */
 export const CHOICES = ["choosePlayer", "chooseTwoPlayers", "chooseCharacter"];
 
+/**
+ * The pointing vote (Boomdandy): a card to every player, answered by tapping
+ * a seat like "choose a player". Not offered in the card window.
+ */
+export const POINTING = "pointAtPlayer";
+
 // in the order of the official app
 export const PHRASES = [
   "useAbility",
@@ -30,6 +36,8 @@ const LOOKS = {
   youAre: { color: "#6a2c8c", icon: "user" },
   thisPlayerIs: { color: "#7a3699", icon: "hand-point-right" },
   characterSelectedYou: { color: "#2b7a34", icon: "crosshairs" },
+  // the pointing vote (Boomdandy), sent to everyone from the menu
+  pointAtPlayer: { color: "#b8561b", icon: "hand-point-up" },
 };
 // cards sent before these changes ("youLearn") and cards without a phrase
 const PLAIN = { color: "#444444", icon: "comment-dots" };

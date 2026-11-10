@@ -61,7 +61,11 @@ export default {
         return role ? this.$store.getters.localizeRole(role).name : id;
       };
       return partsOf(this.message.card)
-        .filter((part) => !CHOICES.includes(part.phrase))
+        .filter(
+          (part) =>
+            !CHOICES.includes(part.phrase) &&
+            part.phrase !== this.message.card.phrase,
+        )
         .map((part) => describePart(part, (key) => this.$t(key), roleName));
     },
     canConfirm: function () {
