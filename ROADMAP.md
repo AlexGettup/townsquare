@@ -40,6 +40,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   players; tap the night order number on touch screens
 - **3.21.0** Show the grimoire to a player at night (Spy)
 - **3.22.0** Background noise suppression and voice gate in voice chat, like Discord
+- **3.23.0** Practice game; info cards like the official app; audio settings in the menu
 
 ## Planned
 
@@ -70,12 +71,12 @@ guided night, own live session server, and the rest of the catalogue.
 
 ### Night without talking
 
-- [x] **Cards like the official app** (unreleased): only the game's eight info tokens
+- [x] **Cards like the official app** (3.23.0): only the game's eight info tokens
       ("Make a choice" says what to choose: 1 player, 2 players or a character), each with
       its own colour and icon. The card window shows what the player's character does
       tonight and what they were sent and answered since nightfall, like the official
       "Wake" window. Waking and the quick answer buttons (good/evil, directions) not copied.
-- [x] **Practice game** (unreleased): "Practice" on the first screen sets up a game with
+- [x] **Practice game** (3.23.0): "Practice" on the first screen sets up a game with
       made-up players, for the storyteller to rehearse alone. Info cards and the grimoire
       sent to them show up as "What Ana sees", and the storyteller answers for them (seats
       chosen, a reply in the private chat); ticks and the book icon work as in a real game.

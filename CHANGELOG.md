@@ -4,6 +4,13 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.23.0
+- Practice game: "Practice" on the first screen sets up a game with made-up players, for the Storyteller to rehearse alone. Info cards and the grimoire sent to them show up as "What Ana sees", and the Storyteller answers for them (seats chosen, a reply in the private chat), with the usual sent, seen and answered marks on the seats. In votes they raise hands at random. "Practice · Leave" in the top left corner ends it; creating or joining a real game ends it too
+- Info cards like the official app: only the game's eight info tokens, each with its own colour and icon. "Make a choice" says what to choose: 1 player, 2 players or a character. "You learn" is gone
+- The info card window shows what the player's character does tonight (from the night order) and what they were sent and answered since nightfall
+- Audio settings moved to Menu > Settings > Audio: background noise and, on computers, microphone and speaker. The voice panel keeps mute and leave
+- Computers: a seat's "add reminder" button no longer covers the day timer
+
 ### Version 3.22.0
 - Background noise in voice chat, like Discord: noise suppression removes fans, keyboards and similar noise, and a voice gate sends silence while you aren't talking. Both are on by default, in the voice panel under "Background noise". Sensitivity is automatic; untick it to set the threshold by hand on a live level meter. Settings are saved on the device. It favours letting some noise through over cutting a soft voice. Browsers that can't run the noise suppression (possibly Firefox) keep only the voice gate
 

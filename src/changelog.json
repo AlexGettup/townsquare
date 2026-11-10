@@ -1,5 +1,27 @@
 [
   {
+    "version": "3.23.0",
+    "date": "2026-11-10",
+    "title": {
+      "en": "Practice game",
+      "es": "Partida de práctica"
+    },
+    "en": [
+      "Storyteller: \"Practice\" on the first screen sets up a game with made-up players to rehearse alone. What you send them shows up for you as \"What Ana sees\", and you answer for them",
+      "Info cards look like the official ones: the game's eight info tokens, each with its colour and icon. \"Make a choice\" says what to choose",
+      "Storyteller: the info card window shows what the player's character does tonight and what you sent them and they answered",
+      "Background noise, microphone and speaker are now in Menu > Settings > Audio",
+      "Computers: the day timer can always be clicked, even with the mouse over a seat"
+    ],
+    "es": [
+      "Narrador: «Practicar», en la pantalla de inicio, monta una partida con jugadores inventados para ensayar tú solo. Lo que les envías te aparece a ti como «Lo que ve Ana», y respondes por ellos",
+      "Las tarjetas de información se parecen a las oficiales: las ocho del juego, cada una con su color e icono. «Haz una elección» dice qué hay que elegir",
+      "Narrador: la ventana de información muestra lo que hace esa noche el personaje del jugador y lo que le has enviado y te ha contestado",
+      "Ruido de fondo, micrófono y altavoz están ahora en Menú > Ajustes > Audio",
+      "Ordenador: el temporizador del día siempre se puede pulsar, aunque el ratón pase por un asiento"
+    ]
+  },
+  {
     "version": "3.22.0",
     "date": "2026-11-10",
     "title": {
