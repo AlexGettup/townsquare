@@ -38,13 +38,6 @@
         </div>
       </div>
 
-      <i18n path="intro.offline" tag="p" class="offline">
-        <template #menu>
-          <span class="button small" data-menu-toggle @click="toggleMenu">
-            <font-awesome-icon icon="cog" /> {{ $t("intro.menu") }}
-          </span>
-        </template>
-      </i18n>
       <i18n path="intro.footer" tag="div" class="footer">
         <template #github>
           <a href="https://github.com/AlexGettup/townsquare" target="_blank"
@@ -66,7 +59,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapState } from "vuex";
 
 const MAX_PLAYERS = 20;
 const NOTICE_TIMEOUT = 8 * 1000;
@@ -92,7 +85,6 @@ export default {
     if (this.isWaiting) this.notify("intro.joined", "chair");
   },
   methods: {
-    ...mapMutations(["toggleMenu"]),
     // a notice at the top of the screen saying what to do next
     notify(key, icon) {
       this.$store.commit("alerts/add", { key, icon });
@@ -288,16 +280,6 @@ export default {
     small {
       font-size: 75%;
       opacity: 0.85;
-    }
-  }
-
-  .offline {
-    font-size: 75%;
-    opacity: 0.85;
-
-    .button.small {
-      font-size: 100%;
-      padding: 0 8px;
     }
   }
 }

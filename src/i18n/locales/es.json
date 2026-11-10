@@ -224,8 +224,6 @@
     "hostHint": "Elige cuántos jugadores hay; se copia el enlace para ellos, compártelo.",
     "join": "Unirse a partida (Jugador)",
     "joinHint": "Introduce el código o pega el enlace que te pase el Narrador, y después reclama tu asiento.",
-    "offline": "También puedes preparar una partida sin conexión desde el {menu}.",
-    "menu": "Menú",
     "hosted": "Partida creada. El enlace para los jugadores está copiado: compártelo. También lo tienes en el menú, en «Sesión en vivo».",
     "joined": "¡Ya estás dentro! Toca un asiento libre y elige «Reclamar asiento».",
     "waiting": "Esperando al Narrador en la sesión {code}. Si no aparece nada, comprueba el código.",
