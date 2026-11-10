@@ -12,8 +12,7 @@ const ACTS_WHEN_DEAD = /\b(died|dies|dead|death)\b/i;
 
 /**
  * Tonight's steps: night order entries with someone seated to wake, in order.
- * Each: { id, role, players, grimoire } (grimoire: the text says to show it,
- * as for the Spy).
+ * Each: { id, role, players }.
  */
 export function nightSteps(first, game) {
   const key = first ? "firstNightReminder" : "otherNightReminder";
@@ -33,7 +32,6 @@ export function nightSteps(first, game) {
       id: role.id,
       role,
       players,
-      grimoire: /show the grimoire/i.test(reminder),
     });
   });
   return steps;

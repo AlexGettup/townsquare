@@ -88,10 +88,6 @@
             <font-awesome-icon icon="comment-dots" />
             {{ $t("guidedNight.sendCard") }}
           </span>
-          <span v-if="step.grimoire" class="button" @click="showGrimoire">
-            <font-awesome-icon icon="book-open" />
-            {{ $t("player.showGrimoire") }}
-          </span>
         </div>
 
         <!-- what came back since this step started -->
@@ -240,7 +236,8 @@ export default {
           }
         });
         const view = this.session.grimoireViews[player.id];
-        if (this.step.grimoire && view) {
+        // shown from their seat menu (Spy): sent, then closed
+        if (view) {
           list.push({
             key: "grimoire-" + player.id,
             icon: view === "seen" ? "check" : "book-open",
@@ -341,14 +338,6 @@ export default {
     compose() {
       this.$store.commit("chat/composeCard", {
         to: this.step.players.map(({ id }) => id),
-      });
-    },
-    showGrimoire() {
-      this.step.players.forEach(({ id }) => {
-        this.$store.commit("session/setGrimoireView", {
-          playerId: id,
-          status: "sent",
-        });
       });
     },
     toDay() {

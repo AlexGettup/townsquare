@@ -96,7 +96,7 @@ own live session server, and the rest of the catalogue.
       tonight's night order, only the characters in play with their players (dead ones skipped
       unless their text is about dying); the current seat glows on the town square. Each step:
       wake, open the card window for them (empty: the storyteller decides what to send), the
-      grimoire for the Spy, the answers as they come, then sleep and next. A first version
+      answers as they come (and the grimoire, if shown from the seat menu), then sleep and next. A first version
       also filled the card in from the character's text; dropped because characters like the
       Lunatic make that guess wrong in bigger scripts. Top right on computers, a bottom sheet
       on phones; folds, hides for the night, off in Menu > Grimoire.
