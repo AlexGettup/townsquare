@@ -224,8 +224,6 @@
     "hostHint": "Choose how many players there are; the link for them is copied, share it.",
     "join": "Join a game (Player)",
     "joinHint": "Enter the code or paste the link your Storyteller gives you, then claim your seat.",
-    "offline": "You can also prepare a game without connecting from the {menu}.",
-    "menu": "Menu",
     "hosted": "Game created. The players' link is copied: share it. It is also in the menu, under “Live Session”.",
     "joined": "You're in! Tap a free seat and choose “Claim seat”.",
     "waiting": "Waiting for the Storyteller in session {code}. If nothing appears, check the code.",

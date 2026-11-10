@@ -129,6 +129,14 @@ h2 {
   user-select: text;
 }
 
+// the browser's list indent pushed tokens and names off centre
+.roles,
+.players {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .roles {
   display: flex;
   flex-wrap: wrap;
