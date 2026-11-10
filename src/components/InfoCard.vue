@@ -1,6 +1,18 @@
 <template>
   <div class="info-card">
-    <h2 v-if="card.phrase">{{ $t(`cards.phrases.${card.phrase}`) }}</h2>
+    <!-- the info token, in its colour -->
+    <div
+      class="token"
+      v-if="card.phrase"
+      :style="{ '--card-color': look.color }"
+    >
+      <font-awesome-icon :icon="look.icon" />
+      <h2>{{ $t(`cards.phrases.${token}`) }}</h2>
+    </div>
+    <!-- "Make a choice": what to choose -->
+    <p class="choice" v-if="token !== card.phrase">
+      {{ $t(`cards.phrases.${card.phrase}`) }}
+    </p>
     <p class="text" v-if="card.text">{{ card.text }}</p>
     <ul class="roles" v-if="roles.length">
       <li v-for="(role, index) in roles" :key="index" :class="role.team">
@@ -25,6 +37,7 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import Token from "./Token";
+import { lookOf, tokenOf } from "../cards";
 
 /**
  * An info card from the storyteller: what a player learns at night.
@@ -39,6 +52,12 @@ export default {
     },
   },
   computed: {
+    token: function () {
+      return tokenOf(this.card.phrase);
+    },
+    look: function () {
+      return lookOf(this.card.phrase);
+    },
     roles: function () {
       return (this.card.roles || []).map(
         (id) =>
@@ -68,9 +87,39 @@ export default {
   overflow-wrap: anywhere;
 }
 
+.token {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 14px 24px 12px;
+  border: 3px solid black;
+  border-radius: 10px;
+  background: linear-gradient(
+    to bottom,
+    var(--card-color) 0%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  box-shadow: 0 0 14px var(--card-color);
+
+  svg {
+    font-size: 40px;
+  }
+}
+
 h2 {
+  margin: 0;
   font-size: 160%;
   line-height: 1.2;
+}
+
+.choice {
+  margin: 0;
+  font-size: 120%;
+  font-weight: bold;
 }
 
 .text {

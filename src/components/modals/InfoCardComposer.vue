@@ -2,6 +2,24 @@
   <Modal class="info-card-composer" v-if="playerId" @close="close">
     <h3>{{ $t("cards.title", { name: recipientNames }) }}</h3>
 
+    <!-- what their character does tonight, as in the night order -->
+    <p class="night-reminder" v-if="nightReminder">
+      <font-awesome-icon icon="moon" />
+      <span v-html="nightReminder"></span>
+    </p>
+
+    <!-- what they were sent and answered since nightfall (or dawn) -->
+    <ul class="history" v-if="history.length">
+      <li
+        v-for="item in history"
+        :key="item.key"
+        :class="item.sent ? 'sent' : 'received'"
+      >
+        <font-awesome-icon :icon="item.sent ? 'paper-plane' : 'reply'" />
+        <span>{{ item.text }}</span>
+      </li>
+    </ul>
+
     <section>
       <h4>{{ $t("cards.to") }}</h4>
       <ul class="chips">
@@ -18,16 +36,31 @@
 
     <section>
       <h4>{{ $t("cards.phrase") }}</h4>
-      <ul class="chips">
+      <ul class="chips phrases">
         <li
           v-for="key in phrases"
           :key="key"
-          :class="{ selected: phrase === key }"
-          @click="phrase = phrase === key ? null : key"
+          :class="{ selected: token === key }"
+          :style="{ '--card-color': lookOf(key).color }"
+          @click="pickPhrase(key)"
         >
+          <font-awesome-icon :icon="lookOf(key).icon" />
           {{ $t(`cards.phrases.${key}`) }}
         </li>
       </ul>
+      <div class="choices" v-if="token === 'makeChoice'">
+        <h4>{{ $t("cards.askToChoose") }}</h4>
+        <ul class="chips">
+          <li
+            v-for="key in choices"
+            :key="key"
+            :class="{ selected: phrase === key }"
+            @click="phrase = key"
+          >
+            {{ $t(`cards.choices.${key}`) }}
+          </li>
+        </ul>
+      </div>
       <input
         class="text"
         v-model="text"
@@ -36,21 +69,6 @@
         @keyup.stop
         @keydown.stop="onKeydown"
       />
-    </section>
-
-    <!-- not cards from the game: the player answers on the seats or in chat -->
-    <section>
-      <h4>{{ $t("cards.askToChoose") }}</h4>
-      <ul class="chips">
-        <li
-          v-for="key in choices"
-          :key="key"
-          :class="{ selected: phrase === key }"
-          @click="phrase = phrase === key ? null : key"
-        >
-          {{ $t(`cards.choices.${key}`) }}
-        </li>
-      </ul>
     </section>
 
     <section>
@@ -128,27 +146,22 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
+import { CHOICES, PHRASES, lookOf, tokenOf } from "../../cards";
+import { STORYTELLER } from "../../store/modules/voice";
 
-// the game's info tokens ("youLearn" is gone, but old cards still show it)
-const PHRASES = [
-  "youAre",
-  "thisIsTheDemon",
-  "theseAreYourMinions",
-  "notInPlay",
-  "thisPlayerIs",
-  "characterSelectedYou",
-  "useAbility",
-];
-// asking the player to choose, apart from the game's tokens: they answer by
-// tapping seats (see ChoosePlayers.vue) or, for a character, in the chat
-const CHOICES = ["choosePlayer", "chooseTwoPlayers", "chooseCharacter"];
+// "Make a choice" says what to choose: an hour of the night is short
+const DEFAULT_CHOICE = "choosePlayer";
+// lines of history shown, the latest
+const HISTORY_LINES = 8;
 
 /**
  * Storyteller: write an info card for a player (phrase, characters,
- * players, number, yes/no) and send it through the private chat.
+ * players, number, yes/no) and send it through the private chat. On top,
+ * what their character does tonight and what they were sent and answered,
+ * like the official app's "Wake" window.
  */
 export default {
   components: { Modal, Token },
@@ -177,6 +190,60 @@ export default {
     scriptRoles: function () {
       return [...this.roleMap.values()];
     },
+    token: function () {
+      return tokenOf(this.phrase);
+    },
+    player: function () {
+      return this.players.find(({ id }) => id === this.playerId) || null;
+    },
+    nightReminder: function () {
+      if (!this.grimoire.isNight || !this.player) return null;
+      const { role } = this.player;
+      if (!role || !role.id) return null;
+      const localized = this.localizeRole(role);
+      const text =
+        this.grimoire.nightCount <= 1
+          ? localized.firstNightReminder
+          : localized.otherNightReminder;
+      if (!text) return null;
+      return text
+        .replace(/</g, "&lt;")
+        .replace(/\*(.*?)\*/g, "<b>$1</b>")
+        .replace(/:reminder:/g, "")
+        .trim();
+    },
+    history: function () {
+      if (!this.playerId) return [];
+      const channel = "dm:" + this.playerId;
+      const items = [];
+      this.chat.messages.forEach((message) => {
+        if (message.channel !== channel || message.at < this.chat.cardsSince)
+          return;
+        const sent = message.from === STORYTELLER;
+        const key = message.id;
+        if (!message.card) {
+          items.push({ key, sent, text: message.text });
+          return;
+        }
+        items.push({ key, sent, text: this.summary(message.card) });
+        if (message.choice) {
+          items.push({
+            key: key + "-choice",
+            sent: false,
+            text: this.$t("cards.chosen", {
+              players: message.choice.join(", "),
+            }),
+          });
+        } else if (message.seen) {
+          items.push({
+            key: key + "-seen",
+            sent: false,
+            text: this.$t("cards.gotIt"),
+          });
+        }
+      });
+      return items.slice(-HISTORY_LINES);
+    },
     isEmpty: function () {
       return (
         !this.recipients.length ||
@@ -188,7 +255,8 @@ export default {
           !this.answer)
       );
     },
-    ...mapState(["chat"]),
+    ...mapState(["chat", "grimoire"]),
+    ...mapGetters(["localizeRole", "rolesJSONbyId"]),
     ...mapState({ roleMap: "roles" }),
     ...mapState("players", ["players"]),
   },
@@ -205,6 +273,33 @@ export default {
     window.removeEventListener("keydown", this.onKeydown);
   },
   methods: {
+    lookOf,
+    pickPhrase(key) {
+      if (key !== "makeChoice") {
+        this.phrase = this.phrase === key ? null : key;
+      } else {
+        this.phrase = this.token === key ? null : DEFAULT_CHOICE;
+      }
+    },
+    // one line for the history: the token and what the card shows
+    summary(card) {
+      const parts = [];
+      if (card.phrase) {
+        parts.push(this.$t(`cards.phrases.${tokenOf(card.phrase)}`));
+        if (tokenOf(card.phrase) !== card.phrase)
+          parts.push(this.$t(`cards.choices.${card.phrase}`));
+      }
+      (card.roles || []).forEach((id) => {
+        const role = this.roleMap.get(id) || this.rolesJSONbyId.get(id);
+        parts.push(role ? this.localizeRole(role).name : id);
+      });
+      parts.push(...(card.players || []));
+      if (card.number !== null && card.number !== undefined)
+        parts.push(String(card.number));
+      if (card.answer) parts.push(this.$t(`cards.${card.answer}`));
+      if (card.text) parts.push(`«${card.text}»`);
+      return parts.join(" · ");
+    },
     emptyCard() {
       // also called from data(), before the computed properties exist
       const { composingFor } = this.$store.state.chat;
@@ -320,6 +415,56 @@ h4 {
   &.numbers li {
     min-width: 2em;
     text-align: center;
+  }
+}
+
+// each token in its colour, like the card the player gets
+.chips.phrases li {
+  border-color: var(--card-color);
+  svg {
+    margin-right: 3px;
+  }
+  &.selected {
+    border-color: white;
+    background: var(--card-color);
+  }
+}
+
+.choices {
+  margin-top: 6px;
+  h4 {
+    font-size: 85%;
+  }
+}
+
+.night-reminder {
+  margin: 0 0 8px;
+  padding: 6px 10px;
+  border-left: 3px solid $fabled;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 90%;
+  svg {
+    margin-right: 6px;
+    color: $fabled;
+  }
+}
+
+.history {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  font-size: 85%;
+  li {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+    padding: 1px 0;
+    &.sent svg {
+      color: orange;
+    }
+    &.received svg {
+      color: violet;
+    }
   }
 }
 

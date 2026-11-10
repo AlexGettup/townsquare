@@ -70,6 +70,11 @@ guided night, own live session server, and the rest of the catalogue.
 
 ### Night without talking
 
+- [x] **Cards like the official app** (unreleased): only the game's eight info tokens
+      ("Make a choice" says what to choose: 1 player, 2 players or a character), each with
+      its own colour and icon. The card window shows what the player's character does
+      tonight and what they were sent and answered since nightfall, like the official
+      "Wake" window. Waking and the quick answer buttons (good/evil, directions) not copied.
 - [x] **Practice game** (unreleased): "Practice" on the first screen sets up a game with
       made-up players, for the storyteller to rehearse alone. Info cards and the grimoire
       sent to them show up as "What Ana sees", and the storyteller answers for them (seats
