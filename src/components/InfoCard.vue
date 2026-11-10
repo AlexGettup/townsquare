@@ -1,47 +1,51 @@
 <template>
   <div class="info-card">
-    <!-- the info token, in its colour -->
-    <div
-      class="info-token"
-      v-if="card.phrase"
-      :style="{ '--card-color': look.color }"
-    >
-      <font-awesome-icon :icon="look.icon" />
-      <h2>{{ $t(`cards.phrases.${token}`) }}</h2>
+    <!-- one block per line: the token, then what goes with it -->
+    <div class="part" v-for="(part, index) in parts" :key="index">
+      <!-- the info token, in its colour -->
+      <div
+        class="info-token"
+        v-if="part.phrase"
+        :style="{ '--card-color': lookOf(part.phrase).color }"
+      >
+        <font-awesome-icon :icon="lookOf(part.phrase).icon" />
+        <h2>{{ $t(`cards.phrases.${tokenOf(part.phrase)}`) }}</h2>
+      </div>
+      <!-- "Make a choice": what to choose -->
+      <p
+        class="choice"
+        v-if="part.phrase && tokenOf(part.phrase) !== part.phrase"
+      >
+        {{ $t(`cards.phrases.${part.phrase}`) }}
+      </p>
+      <ul class="roles" v-if="part.roles.length">
+        <li v-for="(role, i) in rolesOf(part)" :key="i" :class="role.team">
+          <Token :role="role" />
+        </li>
+      </ul>
+      <ul class="players" v-if="part.players.length">
+        <li v-for="(name, i) in part.players" :key="i">{{ name }}</li>
+      </ul>
+      <div class="number" v-if="part.number !== null">
+        {{ part.number }}
+      </div>
+      <div class="answer" v-if="part.answer" :class="part.answer">
+        {{ $t(`cards.${part.answer}`) }}
+      </div>
     </div>
-    <!-- "Make a choice": what to choose -->
-    <p class="choice" v-if="token !== card.phrase">
-      {{ $t(`cards.phrases.${card.phrase}`) }}
-    </p>
     <p class="text" v-if="card.text">{{ card.text }}</p>
-    <ul class="roles" v-if="roles.length">
-      <li v-for="(role, index) in roles" :key="index" :class="role.team">
-        <Token :role="role" />
-      </li>
-    </ul>
-    <ul class="players" v-if="card.players && card.players.length">
-      <li v-for="(name, index) in card.players" :key="index">{{ name }}</li>
-    </ul>
-    <div
-      class="number"
-      v-if="card.number !== null && card.number !== undefined"
-    >
-      {{ card.number }}
-    </div>
-    <div class="answer" v-if="card.answer" :class="card.answer">
-      {{ $t(`cards.${card.answer}`) }}
-    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from "vuex";
 import Token from "./Token";
-import { lookOf, tokenOf } from "../cards";
+import { lookOf, partsOf, tokenOf } from "../cards";
 
 /**
- * An info card from the storyteller: what a player learns at night.
- * card: { phrase, text, roles: [roleId], players: [name], number, answer }
+ * An info card from the storyteller: what a player learns at night. One or
+ * more lines (see cards.js), each a token with characters, players, a number
+ * or yes/no, and free text at the end.
  */
 export default {
   components: { Token },
@@ -52,22 +56,23 @@ export default {
     },
   },
   computed: {
-    token: function () {
-      return tokenOf(this.card.phrase);
+    parts: function () {
+      return partsOf(this.card);
     },
-    look: function () {
-      return lookOf(this.card.phrase);
-    },
-    roles: function () {
-      return (this.card.roles || []).map(
+    ...mapState({ scriptRoles: "roles", otherTravellers: "otherTravellers" }),
+    ...mapGetters(["rolesJSONbyId"]),
+  },
+  methods: {
+    lookOf,
+    tokenOf,
+    rolesOf: function (part) {
+      return part.roles.map(
         (id) =>
           this.scriptRoles.get(id) ||
           this.rolesJSONbyId.get(id) ||
           this.otherTravellers.get(id) || { id, name: id },
       );
     },
-    ...mapState({ scriptRoles: "roles", otherTravellers: "otherTravellers" }),
-    ...mapGetters(["rolesJSONbyId"]),
   },
 };
 </script>
@@ -87,12 +92,25 @@ export default {
   overflow-wrap: anywhere;
 }
 
+.part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  // a gap between lines, so each token reads with its own content
+  & + .part {
+    margin-top: 10px;
+  }
+}
+
 .info-token {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  min-width: 200px;
+  // the same width for every line's token, as far as the window allows
+  width: 300px;
   max-width: 100%;
   box-sizing: border-box;
   padding: 14px 24px 12px;

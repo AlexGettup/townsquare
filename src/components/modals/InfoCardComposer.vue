@@ -34,6 +34,30 @@
       </ul>
     </section>
 
+    <!-- the message so far, line by line, like the official app -->
+    <section class="message">
+      <h4>{{ $t("cards.message") }}</h4>
+      <ol class="lines">
+        <li
+          v-for="(item, index) in lines"
+          :key="index"
+          :class="{ current: index === current }"
+          :style="{ '--card-color': lookOf(item.phrase).color }"
+          @click="current = index"
+        >
+          <font-awesome-icon :icon="lookOf(item.phrase).icon" />
+          <span class="line-text">{{ lineText(item) }}</span>
+          <font-awesome-icon
+            icon="times-circle"
+            class="remove"
+            :title="$t('cards.removeLine')"
+            @click.stop="removeLine(index)"
+          />
+        </li>
+      </ol>
+      <p class="hint">{{ $t("cards.buildHint") }}</p>
+    </section>
+
     <section>
       <h4>{{ $t("cards.phrase") }}</h4>
       <ul class="chips phrases">
@@ -54,8 +78,8 @@
           <li
             v-for="key in choices"
             :key="key"
-            :class="{ selected: phrase === key }"
-            @click="phrase = key"
+            :class="{ selected: line.phrase === key }"
+            @click="line.phrase = key"
           >
             {{ $t(`cards.choices.${key}`) }}
           </li>
@@ -77,8 +101,8 @@
         <li
           v-for="role in scriptRoles"
           :key="role.id"
-          :class="[role.team, { selected: roles.includes(role.id) }]"
-          @click="toggle(roles, role.id)"
+          :class="[role.team, { selected: line.roles.includes(role.id) }]"
+          @click="toggle(line.roles, role.id)"
         >
           <Token :role="role" />
         </li>
@@ -91,8 +115,8 @@
         <li
           v-for="(player, index) in players"
           :key="index"
-          :class="{ selected: chosenPlayers.includes(player.name) }"
-          @click="toggle(chosenPlayers, player.name)"
+          :class="{ selected: line.players.includes(player.name) }"
+          @click="toggle(line.players, player.name)"
         >
           {{ player.name }}
         </li>
@@ -103,14 +127,17 @@
       <div>
         <h4>{{ $t("cards.number") }}</h4>
         <ul class="chips numbers">
-          <li :class="{ selected: number === null }" @click="number = null">
+          <li
+            :class="{ selected: line.number === null }"
+            @click="line.number = null"
+          >
             {{ $t("cards.none") }}
           </li>
           <li
             v-for="n in 10"
             :key="n"
-            :class="{ selected: number === n - 1 }"
-            @click="number = n - 1"
+            :class="{ selected: line.number === n - 1 }"
+            @click="line.number = n - 1"
           >
             {{ n - 1 }}
           </li>
@@ -119,13 +146,22 @@
       <div>
         <h4>{{ $t("cards.answer") }}</h4>
         <ul class="chips">
-          <li :class="{ selected: answer === null }" @click="answer = null">
+          <li
+            :class="{ selected: line.answer === null }"
+            @click="line.answer = null"
+          >
             {{ $t("cards.none") }}
           </li>
-          <li :class="{ selected: answer === 'yes' }" @click="answer = 'yes'">
+          <li
+            :class="{ selected: line.answer === 'yes' }"
+            @click="line.answer = 'yes'"
+          >
             {{ $t("cards.yes") }}
           </li>
-          <li :class="{ selected: answer === 'no' }" @click="answer = 'no'">
+          <li
+            :class="{ selected: line.answer === 'no' }"
+            @click="line.answer = 'no'"
+          >
             {{ $t("cards.no") }}
           </li>
         </ul>
@@ -149,7 +185,17 @@
 import { mapGetters, mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
-import { CHOICES, PHRASES, lookOf, tokenOf } from "../../cards";
+import {
+  CHOICES,
+  MAX_PARTS,
+  PHRASES,
+  buildCard,
+  emptyPart,
+  isEmptyPart,
+  lookOf,
+  partsOf,
+  tokenOf,
+} from "../../cards";
 import { STORYTELLER } from "../../store/modules/voice";
 
 // "Make a choice" says what to choose: an hour of the night is short
@@ -190,8 +236,12 @@ export default {
     scriptRoles: function () {
       return [...this.roleMap.values()];
     },
+    // the line being written: tokens, characters, players… go into it
+    line: function () {
+      return this.lines[this.current] || this.lines[0];
+    },
     token: function () {
-      return tokenOf(this.phrase);
+      return tokenOf(this.line.phrase);
     },
     player: function () {
       return this.players.find(({ id }) => id === this.playerId) || null;
@@ -247,12 +297,7 @@ export default {
     isEmpty: function () {
       return (
         !this.recipients.length ||
-        (!this.phrase &&
-          !this.text.trim() &&
-          !this.roles.length &&
-          !this.chosenPlayers.length &&
-          this.number === null &&
-          !this.answer)
+        (!this.text.trim() && this.lines.every(isEmptyPart))
       );
     },
     ...mapState(["chat", "grimoire"]),
@@ -277,49 +322,90 @@ export default {
   },
   methods: {
     lookOf,
+    /**
+     * A token starts a new line, like the official app; on an empty line it
+     * goes into that one. Only one line can be a choice: tapping "Make a
+     * choice" again goes back to it. Tapping the token of a line with
+     * nothing else in it takes it away.
+     */
     pickPhrase(key) {
-      if (key !== "makeChoice") {
-        this.phrase = this.phrase === key ? null : key;
-      } else {
-        this.phrase = this.token === key ? null : DEFAULT_CHOICE;
+      const phrase = key === "makeChoice" ? DEFAULT_CHOICE : key;
+      const line = this.line;
+      const hasContent = !isEmptyPart({ ...line, phrase: null });
+      if (this.token === key && !hasContent) {
+        line.phrase = null;
+        return;
       }
+      if (key === "makeChoice") {
+        const choice = this.lines.findIndex((item) =>
+          CHOICES.includes(item.phrase),
+        );
+        if (choice !== -1) {
+          this.current = choice;
+          return;
+        }
+      }
+      if (!line.phrase && !hasContent) {
+        line.phrase = phrase;
+      } else if (this.lines.length < MAX_PARTS) {
+        this.lines.push(emptyPart(phrase));
+        this.current = this.lines.length - 1;
+      }
+    },
+    removeLine(index) {
+      if (this.lines.length === 1) {
+        this.lines.splice(0, 1, emptyPart());
+      } else {
+        this.lines.splice(index, 1);
+      }
+      this.current = Math.min(this.current, this.lines.length - 1);
+    },
+    // one line of the message, written out
+    lineText(line) {
+      if (isEmptyPart(line)) return this.$t("cards.emptyLine");
+      return this.partText(line);
+    },
+    partText(part) {
+      const items = [];
+      if (part.phrase) {
+        items.push(this.$t(`cards.phrases.${tokenOf(part.phrase)}`));
+        if (tokenOf(part.phrase) !== part.phrase)
+          items.push(this.$t(`cards.choices.${part.phrase}`));
+      }
+      part.roles.forEach((id) => {
+        const role = this.roleMap.get(id) || this.rolesJSONbyId.get(id);
+        items.push(role ? this.localizeRole(role).name : id);
+      });
+      items.push(...part.players);
+      if (part.number !== null) items.push(String(part.number));
+      if (part.answer) items.push(this.$t(`cards.${part.answer}`));
+      return items.join(" · ");
     },
     // one line for the history: the token and what the card shows
     summary(card) {
-      const parts = [];
-      if (card.phrase) {
-        parts.push(this.$t(`cards.phrases.${tokenOf(card.phrase)}`));
-        if (tokenOf(card.phrase) !== card.phrase)
-          parts.push(this.$t(`cards.choices.${card.phrase}`));
-      }
-      (card.roles || []).forEach((id) => {
-        const role = this.roleMap.get(id) || this.rolesJSONbyId.get(id);
-        parts.push(role ? this.localizeRole(role).name : id);
-      });
-      parts.push(...(card.players || []));
-      if (card.number !== null && card.number !== undefined)
-        parts.push(String(card.number));
-      if (card.answer) parts.push(this.$t(`cards.${card.answer}`));
-      if (card.text) parts.push(`«${card.text}»`);
-      return parts.join(" · ");
+      const lines = partsOf(card).map((part) => this.partText(part));
+      if (card.text) lines.push(`«${card.text}»`);
+      return lines.join(" / ");
     },
     emptyCard() {
       // also called from data(), before the computed properties exist
       const { composingFor, composePreset } = this.$store.state.chat;
-      // the guided night opens it filled in, maybe for several players
+      // the guided night opens it for several players (maybe filled in)
       const card = (composePreset && composePreset.card) || {};
+      const lines = partsOf(card).map((part) => ({
+        ...part,
+        roles: [...part.roles],
+        players: [...part.players],
+      }));
       return {
         recipients: composePreset
           ? [...composePreset.to]
           : composingFor
             ? [composingFor]
             : [],
-        phrase: card.phrase || null,
+        lines: lines.length ? lines : [emptyPart()],
+        current: 0,
         text: card.text || "",
-        roles: [...(card.roles || [])],
-        chosenPlayers: [...(card.players || [])],
-        number: card.number === undefined ? null : card.number,
-        answer: card.answer || null,
       };
     },
     // Enter sends the card, anywhere in the window
@@ -336,24 +422,12 @@ export default {
     send() {
       if (this.isEmpty) return;
       // the same card to each one, in their own private chat
-      const card = {
-        phrase: this.phrase,
-        text: this.text.trim(),
-        roles: this.roles,
-        players: this.chosenPlayers,
-        number: this.number,
-        answer: this.answer,
-      };
       this.seatedPlayers
         .filter(({ id }) => this.recipients.includes(id))
         .forEach(({ id }) => {
           this.$store.dispatch("chat/sendCard", {
             to: id,
-            card: {
-              ...card,
-              roles: [...card.roles],
-              players: [...card.players],
-            },
+            card: buildCard(this.lines, this.text),
           });
         });
       this.close();
@@ -436,6 +510,47 @@ h4 {
   &.selected {
     border-color: white;
     background: var(--card-color);
+  }
+}
+
+// the message being built: one row per line, the current one highlighted
+.message {
+  .lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 2px solid var(--card-color);
+      background: rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      font-size: 90%;
+      &.current {
+        border-color: white;
+        box-shadow: 0 0 8px var(--card-color);
+      }
+      .line-text {
+        flex: 1;
+      }
+      .remove {
+        opacity: 0.6;
+        &:hover {
+          opacity: 1;
+          color: red;
+        }
+      }
+    }
+  }
+  .hint {
+    margin: 2px 0 0;
+    font-size: 75%;
+    color: lightgray;
+    text-align: left;
   }
 }
 

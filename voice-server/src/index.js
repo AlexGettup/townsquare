@@ -116,30 +116,51 @@ const listOf = (value, max, length) =>
     .map((item) => shortString(item, length))
     .filter(Boolean);
 
-/**
- * Info card from the storyteller: a preset phrase and/or text, characters
- * (role IDs), players (names) and a number or yes/no. Returns null if empty.
- */
-const cleanCard = (card) => {
-  if (!card || typeof card !== "object") return null;
+// lines of one info card ("These are your minions: …" + "Not in play: …")
+const MAX_CARD_PARTS = 6;
+
+/** One line of an info card: a preset phrase, characters, players, a number, yes/no. */
+const cleanPart = (part) => {
+  if (!part || typeof part !== "object") return null;
   const clean = {
-    phrase: shortString(card.phrase, 40) || null,
-    text: shortString(card.text, 300).trim() || null,
-    roles: listOf(card.roles, 12, 60),
-    players: listOf(card.players, 20, 60),
-    number: Number.isInteger(card.number)
-      ? Math.max(0, Math.min(99, card.number))
+    phrase: shortString(part.phrase, 40) || null,
+    roles: listOf(part.roles, 12, 60),
+    players: listOf(part.players, 20, 60),
+    number: Number.isInteger(part.number)
+      ? Math.max(0, Math.min(99, part.number))
       : null,
-    answer: card.answer === "yes" || card.answer === "no" ? card.answer : null,
+    answer: part.answer === "yes" || part.answer === "no" ? part.answer : null,
   };
   const empty =
     !clean.phrase &&
-    !clean.text &&
     !clean.roles.length &&
     !clean.players.length &&
     clean.number === null &&
     !clean.answer;
   return empty ? null : clean;
+};
+
+/**
+ * Info card from the storyteller: its lines (`parts`), free text, and the
+ * main line's fields at the top level (the one to answer, if any; what
+ * clients from before parts existed show). Returns null if empty.
+ */
+const cleanCard = (card) => {
+  if (!card || typeof card !== "object") return null;
+  const parts = (Array.isArray(card.parts) ? card.parts : [])
+    .slice(0, MAX_CARD_PARTS)
+    .map(cleanPart)
+    .filter(Boolean);
+  const main = cleanPart(card) || {
+    phrase: null,
+    roles: [],
+    players: [],
+    number: null,
+    answer: null,
+  };
+  const text = shortString(card.text, 300).trim() || null;
+  if (!text && !parts.length && !cleanPart(card)) return null;
+  return parts.length ? { ...main, text, parts } : { ...main, text };
 };
 // clients connected before conversations existed lack these fields
 const withDefaults = (state) => ({
