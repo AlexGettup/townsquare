@@ -486,7 +486,11 @@
     "sendAndClose": "Enviar y cerrar",
     "grimoire": "{name} ve el grimorio como lo tienes ahora: el personaje real de cada uno, los recordatorios y los faroles del Demonio, hasta que lo cierre o se haga de día.",
     "closeAs": "Cerrar como {name}",
-    "seeAll": "Cerrar todo como visto"
+    "seeAll": "Cerrar todo como visto",
+    "nominate": "Nominación al azar",
+    "nominateHint": "Un jugador inventado nomina a otro, los dos al azar",
+    "random": "Al azar",
+    "allRandom": "Todos al azar"
   },
   "pointing": {
     "title": "Votación señalando",

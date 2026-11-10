@@ -105,6 +105,26 @@ const actions = {
     });
   },
   /**
+   * Storyteller: one player nominates another (seat indexes). Both get their
+   * mark next to the name until the day ends (synced to the players).
+   */
+  nominate({ commit, rootState }, [from, to]) {
+    commit("nomination", { nomination: [from, to] });
+    const { players } = rootState.players;
+    [
+      [players[from], "hasNominated"],
+      [players[to], "wasNominated"],
+    ].forEach(([player, property]) => {
+      if (player && !player[property]) {
+        commit(
+          "players/update",
+          { player, property, value: true },
+          { root: true },
+        );
+      }
+    });
+  },
+  /**
    * Storyteller: end the game. Everyone sees the winner and the grimoire as it
    * is now, by day, back in the plaza.
    */

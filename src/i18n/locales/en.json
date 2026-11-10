@@ -486,7 +486,11 @@
     "sendAndClose": "Send and close",
     "grimoire": "{name} sees the grimoire as you have it now: everyone's real character, the reminders and the Demon's bluffs, until they close it or day comes.",
     "closeAs": "Close as {name}",
-    "seeAll": "Close all as seen"
+    "seeAll": "Close all as seen",
+    "nominate": "Random nomination",
+    "nominateHint": "A made-up player nominates another, both at random",
+    "random": "At random",
+    "allRandom": "All at random"
   },
   "pointing": {
     "title": "Pointing vote",

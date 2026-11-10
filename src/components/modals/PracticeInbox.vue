@@ -32,6 +32,10 @@
           >
             {{ $t("practice.answer") }}
           </div>
+          <div class="button" @click="answerAtRandom(item)">
+            <font-awesome-icon icon="dice" />
+            {{ $t("practice.random") }}
+          </div>
           <div class="button" @click="done">{{ $t("cards.later") }}</div>
         </div>
       </template>
@@ -47,6 +51,14 @@
         <div class="button-group">
           <div class="button townsfolk" @click="done">
             {{ reply.trim() ? $t("practice.sendAndClose") : $t("cards.gotIt") }}
+          </div>
+          <div
+            class="button"
+            v-if="randomAnswerOf(message)"
+            @click="answerAtRandom(item)"
+          >
+            <font-awesome-icon icon="dice" />
+            {{ $t("practice.random") }}
           </div>
         </div>
       </template>
@@ -67,6 +79,10 @@
 
     <div class="button-group skip" v-if="inbox.length > 1">
       <div class="button" @click="doneAll">{{ $t("practice.seeAll") }}</div>
+      <div class="button" @click="allAtRandom">
+        <font-awesome-icon icon="dice" />
+        {{ $t("practice.allRandom") }}
+      </div>
     </div>
   </Modal>
 </template>
@@ -75,6 +91,8 @@
 import { mapGetters, mapState } from "vuex";
 import Modal from "./Modal";
 import InfoCard from "../InfoCard";
+import { partsOf } from "../../cards";
+import { pickAtRandom } from "../../store/modules/practice";
 
 // cards answered by tapping seats: how many to pick
 const SEATS_TO_CHOOSE = {
@@ -87,7 +105,8 @@ const SEATS_TO_CHOOSE = {
 /**
  * Practice game: what a made-up player received (an info card, the grimoire),
  * one at a time. The storyteller acts for them: closing it is the player
- * seeing it, and they can pick seats or write back.
+ * seeing it, and they can pick seats or write back. "At random" answers a
+ * choice for them: seats, a character, or yes or no to using their ability.
  */
 export default {
   components: { Modal, InfoCard },
@@ -120,6 +139,12 @@ export default {
     // anyone can be picked, themselves and the dead included
     names() {
       return this.players.map(({ name }) => name);
+    },
+    // characters a player could name: the script's, without travellers
+    scriptRoleNames() {
+      return [...this.$store.state.roles.values()]
+        .filter(({ team }) => team !== "traveller" && team !== "fabled")
+        .map((role) => this.$store.getters.localizeRole(role).name);
     },
   },
   watch: {
@@ -171,6 +196,59 @@ export default {
     doneAll() {
       this.done();
       [...this.inbox].forEach((item) => this.finish(item));
+    },
+    messageOf(item) {
+      if (item.kind !== "card") return null;
+      return (
+        this.$store.state.chat.messages.find(
+          ({ id }) => id === item.messageId,
+        ) || null
+      );
+    },
+    /**
+     * What a made-up player answers at random to this card, or null when it
+     * asks nothing: { seats: [names] } or { text }.
+     */
+    randomAnswerOf(message) {
+      if (!message || !message.card) return null;
+      const seats = SEATS_TO_CHOOSE[message.card.phrase];
+      if (seats) {
+        const names = [...this.names];
+        const picked = [];
+        while (picked.length < seats && names.length) {
+          picked.push(names.splice(Math.random() * names.length, 1)[0]);
+        }
+        return picked.length === seats ? { seats: picked } : null;
+      }
+      const phrases = [
+        message.card.phrase,
+        ...partsOf(message.card).map(({ phrase }) => phrase),
+      ];
+      if (phrases.includes("chooseCharacter") && this.scriptRoleNames.length) {
+        return { text: pickAtRandom(this.scriptRoleNames) };
+      }
+      if (phrases.includes("useAbility")) {
+        return {
+          text: this.$t(Math.random() < 0.5 ? "cards.yes" : "cards.no"),
+        };
+      }
+      return null;
+    },
+    // answer for them at random (if the card asks something), then close it
+    answerAtRandom(item) {
+      const message = this.messageOf(item);
+      const answer = this.randomAnswerOf(message);
+      if (answer && answer.seats) {
+        this.$store.$chat.seenBy(message.id);
+        this.$store.$chat.answerAs(message.id, answer.seats);
+        this.$store.commit("practice/close", item.id);
+        return;
+      }
+      if (answer) this.$store.$chat.writeAs(item.playerId, answer.text);
+      this.finish(item);
+    },
+    allAtRandom() {
+      [...this.inbox].forEach((item) => this.answerAtRandom(item));
     },
   },
 };
