@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.24.0",
+    "date": "2026-11-10",
+    "title": {
+      "en": "Guided night",
+      "es": "Noche guiada"
+    },
+    "en": [
+      "Storyteller: at night a panel tells you whose turn it is, in night order, and lights up their seat. From there you wake them, send them an info card and see their answer",
+      "Info cards can have several lines, like the official ones: \"These are your minions: Ana, Belén\" and \"These characters are not in play: …\" in the same card",
+      "Info cards: characters are centred properly now"
+    ],
+    "es": [
+      "Narrador: por la noche, un panel te dice a quién le toca, en el orden de la noche, y le ilumina el asiento. Desde ahí le despiertas, le envías una tarjeta y ves su respuesta",
+      "Las tarjetas de información pueden tener varias líneas, como las oficiales: «Estos son tus Esbirros: Ana, Belén» y «Estos personajes no están en juego: …» en la misma tarjeta",
+      "Tarjetas de información: los personajes ya salen bien centrados"
+    ]
+  },
+  {
     "version": "3.23.1",
     "date": "2026-11-10",
     "title": {

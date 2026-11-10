@@ -41,6 +41,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.21.0** Show the grimoire to a player at night (Spy)
 - **3.22.0** Background noise suppression and voice gate in voice chat, like Discord
 - **3.23.0** Practice game; info cards like the official app; audio settings in the menu
+- **3.24.0** Guided night for the storyteller; info cards built line by line
 
 ## Planned
 
@@ -76,9 +77,9 @@ own live session server, and the rest of the catalogue.
       its own colour and icon. The card window shows what the player's character does
       tonight and what they were sent and answered since nightfall, like the official
       "Wake" window. Waking and the quick answer buttons (good/evil, directions) not copied.
-- [x] **Cards built line by line, like the official app** (unreleased, needs the voice server
-      deployed first): each token tapped starts a line, and the characters, players or number
-      picked next go into it, so one card can say "These are your minions: Ana, Belén" and
+- [x] **Cards built line by line, like the official app** (3.24.0): each token tapped starts a line,
+      and the characters, players or number picked next go into it, so one card can say
+      "These are your minions: Ana, Belén" and
       "These characters are not in play: …". Up to 6 lines, one of them a choice at most.
       Older cards show as one line; older apps see the main line.
 - [x] **Practice game** (3.23.0): "Practice" on the first screen sets up a game with
@@ -97,7 +98,7 @@ own live session server, and the rest of the catalogue.
       one is struck through.
 - [x] **Choose targets on screen** *(official)* (3.15.0): the storyteller asks "choose a player" (or two)
       and the player taps the seats on their device (Monk, Poisoner, Demon…).
-- [x] **Guided night for the storyteller** (unreleased): at nightfall a panel steps through
+- [x] **Guided night for the storyteller** (3.24.0): at nightfall a panel steps through
       tonight's night order, only the characters in play with their players (dead ones skipped
       unless their text is about dying); the current seat glows on the town square. Each step:
       wake, open the card window for them (empty: the storyteller decides what to send), the
