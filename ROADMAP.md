@@ -60,13 +60,17 @@ Nothing planned yet. Candidates: analyse joining voice and text chat, game diary
 own live session server, and the rest of the catalogue.
 
 Added 2026-11-10 from the official app (its tutorial video and the special features of its
-character data), not decided yet: cards that fill themselves, "thinks they are…" (Lunatic,
-Drunk, Marionette), quick answers for players, edit the grimoire before showing it, marks on
-the night order sheet, open eyes at night, pointing and hidden votes, vote multiplier from a
-reminder, give back ghost votes, public reminders, end-of-game reveal from a reminder,
-whispers between neighbours, character selection rules, a key to call everyone to the plaza.
-My suggested order: cards that fill themselves, "thinks they are…", quick answers, edit the
-grimoire, then the votes.
+character data), not decided yet: cards that fill themselves, quick answers for players,
+edit the grimoire before showing it, marks on the night order sheet, open eyes at night,
+pointing and hidden votes, vote multiplier from a reminder, give back ghost votes, public
+reminders, character selection rules, a key to call everyone to the plaza. Also, the owner's
+idea: dim the seats of people who aren't in your place right now. My suggested order: cards
+that fill themselves, quick answers, edit the grimoire, then the votes.
+
+Discarded 2026-11-10: "thinks they are…" for the Lunatic, Drunk and Marionette (the
+storyteller handles the grimoire), whispers only between neighbours (players can already
+write to each other while in a conversation), the end-of-game reveal from a reminder, and
+panels you can drag around the screen.
 
 ### Phones and tablets
 
@@ -124,13 +128,6 @@ grimoire, then the votes.
       Demon's player, "These are your minions" the Minions, "These characters are not in
       play" the Demon's bluffs. Only a suggestion the storyteller can change before sending:
       the Lunatic gets made-up minions. Saves most of the first night's taps.
-- [ ] **"Thinks they are…"** (Lunatic, Drunk, Marionette): an entry in the seat menu. The
-      grimoire keeps the real token (Lunatic) with "thinks they are: Imp" under it, and
-      sending characters, reconnecting or dealing again always sends that player what they
-      think they are. Today it works only in the right order (Demon token on the seat, send,
-      change it to Lunatic), and "Deal and send" or sending characters again tells the
-      Lunatic the truth. Minimum version: a warning when sending would change what a player
-      was told ("Ana will get Lunatic, she got Imp before").
 - [ ] **Quick answers for players** *(official)*: buttons on the card to answer without typing
       (Got it, Yes/No, Good/Evil, Clockwise/Anticlockwise, 0–5, a player, a character). The
       official app also lets a script add its own answers and its own storyteller cards.
@@ -170,19 +167,12 @@ cards, because characters like the Lunatic make an automatic version misleading.
       vote to every dead player.
 - [ ] **Public reminders** *(official)*: some characters' reminders are seen by every player
       (only the storyteller places them).
-- [ ] **Whispers between neighbours** *(official)*: by day a player can only send a private
-      text message to the players sitting next to them, and everyone sees an envelope fly
-      between the two seats, without the text, like a whisper in a game in person. Changes how
-      the game is played: to decide.
 - [ ] **Key to call everyone to the plaza** *(official)*: the "Call to the plaza" button
       exists; the official app also has a key (R). Our R opens the reference sheet.
 - [x] **End of game and grimoire reveal** *(official)* (3.20.0): the storyteller ends the game and
       declares the winning team (Good or Evil); everyone sees the result and the full
       grimoire (real characters, reminders and demon bluffs), and voice brings everyone back to
       the plaza to talk about it.
-- [ ] **Reveal from a reminder** *(official)* (Drunk, Philosopher): a reminder such as "Is
-      the Drunk" or "Is the Philosopher" makes the end-of-game grimoire show that character
-      instead of the token on the seat. Check first what 3.20.0 already does with the Drunk.
 
 ### For players
 
@@ -242,6 +232,9 @@ Ranked with the same criteria as the [next steps](#next-steps).
       place; at night the same list wakes and puts to sleep. A side panel that folds on
       computers, the bottom panel on touch screens. Volume goes in a name's options, and
       the choice of microphone and speaker in the controls on top.
+- [ ] **Dim who isn't with you**: the seats of the people who aren't in your place right now
+      are dimmed on the town square, whether they left for a private conversation or room, or
+      you are in one and they stayed in the plaza. Shows at a glance who can hear you.
 - [ ] **Voice and text chat together** (to analyse after the voice panel): text chat also
       follows the places (a private conversation has its own chat), so one communication
       panel with each place's people and messages may be clearer than two panels. Decide
@@ -279,9 +272,6 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 - [x] Red Herring reminder: official data says "Pista falsa" (token) but "SEÑUELO" (night text).
       Decided to keep the official translations as they are.
-
-Not planned: **panels you can drag around the screen** *(official)* (chat, voice, bluffs,
-fabled). They don't help on phones, where the panels are bottom sheets.
 
 ## Notes
 
