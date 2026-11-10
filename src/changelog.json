@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.23.1",
+    "date": "2026-11-10",
+    "title": {
+      "en": "Centred info cards",
+      "es": "Tarjetas centradas"
+    },
+    "en": [
+      "Info cards: characters and player names are centred again",
+      "First screen: removed the line about preparing a game from the menu, which was confusing next to \"Practice\""
+    ],
+    "es": [
+      "Tarjetas de información: los personajes y los nombres de jugadores vuelven a salir centrados",
+      "Pantalla de inicio: quitada la frase sobre preparar una partida desde el menú, que confundía junto a «Practicar»"
+    ]
+  },
+  {
     "version": "3.23.0",
     "date": "2026-11-10",
     "title": {

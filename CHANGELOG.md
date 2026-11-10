@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.23.1
+- Info cards: character tokens and player names are centred again (they were pushed to the right, also in the practice game's "What Ana sees")
+- First screen: removed the line about preparing a game without connecting from the menu, which read as if the practice game was there
+
 ### Version 3.23.0
 - Practice game: "Practice" on the first screen sets up a game with made-up players, for the Storyteller to rehearse alone. Info cards and the grimoire sent to them show up as "What Ana sees", and the Storyteller answers for them (seats chosen, a reply in the private chat), with the usual sent, seen and answered marks on the seats. In votes they raise hands at random. "Practice · Leave" in the top left corner ends it; creating or joining a real game ends it too
 - Info cards like the official app: only the game's eight info tokens, each with its own colour and icon. "Make a choice" says what to choose: 1 player, 2 players or a character. "You learn" is gone
