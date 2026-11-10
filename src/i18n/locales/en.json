@@ -167,6 +167,10 @@
     "later": "Later",
     "notSent": "It didn't arrive. Try again",
     "chosen": "Chosen: {players}",
+    "message": "Message",
+    "removeLine": "Remove line",
+    "emptyLine": "Empty line: pick a token, characters or players",
+    "buildHint": "Each token starts a new line; what you pick next goes into the highlighted line. Tap a line to go back to it.",
     "askToChoose": "What to choose",
     "choices": {
       "choosePlayer": "1 player",

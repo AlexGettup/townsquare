@@ -2,6 +2,10 @@
   <div class="choose-players" v-if="isPicking">
     <div class="what">
       <h3>{{ $t(`cards.phrases.${message.card.phrase}`) }}</h3>
+      <!-- the card's other lines, still in view while choosing -->
+      <p class="other" v-for="(line, index) in otherLines" :key="index">
+        {{ line }}
+      </p>
       <p class="text" v-if="message.card.text">{{ message.card.text }}</p>
       <p class="picked" :class="{ empty: !chat.picked.length }">
         {{ chat.picked.join(", ") || $t("cards.tapSeat") }}
@@ -36,6 +40,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
+import { CHOICES, describePart, partsOf } from "../cards";
 
 /**
  * Player answering a "choose a player" card: this box sits outside the
@@ -46,6 +51,18 @@ export default {
   computed: {
     message: function () {
       return this.shownMessage;
+    },
+    otherLines: function () {
+      const roleName = (id) => {
+        const role =
+          this.$store.state.roles.get(id) ||
+          this.$store.getters.rolesJSONbyId.get(id) ||
+          this.$store.state.otherTravellers.get(id);
+        return role ? this.$store.getters.localizeRole(role).name : id;
+      };
+      return partsOf(this.message.card)
+        .filter((part) => !CHOICES.includes(part.phrase))
+        .map((part) => describePart(part, (key) => this.$t(key), roleName));
     },
     canConfirm: function () {
       return (
@@ -111,6 +128,12 @@ export default {
     gap: 10px;
     text-align: left;
   }
+}
+
+.other {
+  margin: 0;
+  font-size: 85%;
+  color: lightgray;
 }
 
 .what,

@@ -40,3 +40,79 @@ export const tokenOf = (phrase) =>
 
 /** { color, icon } of a card's token. */
 export const lookOf = (phrase) => LOOKS[tokenOf(phrase)] || PLAIN;
+
+/**
+ * A card is built line by line, like the official app: each line a token
+ * with its characters, players, number or yes/no ("These are your minions:
+ * Ana, Belén" + "These characters are not in play: …"). Only one line can
+ * be a choice, the one the player answers.
+ */
+export const MAX_PARTS = 6;
+
+export const emptyPart = (phrase = null) => ({
+  phrase,
+  roles: [],
+  players: [],
+  number: null,
+  answer: null,
+});
+
+export const isEmptyPart = (part) =>
+  !part.phrase &&
+  !part.roles.length &&
+  !part.players.length &&
+  part.number === null &&
+  !part.answer;
+
+/** A card's lines; cards from before lines existed are one line. */
+export const partsOf = (card) =>
+  card.parts && card.parts.length
+    ? card.parts
+    : [
+        {
+          phrase: card.phrase || null,
+          roles: card.roles || [],
+          players: card.players || [],
+          number: card.number === undefined ? null : card.number,
+          answer: card.answer || null,
+        },
+      ].filter((part) => !isEmptyPart(part));
+
+/**
+ * The card to send from its lines and text. The main line (the choice, or
+ * else the first) also goes at the top level: the server reads the choice
+ * there, and older clients show that line.
+ */
+export const buildCard = (parts, text) => {
+  const lines = parts.filter((part) => !isEmptyPart(part));
+  const main =
+    lines.find((part) => CHOICES.includes(part.phrase)) ||
+    lines[0] ||
+    emptyPart();
+  const copy = (part) => ({
+    ...part,
+    roles: [...part.roles],
+    players: [...part.players],
+  });
+  return {
+    ...copy(main),
+    text: text.trim(),
+    parts: lines.map(copy),
+  };
+};
+
+/**
+ * One line written out: "These are your minions: Ana, Belén". `t` is the
+ * i18n function, `roleName(id)` gives a character's name.
+ */
+export const describePart = (part, t, roleName) => {
+  const items = [
+    ...part.roles.map(roleName),
+    ...part.players,
+    ...(part.number !== null ? [String(part.number)] : []),
+    ...(part.answer ? [t(`cards.${part.answer}`)] : []),
+  ].join(", ");
+  if (!part.phrase) return items;
+  const phrase = t(`cards.phrases.${part.phrase}`);
+  return items ? `${phrase}: ${items}` : phrase;
+};

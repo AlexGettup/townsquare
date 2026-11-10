@@ -96,6 +96,7 @@ import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
 import { PLACE_TAB, isRoleCard } from "../store/modules/chat";
 import { STORYTELLER } from "../store/modules/voice";
+import { partsOf } from "../cards";
 
 /**
  * Text chat panel (bottom right): what is said around us, and the private
@@ -179,11 +180,15 @@ export default {
       }
     },
     isRoleCard,
+    // the first line's phrase (the link to open the card)
     cardSummary(card) {
-      if (card.phrase) return this.$t(`cards.phrases.${card.phrase}`);
+      const [first] = partsOf(card);
+      if (first && first.phrase)
+        return this.$t(`cards.phrases.${first.phrase}`);
       return this.$t("cards.card");
     },
-    // what the card says, written out: text, characters, players, number…
+    // what the card says, written out: each line's characters, players,
+    // number…, the next lines with their phrase, then the text
     cardDetails(card) {
       const roleName = (id) => {
         const role =
@@ -192,19 +197,20 @@ export default {
           this.$store.state.otherTravellers.get(id);
         return role ? this.$store.getters.localizeRole(role).name : id;
       };
-      const parts = [];
-      if (card.text) parts.push(card.text);
-      if (card.roles && card.roles.length) {
-        parts.push(card.roles.map(roleName).join(", "));
-      }
-      if (card.players && card.players.length) {
-        parts.push(card.players.join(", "));
-      }
-      if (card.number !== null && card.number !== undefined) {
-        parts.push(String(card.number));
-      }
-      if (card.answer) parts.push(this.$t(`cards.${card.answer}`));
-      return parts.length ? "— " + parts.join(" · ") : "";
+      const lines = partsOf(card).map((part, index) => {
+        const items = [];
+        if (part.roles.length) items.push(part.roles.map(roleName).join(", "));
+        if (part.players.length) items.push(part.players.join(", "));
+        if (part.number !== null) items.push(String(part.number));
+        if (part.answer) items.push(this.$t(`cards.${part.answer}`));
+        const content = items.join(" · ");
+        if (index === 0 || !part.phrase) return content;
+        const phrase = this.$t(`cards.phrases.${part.phrase}`);
+        return content ? `${phrase}: ${content}` : phrase;
+      });
+      if (card.text) lines.push(card.text);
+      const details = lines.filter(Boolean);
+      return details.length ? "— " + details.join(" · ") : "";
     },
     time(at) {
       return new Date(at).toLocaleTimeString(this.grimoire.locale, {

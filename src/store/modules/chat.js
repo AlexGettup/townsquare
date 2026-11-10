@@ -14,7 +14,9 @@ export const dmTab = (playerId) => "dm:" + playerId;
 export const tabOf = (message) =>
   message.channel.startsWith("dm:") ? message.channel : PLACE_TAB;
 // a card telling a player their character: the latest one is the valid one
-export const isRoleCard = ({ card }) => !!card && card.phrase === "youAre";
+// the card sent when dealing: "You are" and nothing else
+export const isRoleCard = ({ card }) =>
+  !!card && card.phrase === "youAre" && (!card.parts || card.parts.length <= 1);
 // cards the player answers by tapping seats: how many they have to pick
 const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
 const seatsToChoose = ({ card }) => (card && SEATS_TO_CHOOSE[card.phrase]) || 0;

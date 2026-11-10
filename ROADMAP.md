@@ -76,6 +76,11 @@ own live session server, and the rest of the catalogue.
       its own colour and icon. The card window shows what the player's character does
       tonight and what they were sent and answered since nightfall, like the official
       "Wake" window. Waking and the quick answer buttons (good/evil, directions) not copied.
+- [x] **Cards built line by line, like the official app** (unreleased, needs the voice server
+      deployed first): each token tapped starts a line, and the characters, players or number
+      picked next go into it, so one card can say "These are your minions: Ana, Belén" and
+      "These characters are not in play: …". Up to 6 lines, one of them a choice at most.
+      Older cards show as one line; older apps see the main line.
 - [x] **Practice game** (3.23.0): "Practice" on the first screen sets up a game with
       made-up players, for the storyteller to rehearse alone. Info cards and the grimoire
       sent to them show up as "What Ana sees", and the storyteller answers for them (seats

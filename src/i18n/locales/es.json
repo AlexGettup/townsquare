@@ -167,6 +167,10 @@
     "later": "Más tarde",
     "notSent": "No ha llegado. Inténtalo de nuevo",
     "chosen": "Elegido: {players}",
+    "message": "Mensaje",
+    "removeLine": "Quitar línea",
+    "emptyLine": "Línea vacía: elige una ficha, personajes o jugadores",
+    "buildHint": "Cada ficha empieza una línea nueva; lo que elijas después va a la línea marcada. Toca una línea para volver a ella.",
     "askToChoose": "Qué tiene que elegir",
     "choices": {
       "choosePlayer": "1 jugador",
