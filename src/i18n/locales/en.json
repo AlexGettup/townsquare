@@ -222,7 +222,9 @@
     "hosted": "Game created. The players' link is copied: share it. It is also in the menu, under “Live Session”.",
     "joined": "You're in! Tap a free seat and choose “Claim seat”.",
     "waiting": "Waiting for the Storyteller in session {code}. If nothing appears, check the code.",
-    "footer": "This project is free and open source and can be found on {github}. It is not affiliated with The Pandemonium Institute. \"Blood on the Clocktower\" is a trademark of Steven Medway and The Pandemonium Institute."
+    "footer": "This project is free and open source and can be found on {github}. It is not affiliated with The Pandemonium Institute. \"Blood on the Clocktower\" is a trademark of Steven Medway and The Pandemonium Institute.",
+    "practice": "Practice",
+    "practiceHint": "Rehearse a game on your own, with made-up players: what you send them shows up for you."
   },
   "gameOver": {
     "good": "Good wins!",
@@ -428,5 +430,21 @@
       "exile": "Exile",
       "execution": "Execution"
     }
+  },
+  "practice": {
+    "names": "Alice,Ben,Clara,Dan,Emma,Finn,Grace,Harry,Isla,Jack,Kate,Leo,Mia,Noah,Olivia,Paul,Quinn,Rose,Sam,Tom",
+    "started": "Practice game: deal characters, and send info or the grimoire from each player's menu. What they receive shows up for you.",
+    "badge": "Practice",
+    "leave": "Leave",
+    "leaveConfirm": "Leave the practice? The practice game is deleted.",
+    "sees": "What {name} sees",
+    "count": "And {count} more after this one",
+    "choose": "Answer for {name}: choose a player | Answer for {name}: choose {count} players",
+    "answer": "Answer",
+    "reply": "{name}'s reply in the private chat (optional)",
+    "sendAndClose": "Send and close",
+    "grimoire": "{name} sees the grimoire as you have it now: everyone's real character, the reminders and the Demon's bluffs, until they close it or day comes.",
+    "closeAs": "Close as {name}",
+    "seeAll": "Close all as seen"
   }
 }

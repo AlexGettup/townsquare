@@ -4,6 +4,7 @@ import persistence from "./persistence";
 import socket from "./socket";
 import voicePlugin from "./voice";
 import chatPlugin from "./chat";
+import practicePlugin from "./practice";
 import notesPlugin from "./notes";
 import wakeLockPlugin from "./wakeLock";
 import alertsPlugin from "./alerts";
@@ -13,6 +14,7 @@ import voice from "./modules/voice";
 import chat from "./modules/chat";
 import alerts from "./modules/alerts";
 import notes from "./modules/notes";
+import practice from "./modules/practice";
 import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
 import nightJSON from "../nightsheet.json";
@@ -131,6 +133,7 @@ export default new Vuex.Store({
     chat,
     alerts,
     notes,
+    practice,
   },
   state: {
     grimoire: {
@@ -485,6 +488,7 @@ export default new Vuex.Store({
     socket,
     voicePlugin,
     chatPlugin,
+    practicePlugin,
     wakeLockPlugin,
     alertsPlugin,
     notesPlugin,

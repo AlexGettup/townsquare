@@ -1,7 +1,7 @@
 <template>
   <div
     class="chat"
-    v-if="voice.isAvailable && session.sessionId"
+    v-if="(voice.isAvailable && session.sessionId) || practice.active"
     :class="{ closed: !chat.isOpen }"
   >
     <h3 @click="!chat.isOpen && setOpen(true)">
@@ -146,7 +146,7 @@ export default {
         this.chat.tab === PLACE_TAB
       );
     },
-    ...mapState(["chat", "voice", "session", "grimoire"]),
+    ...mapState(["chat", "voice", "session", "grimoire", "practice"]),
     ...mapGetters("chat", [
       "isConnected",
       "messagesOf",

@@ -361,7 +361,10 @@
                   <font-awesome-icon icon="address-card" />
                   {{ $t("cards.send") }}
                 </li>
-                <li @click="showGrimoire" v-if="session.sessionId && player.id">
+                <li
+                  @click="showGrimoire"
+                  v-if="(session.sessionId || practice.active) && player.id"
+                >
                   <font-awesome-icon icon="book-open" />
                   {{ $t("player.showGrimoire") }}
                 </li>
@@ -546,17 +549,18 @@ export default {
   },
   computed: {
     ...mapState("players", ["players"]),
-    ...mapState(["grimoire", "session", "voice", "chat"]),
+    ...mapState(["grimoire", "session", "voice", "chat", "practice"]),
     ...mapGetters("chat", ["isPicking"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
-    // storyteller: info cards go to seated players through the chat
+    // storyteller: info cards go to seated players through the chat (in a
+    // practice game, to the made-up players)
     canSendInfoCard: function () {
       return (
         !this.session.isSpectator &&
-        !!this.session.sessionId &&
         !!this.player.id &&
-        this.voice.isAvailable
+        ((!!this.session.sessionId && this.voice.isAvailable) ||
+          this.practice.active)
       );
     },
     cardStatus: function () {

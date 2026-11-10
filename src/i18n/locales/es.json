@@ -222,7 +222,9 @@
     "hosted": "Partida creada. El enlace para los jugadores está copiado: compártelo. También lo tienes en el menú, en «Sesión en vivo».",
     "joined": "¡Ya estás dentro! Toca un asiento libre y elige «Reclamar asiento».",
     "waiting": "Esperando al Narrador en la sesión {code}. Si no aparece nada, comprueba el código.",
-    "footer": "Este proyecto es gratuito y de código abierto, y puedes encontrarlo en {github}. No está afiliado a The Pandemonium Institute. «Blood on the Clocktower» es una marca registrada de Steven Medway y The Pandemonium Institute."
+    "footer": "Este proyecto es gratuito y de código abierto, y puedes encontrarlo en {github}. No está afiliado a The Pandemonium Institute. «Blood on the Clocktower» es una marca registrada de Steven Medway y The Pandemonium Institute.",
+    "practice": "Practicar",
+    "practiceHint": "Ensaya una partida tú solo, con jugadores inventados: lo que les envíes te aparece a ti."
   },
   "gameOver": {
     "good": "¡Gana el Bien!",
@@ -428,5 +430,21 @@
       "exile": "Exilio",
       "execution": "Ejecución"
     }
+  },
+  "practice": {
+    "names": "Ana,Bruno,Carla,David,Elena,Fran,Gema,Hugo,Irene,Javi,Laura,Mario,Nuria,Óscar,Paula,Quique,Rosa,Sergio,Tere,Víctor",
+    "started": "Partida de práctica: reparte personajes y envía información o el grimorio desde el menú de cada jugador. Lo que reciban te aparecerá a ti.",
+    "badge": "Práctica",
+    "leave": "Salir",
+    "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",
+    "sees": "Lo que ve {name}",
+    "count": "Y {count} más después de esta",
+    "choose": "Responde por {name}: elige un jugador | Responde por {name}: elige {count} jugadores",
+    "answer": "Responder",
+    "reply": "Respuesta de {name} por el chat privado (opcional)",
+    "sendAndClose": "Enviar y cerrar",
+    "grimoire": "{name} ve el grimorio como lo tienes ahora: el personaje real de cada uno, los recordatorios y los faroles del Demonio, hasta que lo cierre o se haga de día.",
+    "closeAs": "Cerrar como {name}",
+    "seeAll": "Cerrar todo como visto"
   }
 }
