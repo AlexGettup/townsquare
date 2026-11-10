@@ -379,6 +379,10 @@ export default {
     &:hover {
       z-index: 25 !important;
     }
+    // a seat's menu goes above everything in the middle (day counter, timer)
+    &:has(> .player > .menu) {
+      z-index: 27 !important;
+    }
 
     > .player {
       margin-left: -50%;
