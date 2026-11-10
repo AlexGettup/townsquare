@@ -161,7 +161,6 @@
     "no": "No",
     "sendButton": "Enviar",
     "gotIt": "Entendido",
-    "choiceHint": "Escribe tu elección al Narrador en el chat privado",
     "sent": "Información enviada, aún sin ver",
     "seen": "El jugador ha visto la información",
     "answered": "El jugador ha respondido",
@@ -194,7 +193,13 @@
       "chooseTwoPlayers": "Elige 2 jugadores",
       "chooseCharacter": "Elige un personaje",
       "pointAtPlayer": "Señala a un jugador"
-    }
+    },
+    "replyPlayer": "Jugador",
+    "replyCharacter": "Personaje",
+    "replyCustom": "Otra cosa",
+    "replyPlaceholder": "Escribe tu respuesta",
+    "replyBack": "Volver",
+    "replySend": "Responder"
   },
   "dialogs": {
     "dayCount": "¿Qué día es?",

@@ -94,13 +94,18 @@ const getters = {
    */
   cardStatusOf: (state) => (playerId) => {
     const channel = dmTab(playerId);
+    // the player wrote back after the card (a quick answer, or by hand)
+    let replied = false;
     for (let i = state.messages.length - 1; i >= 0; i--) {
       const message = state.messages[i];
       if (message.at < state.cardsSince) return null;
-      if (message.channel === channel && message.card) {
-        if (message.choice) return "answered";
-        return message.seen ? "seen" : "sent";
+      if (message.channel !== channel) continue;
+      if (!message.card) {
+        if (message.from === playerId) replied = true;
+        continue;
       }
+      if (message.choice || replied) return "answered";
+      return message.seen ? "seen" : "sent";
     }
     return null;
   },
@@ -296,6 +301,17 @@ const actions = {
         commit("setAnswerStatus", "failed");
       }
     }, ANSWER_TIMEOUT);
+  },
+  /**
+   * Player: answer the card on screen with a few words (a quick answer:
+   * yes, no, players, characters…), in the private chat with the
+   * storyteller. The card closes as seen.
+   */
+  replyToCard({ getters, dispatch }, text) {
+    const message = getters.shownMessage;
+    if (!message || !text.trim()) return;
+    this.$chat.sendMessage(text.trim(), STORYTELLER);
+    dispatch("closeCard");
   },
   /** Player: close an info card, telling the storyteller we saw it. */
   closeCard({ getters, commit, rootGetters }) {

@@ -161,7 +161,6 @@
     "no": "No",
     "sendButton": "Send",
     "gotIt": "Got It",
-    "choiceHint": "Write your choice to the Storyteller in the private chat",
     "sent": "Information sent, not seen yet",
     "seen": "The player saw the information",
     "answered": "The player answered",
@@ -194,7 +193,13 @@
       "chooseTwoPlayers": "Choose 2 players",
       "chooseCharacter": "Choose a character",
       "pointAtPlayer": "Point at a player"
-    }
+    },
+    "replyPlayer": "Player",
+    "replyCharacter": "Character",
+    "replyCustom": "Custom",
+    "replyPlaceholder": "Write your answer",
+    "replyBack": "Back",
+    "replySend": "Answer"
   },
   "dialogs": {
     "dayCount": "Which day is it?",
