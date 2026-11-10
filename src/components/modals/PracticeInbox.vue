@@ -77,7 +77,12 @@ import Modal from "./Modal";
 import InfoCard from "../InfoCard";
 
 // cards answered by tapping seats: how many to pick
-const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
+const SEATS_TO_CHOOSE = {
+  choosePlayer: 1,
+  chooseTwoPlayers: 2,
+  // the pointing vote (Boomdandy)
+  pointAtPlayer: 1,
+};
 
 /**
  * Practice game: what a made-up player received (an info card, the grimoire),

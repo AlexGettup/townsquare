@@ -26,6 +26,9 @@ const state = () => ({
   votingSpeed: 1000,
   allowSelfNaming: true,
   isVoteInProgress: false,
+  // secret vote (Organ Grinder): players only send their hand to the
+  // storyteller, and only the storyteller sees hands and the count
+  isVoteHidden: false,
   voteHistory: [],
   markedPlayer: -1,
   isVoteHistoryAllowed: true,
@@ -47,6 +50,12 @@ const state = () => ({
   shownGrimoire: null,
   // ST: player ID -> "sent" | "seen", the grimoire shown to them tonight
   grimoireViews: {},
+  // ST: player ID whose grimoire to show is being edited (GrimoireEditor)
+  editingGrimoireFor: null,
+  // pointing vote (Boomdandy), the same for everyone: null, { since } while
+  // players point (each answers a card, see chat), then { since, pairs:
+  // [[from, to] names] } once the storyteller reveals who pointed at whom
+  pointing: null,
   messages: [],
 });
 
@@ -68,6 +77,33 @@ const getters = {
 };
 
 const actions = {
+  /**
+   * Storyteller: start a pointing vote (Boomdandy). Every seated player gets
+   * a card to point at a seat; only the storyteller sees the answers until
+   * they reveal them.
+   */
+  startPointing({ state, commit, dispatch, rootState }) {
+    if (state.isSpectator) return;
+    commit("setPointing", { since: Date.now() });
+    rootState.players.players.forEach(({ id }) => {
+      if (!id) return;
+      dispatch(
+        "chat/sendCard",
+        {
+          to: id,
+          card: {
+            phrase: "pointAtPlayer",
+            text: "",
+            roles: [],
+            players: [],
+            number: null,
+            answer: null,
+          },
+        },
+        { root: true },
+      );
+    });
+  },
   /**
    * Storyteller: end the game. Everyone sees the winner and the grimoire as it
    * is now, by day, back in the plaza.
@@ -97,6 +133,7 @@ const mutations = {
   setPing: set("ping"),
   setVotingSpeed: set("votingSpeed"),
   setVoteInProgress: set("isVoteInProgress"),
+  setVoteHidden: set("isVoteHidden"),
   setMarkedPlayer: set("markedPlayer"),
   setNomination: set("nomination"),
   setAllowSelfNaming: set("allowSelfNaming"),
@@ -113,7 +150,12 @@ const mutations = {
   closeShownGrimoire(state) {
     state.shownGrimoire = null;
   },
-  /** ST: { playerId, status: "sent" | "seen" }, or null to forget them all. */
+  /**
+   * ST: { playerId, status: "sent" | "seen" }, or null to forget them all.
+   * "sent" may carry the grimoire to send, edited (see GrimoireEditor).
+   */
+  setPointing: set("pointing"),
+  setEditingGrimoire: set("editingGrimoireFor"),
   setGrimoireView(state, view) {
     state.grimoireViews = view
       ? { ...state.grimoireViews, [view.playerId]: view.status }

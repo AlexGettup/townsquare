@@ -8,6 +8,7 @@
  * "place" (everything said around us) and one tab per private channel.
  */
 import { PLAZA, STORYTELLER } from "./voice";
+import { POINTING } from "../../cards";
 
 export const PLACE_TAB = "place";
 export const dmTab = (playerId) => "dm:" + playerId;
@@ -19,7 +20,16 @@ export const isRoleCard = ({ card }) =>
   !!card && card.phrase === "youAre" && (!card.parts || card.parts.length <= 1);
 // cards the player answers by tapping seats: how many they have to pick
 const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
-const seatsToChoose = ({ card }) => (card && SEATS_TO_CHOOSE[card.phrase]) || 0;
+SEATS_TO_CHOOSE[POINTING] = 1;
+// a pointing vote card only counts while that vote is open
+const isOpenPointing = (rootState) =>
+  !!rootState.session.pointing && !rootState.session.pointing.pairs;
+const seatsToChoose = ({ card }, rootState) => {
+  if (!card) return 0;
+  if (card.phrase === POINTING && rootState && !isOpenPointing(rootState))
+    return 0;
+  return SEATS_TO_CHOOSE[card.phrase] || 0;
+};
 // without an answer from the server by then, the player can try again
 const ANSWER_TIMEOUT = 5 * 1000;
 let answerTimer = null;
@@ -99,8 +109,8 @@ const getters = {
     state.shownCard
       ? state.messages.find(({ id }) => id === state.shownCard.id) || null
       : null,
-  seatsToPick: (state, getters) =>
-    getters.shownMessage ? seatsToChoose(getters.shownMessage) : 0,
+  seatsToPick: (state, getters, rootState) =>
+    getters.shownMessage ? seatsToChoose(getters.shownMessage, rootState) : 0,
   // player: the card on screen is answered on the seats, not in a window
   isAnswering: (state, getters, rootState, rootGetters) =>
     !!getters.seatsToPick &&
@@ -114,9 +124,27 @@ const getters = {
     if (rootGetters["voice/selfPeerId"] === STORYTELLER) return null;
     for (let i = state.messages.length - 1; i >= 0; i--) {
       const message = state.messages[i];
-      if (seatsToChoose(message)) return message.choice ? null : message;
+      if (!seatsToChoose(message)) continue;
+      // the latest seat card decides; a closed pointing vote needs nothing
+      if (message.choice || !seatsToChoose(message, rootState)) return null;
+      return message;
     }
     return null;
+  },
+  /**
+   * Storyteller: the pointing vote under way, by seat: [{ from, to }], `to`
+   * being who they pointed at (the latest pointing card's answer) or null.
+   */
+  pointingRows: (state, getters, rootState) => {
+    const answers = {};
+    state.messages.forEach((message) => {
+      if (message.card && message.card.phrase === POINTING) {
+        answers[message.channel] = message.choice ? message.choice[0] : null;
+      }
+    });
+    return rootState.players.players
+      .filter(({ id }) => id)
+      .map(({ id, name }) => ({ from: name, to: answers[dmTab(id)] || null }));
   },
   totalUnread: (state) =>
     Object.values(state.unread).reduce((total, count) => total + count, 0),

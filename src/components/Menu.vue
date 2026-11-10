@@ -319,6 +319,20 @@
             {{ $t("menu.lowerAllHands") }}
             <em><font-awesome-icon icon="sign-language" /></em>
           </li>
+          <!-- Ferryman: every dead player gets their ghost vote back -->
+          <li @click="returnGhostVotes" v-if="hasSpentGhostVotes">
+            {{ $t("menu.returnGhostVotes") }}
+            <em><font-awesome-icon icon="ghost" /></em>
+          </li>
+          <!-- Boomdandy: everyone points at a player -->
+          <li
+            @click="startPointing"
+            v-if="canPoint && !session.pointing"
+            :title="$t('menu.pointingHint')"
+          >
+            {{ $t("menu.pointing") }}
+            <em><font-awesome-icon icon="hand-point-up" /></em>
+          </li>
           <li @click="randomizeSeatings" v-if="players.length > 2">
             {{ $t("menu.randomize") }}
             <em><font-awesome-icon icon="dice" /></em>
@@ -419,6 +433,21 @@ export default {
     // send characters (no dealing in the roles window either)
     showSendCharacters: function () {
       return !this.npcs.some((npc) => npc.id === "tor");
+    },
+    // a dead player has used their ghost vote (Ferryman gives them back)
+    hasSpentGhostVotes: function () {
+      return this.players.some(
+        ({ isDead, isVoteless }) => isDead && isVoteless,
+      );
+    },
+    // the pointing vote goes through the private chat, like info cards
+    canPoint: function () {
+      return (
+        !this.session.isSpectator &&
+        ((!!this.session.sessionId && this.voice.isAvailable) ||
+          this.$store.state.practice.active) &&
+        this.players.some(({ id }) => id)
+      );
     },
     ...mapState(["grimoire", "session", "edition", "npcs", "voice"]),
     ...mapState("players", ["players"]),
@@ -523,6 +552,22 @@ export default {
       if (name) {
         this.$store.commit("players/add", name);
       }
+    },
+    returnGhostVotes() {
+      if (this.session.isSpectator) return;
+      this.players.forEach((player) => {
+        if (player.isDead && player.isVoteless) {
+          this.$store.commit("players/update", {
+            player,
+            property: "isVoteless",
+            value: false,
+          });
+        }
+      });
+    },
+    startPointing() {
+      if (!this.canPoint || this.session.pointing) return;
+      this.$store.dispatch("session/startPointing");
     },
     lowerHands() {
       if (this.session.isSpectator) return;

@@ -8,6 +8,7 @@ import practicePlugin from "./practice";
 import notesPlugin from "./notes";
 import wakeLockPlugin from "./wakeLock";
 import alertsPlugin from "./alerts";
+import voteValuePlugin from "./voteValue";
 import players from "./modules/players";
 import session from "./modules/session";
 import voice from "./modules/voice";
@@ -500,5 +501,6 @@ export default new Vuex.Store({
     wakeLockPlugin,
     alertsPlugin,
     notesPlugin,
+    voteValuePlugin,
   ],
 });

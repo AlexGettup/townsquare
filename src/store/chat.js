@@ -4,6 +4,7 @@ import { PLACE_TAB, dmTab, tabOf } from "./modules/chat";
 import { STORYTELLER } from "./modules/voice";
 import { playChime } from "../voice/sounds";
 import { flagTitle, vibrate } from "../alerts";
+import { POINTING } from "../cards";
 import i18n from "../i18n";
 
 const ERROR_TIMEOUT = 4 * 1000;
@@ -125,6 +126,19 @@ export default (store) => {
       case "session/distributeRoles":
         if (payload) store.dispatch("chat/sendRoleCards");
         break;
+      // the pointing vote was revealed or is over: its card needs nothing
+      case "session/setPointing": {
+        const shown = store.getters["chat/shownMessage"];
+        if (
+          (!payload || payload.pairs) &&
+          shown &&
+          shown.card &&
+          shown.card.phrase === POINTING
+        ) {
+          store.commit("chat/hideCard");
+        }
+        break;
+      }
       case "practice/setActive":
         // each practice game starts with an empty chat
         practice.messages = [];

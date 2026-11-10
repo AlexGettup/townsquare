@@ -49,7 +49,9 @@
     <InfoCardModal />
     <ChoosePlayers />
     <GuidedNight />
+    <PointingPanel />
     <InfoCardComposer />
+    <GrimoireEditor />
     <EndGameModal />
     <PracticeBadge />
     <PracticeInbox />
@@ -79,10 +81,12 @@ import AlertNotices from "@/components/AlertNotices";
 import ChatPanel from "@/components/ChatPanel";
 import InfoCardModal from "@/components/modals/InfoCardModal";
 import InfoCardComposer from "@/components/modals/InfoCardComposer";
+import GrimoireEditor from "@/components/modals/GrimoireEditor";
 import EndGameModal from "@/components/modals/EndGameModal";
 import PracticeBadge from "@/components/PracticeBadge";
 import PracticeInbox from "@/components/modals/PracticeInbox";
 import GuidedNight from "@/components/GuidedNight";
+import PointingPanel from "@/components/PointingPanel";
 import ChoosePlayers from "@/components/ChoosePlayers";
 
 export default {
@@ -93,10 +97,12 @@ export default {
     ChatPanel,
     InfoCardModal,
     InfoCardComposer,
+    GrimoireEditor,
     EndGameModal,
     PracticeBadge,
     PracticeInbox,
     GuidedNight,
+    PointingPanel,
     ChoosePlayers,
     GameStateModal,
     ChangelogModal,

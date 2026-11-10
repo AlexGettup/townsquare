@@ -14,6 +14,8 @@
           dead: player.isDead,
           // the guided night's current step
           guided: player.id && $store.state.guidedPlayers.includes(player.id),
+          // not with us in voice right now: we can't hear each other
+          away: isAway,
           marked:
             (!session.isSpectator || session.isVoteWatchingAllowed) &&
             session.markedPlayer === index,
@@ -25,22 +27,14 @@
             session.sessionId &&
             player.id &&
             player.id === session.playerId,
-          'vote-yes':
-            (!session.isSpectator ||
-              session.isVoteWatchingAllowed ||
-              (!session.isVoteInProgress && session.lockedVote < 1) ||
-              player.id === session.playerId) &&
-            session.votes[index],
-          'vote-twice':
-            (!session.isSpectator ||
-              session.isVoteWatchingAllowed ||
-              (!session.isVoteInProgress && session.lockedVote < 1) ||
-              player.id === session.playerId) &&
-            session.votes[index] === 2,
+          'vote-yes': canSeeVote && session.votes[index],
+          'vote-twice': canSeeVote && session.votes[index] === 2,
           'vote-hidden':
             session.isSpectator &&
-            !session.isVoteWatchingAllowed &&
-            (session.isVoteInProgress || session.lockedVote >= 1) &&
+            (session.isVoteHidden
+              ? !!session.nomination
+              : !session.isVoteWatchingAllowed &&
+                (session.isVoteInProgress || session.lockedVote >= 1)) &&
             player.id !== session.playerId,
           'vote-lock': voteLocked,
         },
@@ -101,6 +95,11 @@
         "
         @set-role="onTokenTap"
       />
+
+      <!-- Pointing vote: how many point at this seat (players: once revealed) -->
+      <span class="pointed" v-if="pointedCount">
+        <font-awesome-icon icon="hand-point-up" />{{ pointedCount }}
+      </span>
 
       <!-- Storyteller: last info card sent to this player, and if they saw it -->
       <font-awesome-icon
@@ -555,6 +554,41 @@ export default {
     ...mapGetters("chat", ["isPicking"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
+    /**
+     * This seat's player can't hear us now, nor we them: by day they are in
+     * another place (a room, a private conversation, or out of voice); at
+     * night the storyteller only hears who is awake, and players nobody.
+     * Only while we are in voice ourselves; never our own seat.
+     */
+    // can we see this seat's hand in the vote under way?
+    canSeeVote: function () {
+      const { session } = this;
+      if (!session.isSpectator || this.player.id === session.playerId)
+        return true;
+      // a secret vote (Organ Grinder): only the storyteller
+      if (session.isVoteHidden) return false;
+      return (
+        session.isVoteWatchingAllowed ||
+        (!session.isVoteInProgress && session.lockedVote < 1)
+      );
+    },
+    // pointing vote: how many players point at this seat
+    pointedCount: function () {
+      const { pointing } = this.session;
+      if (!pointing) return 0;
+      const targets = pointing.pairs
+        ? pointing.pairs.map(([, to]) => to)
+        : this.session.isSpectator
+          ? []
+          : this.$store.getters["chat/pointingRows"].map(({ to }) => to);
+      return targets.filter((to) => to === this.player.name).length;
+    },
+    isAway: function () {
+      if (!this.$store.getters["voice/isConnected"]) return false;
+      const { id } = this.player;
+      if (!id || id === this.$store.getters["voice/selfPeerId"]) return false;
+      return !this.$store.getters["voice/canHear"](id);
+    },
     // storyteller: info cards go to seated players through the chat (in a
     // practice game, to the made-up players)
     canSendInfoCard: function () {
@@ -957,12 +991,10 @@ export default {
       this.isMenuOpen = false;
       this.$store.commit("chat/composeCard", this.player.id);
     },
+    // the grimoire opens to be edited before it goes (GrimoireEditor)
     showGrimoire() {
       this.isMenuOpen = false;
-      this.$store.commit("session/setGrimoireView", {
-        playerId: this.player.id,
-        status: "sent",
-      });
+      this.$store.commit("session/setEditingGrimoire", this.player.id);
     },
     inviteToTalk() {
       this.isMenuOpen = false;
@@ -1362,6 +1394,28 @@ li.move:not(.from) .player .overlay svg.move {
   cursor: pointer;
 }
 
+/****** Pointing vote: fingers pointing at this seat ******/
+.player .pointed {
+  position: absolute;
+  left: 50%;
+  margin-top: -62%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 0 8px;
+  border-radius: 12px;
+  border: 2px solid #e8b04a;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-weight: bold;
+  font-size: 120%;
+  white-space: nowrap;
+  pointer-events: none;
+  svg {
+    margin-right: 3px;
+    color: #e8b04a;
+  }
+}
+
 /****** Session seat glow *****/
 @mixin glowAnimation($name, $color) {
   @keyframes #{$name}-glow {
@@ -1412,6 +1466,19 @@ li.move:not(.from) .player .overlay svg.move {
   box-shadow:
     0 0 0 4px #e8b04a,
     0 0 20px #e8b04a;
+}
+
+/****** Not with us in voice: dimmed ******/
+.player.away {
+  > .token,
+  > .name {
+    filter: brightness(0.4) grayscale(0.6);
+    transition: filter 300ms;
+  }
+}
+.player > .token,
+.player > .name {
+  transition: filter 300ms;
 }
 
 /****** Marked icon ******/
