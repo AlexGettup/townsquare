@@ -166,7 +166,7 @@
     "later": "Más tarde",
     "notSent": "No ha llegado. Inténtalo de nuevo",
     "chosen": "Elegido: {players}",
-    "askToChoose": "Pedir que elija",
+    "askToChoose": "Qué tiene que elegir",
     "choices": {
       "choosePlayer": "1 jugador",
       "chooseTwoPlayers": "2 jugadores",
@@ -181,6 +181,7 @@
       "characterSelectedYou": "Este personaje te ha elegido",
       "youLearn": "Descubres",
       "useAbility": "¿Quieres usar tu habilidad?",
+      "makeChoice": "Haz una elección",
       "choosePlayer": "Elige un jugador",
       "chooseTwoPlayers": "Elige 2 jugadores",
       "chooseCharacter": "Elige un personaje"
