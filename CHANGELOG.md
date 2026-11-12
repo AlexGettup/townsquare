@@ -4,6 +4,14 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.26.0
+- Practice game: "Automatic" next to the practice badge makes the made-up players answer by themselves, a second or two later (seats, a character, yes or no to using their ability, closing cards and the grimoire)
+- Practice game: "View as Ana" in a made-up player's seat menu shows the game as her device would (only her character, her cards and her private chat), and the Storyteller answers from there as she would. "Back to the grimoire" puts the grimoire back as it was, also after a reload
+- Info card window: under "Players", each player's character and reminders, with those of the recipient's character highlighted (the Investigator's "Minion" and "Wrong")
+- Votes: when an earlier execution vote today reached the majority, a new vote shows how many votes tie it and how many beat it ("3 to tie with Ana, 4 to execute"). Vote history entries now record the day
+- Picking an edition opens the character selection straight away (with five players or more)
+- Practice game: the chat no longer stays disconnected after switching who you are
+
 ### Version 3.25.0
 - Info cards fill themselves: "This is the Demon", "These are your minions", "These characters are not in play" and "You are" come with the players or characters from the grimoire, as a suggestion the Storyteller can change before sending
 - Quick answers on info cards, like the official app: players answer with one tap (Got it, Yes, No, players, characters or a few words). The answer goes to the Storyteller's private chat and the card counts as answered

@@ -1,5 +1,27 @@
 [
   {
+    "version": "3.26.0",
+    "date": "2026-11-12",
+    "title": {
+      "en": "Better practice games",
+      "es": "Mejores partidas de práctica"
+    },
+    "en": [
+      "Practice game: \"Automatic\" makes the made-up players answer cards and choices by themselves",
+      "Practice game: \"View as Ana\" in a seat's menu shows the game as that player sees it, and you answer as they would",
+      "Storyteller: when sending an info card, each player shows their character and reminders, so you don't need to close it to check the grimoire",
+      "Votes: if someone is already about to be executed today, a new vote shows how many votes tie and how many beat it",
+      "Storyteller: picking an edition opens the character selection straight away"
+    ],
+    "es": [
+      "Partida de práctica: «Automáticos» hace que los jugadores inventados contesten solos a las tarjetas y elecciones",
+      "Partida de práctica: «Ver como Ana» en el menú de un asiento muestra la partida como la ve ese jugador, y contestas como lo haría él",
+      "Narrador: al enviar información, cada jugador muestra su personaje y sus recordatorios, sin tener que cerrar la ventana para mirar el grimorio",
+      "Votaciones: si alguien ya va a ser ejecutado hoy, la nueva votación indica cuántos votos empatan y cuántos ejecutan",
+      "Narrador: al elegir edición se abre directamente la selección de personajes"
+    ]
+  },
+  {
     "version": "3.25.0",
     "date": "2026-11-10",
     "title": {
