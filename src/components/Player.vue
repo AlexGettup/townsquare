@@ -169,13 +169,12 @@
         :title="setSeatTitle()"
       />
 
-      <!-- Ghost vote icon -->
+      <!-- Ghost vote icon: only shows it. It is spent by itself when a vote
+           closes; by hand, from the menu ("More") -->
       <font-awesome-icon
         icon="vote-yea"
         class="has-vote"
         v-if="player.isDead && !player.isVoteless"
-        @click="updatePlayer('isVoteless', true)"
-        :title="$t('player.ghostVote')"
       />
 
       <!-- Two votes icon -->
@@ -359,6 +358,14 @@
               <li @click="changeAlignment" v-if="alignmentName">
                 <font-awesome-icon icon="yin-yang" />
                 {{ $t("player.alignment", { alignment: alignmentName }) }}
+              </li>
+              <li @click="toggleGhostVote" v-if="player.isDead">
+                <font-awesome-icon icon="vote-yea" />
+                {{
+                  player.isVoteless
+                    ? $t("player.giveBackGhostVote")
+                    : $t("player.spendGhostVote")
+                }}
               </li>
               <li class="note-entry" @click="openNote">
                 <font-awesome-icon icon="sticky-note" />
@@ -920,28 +927,19 @@ export default {
         this.updatePlayer("pronouns", pronouns, true);
       }
     },
+    // dead or alive (the ghost vote is spent by itself, or from "More")
     toggleStatus() {
-      if (this.grimoire.isPublic) {
-        if (!this.player.isDead) {
-          this.updatePlayer("isDead", true);
-          if (this.player.isMarked) {
-            this.updatePlayer("isMarked", false);
-          }
-        } else if (this.player.isVoteless) {
-          this.updatePlayer("isVoteless", false);
-          this.updatePlayer("isDead", false);
-        } else {
-          this.updatePlayer("isVoteless", true);
-        }
-      } else {
-        this.updatePlayer("isDead", !this.player.isDead);
-        if (this.player.isMarked) {
-          this.updatePlayer("isMarked", false);
-        }
-        if (this.player.isVoteless) {
-          this.updatePlayer("isVoteless", false);
-        }
+      this.updatePlayer("isDead", !this.player.isDead);
+      if (this.player.isMarked) {
+        this.updatePlayer("isMarked", false);
       }
+      if (this.player.isVoteless) {
+        this.updatePlayer("isVoteless", false);
+      }
+    },
+    // by hand, rarely needed: votes spend it by themselves
+    toggleGhostVote() {
+      this.updatePlayer("isVoteless", !this.player.isVoteless, true);
     },
     changeName() {
       const name =
@@ -1409,6 +1407,8 @@ li.move:not(.from) .player .overlay svg.move {
 
 /****** Vote icon ********/
 .player .has-vote {
+  // only shows the ghost vote: taps go through to the token
+  pointer-events: none;
   color: #fff;
   filter: drop-shadow(0 0 3px black);
   transition: opacity 250ms;

@@ -273,6 +273,8 @@
   },
   "player": {
     "ghostVote": "Voto fantasma",
+    "spendGhostVote": "Quitar el voto fantasma",
+    "giveBackGhostVote": "Devolver el voto fantasma",
     "hasTwoVotes": "Tiene dos votos",
     "cancel": "Cancelar",
     "swapWithPlayer": "Intercambiar asiento con este jugador",
