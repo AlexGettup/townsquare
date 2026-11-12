@@ -289,7 +289,35 @@ export default {
       // nothing saved: start at the first step
     }
   },
+  // the town square makes room for the panel on phones (TownSquare.vue)
+  mounted() {
+    this.sheetObserver = new ResizeObserver(() => this.reportHeight());
+    this.watchSheet();
+  },
+  updated() {
+    this.watchSheet();
+  },
+  beforeDestroy() {
+    this.sheetObserver.disconnect();
+    document.documentElement.style.setProperty("--bottom-sheet", "0px");
+  },
   methods: {
+    // the panel comes and goes (v-if on the root): follow its element
+    watchSheet() {
+      const el = this.$el.nodeType === 1 ? this.$el : null;
+      if (el === this.sheet) return;
+      this.sheetObserver.disconnect();
+      this.sheet = el;
+      if (el) this.sheetObserver.observe(el);
+      this.reportHeight();
+    },
+    reportHeight() {
+      const height = this.sheet ? this.sheet.offsetHeight : 0;
+      document.documentElement.style.setProperty(
+        "--bottom-sheet",
+        height + "px",
+      );
+    },
     save() {
       try {
         localStorage.setItem(
