@@ -1,7 +1,10 @@
 import { isPracticeId, restoreView } from "./modules/practice";
+import { valueFromReminders } from "./voteValue";
 
 // how likely a made-up player is to raise their hand in a vote
 const YES_CHANCE = 0.5;
+// a dead one, careful with the only vote they have left: half as likely
+const GHOST_YES_CHANCE = YES_CHANCE / 2;
 
 /**
  * Store plugin for practice games (see store/modules/practice.js): plays the
@@ -9,7 +12,7 @@ const YES_CHANCE = 0.5;
  *
  * - The grimoire shown to a player (Spy) pops up for the storyteller.
  * - When a vote starts, each player who can vote raises a hand or not, at
- *   random. The storyteller can still change any vote once the clock hand
+ *   random; the dead half as often, as they would spend their ghost vote. The storyteller can still change any vote once the clock hand
  *   has passed, as in a real game.
  * - Creating or joining a real game ends the practice.
  */
@@ -42,7 +45,12 @@ export default (store) => {
     const isExile = !!nominee && nominee.role.team === "traveller";
     players.forEach((player, index) => {
       const canVote = !player.isVoteless || isExile;
-      const yes = canVote && Math.random() < YES_CHANCE;
+      // the vote costs them their ghost vote (not in an exile, nor for a
+      // Banshee with her ability)
+      const spendsGhostVote =
+        player.isDead && !isExile && valueFromReminders(player.reminders) !== 2;
+      const chance = spendsGhostVote ? GHOST_YES_CHANCE : YES_CHANCE;
+      const yes = canVote && Math.random() < chance;
       const count = yes ? (player.hasTwoVotes ? 2 : 1) : 0;
       if (store.state.session.votes[index] !== count) {
         store.commit("session/voteSync", [index, count]);
