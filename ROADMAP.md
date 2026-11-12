@@ -47,6 +47,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   who can't hear you; random nominations and answers in the practice game
 - **3.26.0** Practice game with automatic players and "view as a player"; reminders in the
   card window; votes to tie; characters right after picking the edition
+- **3.27.0** Ghost votes spent by themselves and moved to the menu; shorter player menu
+  ("More", "My seat"); the dead vote less in practice games
 
 ## Planned
 
@@ -92,7 +94,7 @@ panels you can drag around the screen.
 - [x] **Night order on touch screens** (3.20.0): tap the night order number next to a token to
       read its text (no hover there). Chosen over a long press, which nobody would find. A
       token's ability is covered by "Ability in the player menu" (For players).
-- [x] **Shorter player menu** (next release): the storyteller's seat menu keeps what each
+- [x] **Shorter player menu** (3.27.0): the storyteller's seat menu keeps what each
       phase uses most (wake or nominate, send info, kill, character, reminder); alignment,
       note, show the grimoire and "view as" go under "More", the seat setup under "Seat".
       A player's own seat puts pronouns, rename and leaving the seat under "My seat".
@@ -220,7 +222,7 @@ cards, because characters like the Lunatic make an automatic version misleading.
       storyteller sets the value by hand (3.11.0).
 - [x] **Give back ghost votes** *(official)* (Ferryman) (3.25.0): one button returns the spent ghost
       vote to every dead player.
-- [x] **Ghost votes spent by themselves** (next release): when a vote goes all the way round
+- [x] **Ghost votes spent by themselves** (3.27.0): when a vote goes all the way round
       and is closed, dead players who raised their hand lose their ghost vote. Not in exiles,
       nor for a Banshee with her ability; a vote reset or closed halfway spends nothing.
       The ghost vote icon no longer takes clicks: taking it away or giving it back by hand

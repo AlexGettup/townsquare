@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.27.0
+- Ghost votes are spent by themselves: when a vote goes all the way round and the Storyteller closes it, dead players who raised their hand lose their ghost vote. Not in exiles, nor for a Banshee with her ability; a vote reset or closed halfway spends nothing
+- The ghost vote icon no longer takes clicks: taking it away or giving it back by hand is under "More" in a dead player's menu. A double tap in the public grimoire only kills or revives
+- Shorter player menu: the Storyteller keeps what each phase uses most (wake or nominate, send info, kill, change character, add reminder); show the grimoire, alignment, note and "view as" go under "More", next to "Seat". On their own seat, players find pronouns, rename and leaving the seat under "My seat"
+- Practice game: dead made-up players raise their hand half as often when it costs them their ghost vote
+
 ### Version 3.26.0
 - Practice game: "Automatic" next to the practice badge makes the made-up players answer by themselves, a second or two later (seats, a character, yes or no to using their ability, closing cards and the grimoire)
 - Practice game: "View as Ana" in a made-up player's seat menu shows the game as her device would (only her character, her cards and her private chat), and the Storyteller answers from there as she would. "Back to the grimoire" puts the grimoire back as it was, also after a reload
