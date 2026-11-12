@@ -31,6 +31,8 @@ const nominationOptions = (players) => {
 
 const state = () => ({
   active: false,
+  // the made-up players answer by themselves, at random
+  auto: false,
   // what the made-up players received and haven't closed yet, oldest first:
   // { id, playerId, kind: "card" | "grimoire", messageId }
   inbox: [],
@@ -54,7 +56,13 @@ const getters = {
 const mutations = {
   setActive(state, active) {
     state.active = active;
-    if (!active) state.inbox = [];
+    if (!active) {
+      state.inbox = [];
+      state.auto = false;
+    }
+  },
+  setAuto(state, auto) {
+    state.auto = auto;
   },
   receive(state, item) {
     state.inbox = [...state.inbox, { id: nextItem++, ...item }];

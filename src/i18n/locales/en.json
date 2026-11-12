@@ -477,6 +477,8 @@
     "names": "Alice,Ben,Clara,Dan,Emma,Finn,Grace,Harry,Isla,Jack,Kate,Leo,Mia,Noah,Olivia,Paul,Quinn,Rose,Sam,Tom",
     "started": "Practice game: deal characters, and send info or the grimoire from each player's menu. What they receive shows up for you.",
     "badge": "Practice",
+    "auto": "Automatic",
+    "autoHint": "The made-up players answer cards, choices and the grimoire by themselves, at random. Their answers reach your private chat.",
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",
     "sees": "What {name} sees",

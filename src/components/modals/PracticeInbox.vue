@@ -1,5 +1,9 @@
 <template>
-  <Modal class="practice-inbox" v-if="item && player" @close="done">
+  <Modal
+    class="practice-inbox"
+    v-if="item && player && !practice.auto"
+    @close="done"
+  >
     <h3>{{ $t("practice.sees", { name: player.name }) }}</h3>
     <p class="count" v-if="inbox.length > 1">
       {{ $t("practice.count", { count: inbox.length - 1 }) }}
@@ -94,6 +98,9 @@ import InfoCard from "../InfoCard";
 import { partsOf } from "../../cards";
 import { pickAtRandom } from "../../store/modules/practice";
 
+// automatic players take between this and twice this to answer (ms)
+const AUTO_DELAY = 1200;
+
 // cards answered by tapping seats: how many to pick
 const SEATS_TO_CHOOSE = {
   choosePlayer: 1,
@@ -114,9 +121,12 @@ export default {
     return {
       picked: [],
       reply: "",
+      // automatic players: items with an answer on the way
+      answering: [],
     };
   },
   computed: {
+    ...mapState(["practice"]),
     ...mapState("practice", ["inbox"]),
     ...mapState("players", ["players"]),
     ...mapGetters("practice", { item: "current" }),
@@ -148,6 +158,10 @@ export default {
     },
   },
   watch: {
+    // automatic players: everything that arrives gets answered, a moment
+    // later (as a person would), one after the other
+    inbox: "answerByThemselves",
+    "practice.auto": "answerByThemselves",
     item() {
       this.picked = [];
       this.reply = "";
@@ -246,6 +260,19 @@ export default {
       }
       if (answer) this.$store.$chat.writeAs(item.playerId, answer.text);
       this.finish(item);
+    },
+    answerByThemselves() {
+      if (!this.practice.auto) return;
+      this.inbox.forEach((item) => {
+        if (this.answering.includes(item.id)) return;
+        this.answering.push(item.id);
+        const delay = AUTO_DELAY + Math.random() * AUTO_DELAY;
+        setTimeout(() => {
+          this.answering = this.answering.filter((id) => id !== item.id);
+          const still = this.inbox.find(({ id }) => id === item.id);
+          if (still && this.practice.auto) this.answerAtRandom(still);
+        }, delay);
+      });
     },
     allAtRandom() {
       [...this.inbox].forEach((item) => this.answerAtRandom(item));

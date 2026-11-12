@@ -13,6 +13,16 @@
       <font-awesome-icon icon="dice" />
       {{ $t("practice.nominate") }}
     </span>
+    <!-- the made-up players answer cards and choices by themselves -->
+    <span
+      class="nominate auto"
+      :class="{ on: practice.auto }"
+      :title="$t('practice.autoHint')"
+      @click="$store.commit('practice/setAuto', !practice.auto)"
+    >
+      <font-awesome-icon icon="robot" />
+      {{ $t("practice.auto") }}
+    </span>
   </div>
 </template>
 
@@ -67,6 +77,10 @@ export default {
     white-space: nowrap;
     &:hover {
       color: $townsfolk;
+    }
+    &.on {
+      background: $townsfolk;
+      color: white;
     }
   }
 
