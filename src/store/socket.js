@@ -199,10 +199,10 @@ class LiveSession {
         if (!this._isSpectator) return;
         // create vote history record (a secret vote isn't known to players)
         if (!params && !this._store.state.session.isVoteHidden) {
-          this._store.commit(
-            "session/addHistory",
-            this._store.state.players.players,
-          );
+          this._store.commit("session/addHistory", {
+            players: this._store.state.players.players,
+            day: this._store.state.grimoire.nightCount,
+          });
         }
         this._store.commit("session/nomination", { nomination: params });
         break;

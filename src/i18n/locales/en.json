@@ -315,6 +315,7 @@
     "inFavor": "in favor",
     "secret": "The vote is secret",
     "majority": "(majority is {count})",
+    "toTie": "({count} to tie with {names}, {more} to execute)",
     "timePerPlayer": "Time per player:",
     "seatsUnoccupied": "Some seats are unoccupied",
     "countdown": "Countdown",
