@@ -289,7 +289,7 @@ export default {
       // nothing saved: start at the first step
     }
   },
-  // the town square makes room for the panel on phones (TownSquare.vue)
+  // the town square makes room for the panel on phones (App.vue, #app)
   mounted() {
     this.sheetObserver = new ResizeObserver(() => this.reportHeight());
     this.watchSheet();

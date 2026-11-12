@@ -284,6 +284,18 @@ ul {
   align-content: center;
   justify-content: center;
 
+  // upright phones: the town square and what's in its middle (edition logo,
+  // counters, the vote) centred in the room above a bottom sheet (the guided
+  // night, see GuidedNight.vue), as far as the space at the top allows
+  @media (orientation: portrait) and (max-width: 767.98px) {
+    box-sizing: border-box;
+    padding-bottom: min(
+      var(--bottom-sheet, 0px),
+      max(0px, 100vh - 100vw - 100px)
+    );
+    transition: padding-bottom 200ms;
+  }
+
   // disable all animations
   &.static *,
   &.static *:after,
