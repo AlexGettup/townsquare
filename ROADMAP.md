@@ -49,6 +49,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   card window; votes to tie; characters right after picking the edition
 - **3.27.0** Ghost votes spent by themselves and moved to the menu; shorter player menu
   ("More", "My seat"); the dead vote less in practice games
+- **3.28.0** Game diary for players with each day's summary (on the block, votes to tie);
+  clearer ghost vote warning; "Change character" under "More"
 
 ## Planned
 
@@ -270,7 +272,7 @@ Ranked with the same criteria as the [next steps](#next-steps).
    think they are. Only for touch screens: computers already show it on hover.
 3. [x] **Day and night counter** (3.19.0): "Day 3" / "Night 2" instead of only day or night, synced from
    the storyteller. Passive and clear; also gives the diary and the notes a reference.
-4. [x] **Game diary** (next release): everything you learnt, night by night and day by day,
+4. [x] **Game diary** (3.28.0): everything you learnt, night by night and day by day,
    newest first: info cards and your answers, the storyteller's messages, deaths, the
    grimoire shown to you, and each day's nominations with their votes. Kept on the device
    per game, so it survives a reload. Each day says who is on the block, how many votes
