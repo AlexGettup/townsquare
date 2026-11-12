@@ -39,6 +39,7 @@ const faIcons = [
   "Dragon",
   "ExchangeAlt",
   "Eye",
+  "Robot",
   "Envelope",
   "ExclamationTriangle",
   "EyeSlash",
