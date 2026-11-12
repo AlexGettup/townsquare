@@ -1,7 +1,7 @@
 <template>
   <Modal
     class="practice-inbox"
-    v-if="item && player && !practice.auto"
+    v-if="item && player && !practice.auto && !practice.viewAs"
     @close="done"
   >
     <h3>{{ $t("practice.sees", { name: player.name }) }}</h3>

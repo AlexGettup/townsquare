@@ -387,6 +387,8 @@ module.exports = (store) => {
         }
         break;
       case "session/setPlayerId":
+        // viewing as a made-up player (practice) doesn't change who we are
+        if (state.practice.viewAs) break;
         if (payload) {
           localStorage.setItem("playerId", payload);
         } else {

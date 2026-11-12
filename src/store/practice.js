@@ -1,4 +1,4 @@
-import { isPracticeId } from "./modules/practice";
+import { isPracticeId, restoreView } from "./modules/practice";
 
 // how likely a made-up player is to raise their hand in a vote
 const YES_CHANCE = 0.5;
@@ -15,6 +15,24 @@ const YES_CHANCE = 0.5;
  */
 export default (store) => {
   const isActive = () => store.state.practice.active;
+
+  // the page reloaded while viewing as a player: the grimoire comes back
+  try {
+    const view = JSON.parse(localStorage.getItem("practiceView"));
+    if (view && isActive()) {
+      restoreView(
+        {
+          commit: store.commit,
+          rootState: store.state,
+          rootGetters: store.getters,
+        },
+        view,
+      );
+    }
+    localStorage.removeItem("practiceView");
+  } catch (e) {
+    // nothing saved
+  }
 
   const randomVotes = () => {
     const { players } = store.state.players;
@@ -60,6 +78,7 @@ export default (store) => {
       // a real game: the made-up players leave their seats
       case "session/setSessionId":
         if (payload) {
+          store.dispatch("practice/leaveView");
           state.players.players.forEach((player) => {
             if (!isPracticeId(player.id)) return;
             store.commit("players/update", {

@@ -388,6 +388,11 @@
                   {{ $t("cards.send") }}
                 </li>
               </template>
+              <!-- practice: see the game as this made-up player does -->
+              <li @click="viewAsPlayer" v-if="practice.active && player.id">
+                <font-awesome-icon icon="theater-masks" />
+                {{ $t("practice.viewAs", { name: player.name }) }}
+              </li>
               <li @click="toggleDeath">
                 <font-awesome-icon
                   :icon="player.isDead ? 'heartbeat' : 'skull'"
@@ -986,6 +991,10 @@ export default {
     toggleAwakeVoice() {
       this.isMenuOpen = false;
       this.$store.dispatch("voice/toggleAwake", this.player.id);
+    },
+    viewAsPlayer() {
+      this.isMenuOpen = false;
+      this.$store.dispatch("practice/viewAs", this.player.id);
     },
     sendInfoCard() {
       this.isMenuOpen = false;
