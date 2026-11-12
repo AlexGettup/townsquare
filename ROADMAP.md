@@ -51,6 +51,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   ("More", "My seat"); the dead vote less in practice games
 - **3.28.0** Game diary for players with each day's summary (on the block, votes to tie);
   clearer ghost vote warning; "Change character" under "More"
+- **3.28.1** One majority in the vote overlay; guided night clear of the circle on phones
 
 ## Planned
 
