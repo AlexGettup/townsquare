@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.28.2",
+    "date": "2026-11-13",
+    "title": {
+      "en": "Guided night on phones",
+      "es": "Noche guiada en el móvil"
+    },
+    "en": [
+      "Storyteller on a phone: with the guided night open, the script logo and the counters move up with the seats"
+    ],
+    "es": [
+      "Narrador en el móvil: con la noche guiada abierta, el logo del script y los contadores suben junto con los asientos"
+    ]
+  },
+  {
     "version": "3.28.1",
     "date": "2026-11-12",
     "title": {
