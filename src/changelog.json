@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.27.0",
+    "date": "2026-11-12",
+    "title": {
+      "en": "Ghost votes and a shorter player menu",
+      "es": "Votos fantasma y un menú del jugador más corto"
+    },
+    "en": [
+      "Ghost votes are spent by themselves when the Storyteller closes a vote, for the dead who raised their hand (not in exiles)",
+      "Storyteller: the ghost vote is taken away or given back by hand under \"More\" in the player's menu, no longer by clicking its icon",
+      "Shorter player menu: the less used options are under \"More\" for the Storyteller, and under \"My seat\" on your own seat",
+      "Practice game: the dead vote less often, careful with their only vote"
+    ],
+    "es": [
+      "Los votos fantasma se gastan solos cuando el Narrador cierra una votación, para los muertos que levantaron la mano (no en los exilios)",
+      "Narrador: el voto fantasma se quita o se devuelve a mano en «Más», en el menú del jugador, y ya no pulsando su icono",
+      "Menú del jugador más corto: lo menos usado está en «Más» para el Narrador, y en «Mi asiento» en tu propio asiento",
+      "Partida de práctica: los muertos votan menos, con cuidado con su único voto"
+    ]
+  },
+  {
     "version": "3.26.0",
     "date": "2026-11-12",
     "title": {
