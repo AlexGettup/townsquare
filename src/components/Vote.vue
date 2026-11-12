@@ -40,6 +40,16 @@
       <em v-if="nominee.role.team !== 'traveller'">
         {{ $t("vote.majority", { count: Math.ceil(alive / 2) }) }}
       </em>
+      <!-- someone is already about to die today: what this vote needs -->
+      <em class="to-tie" v-if="toBeat">
+        {{
+          $t("vote.toTie", {
+            count: toBeat.count,
+            names: toBeat.nominees.join(", "),
+            more: toBeat.count + 1,
+          })
+        }}
+      </em>
       <em v-else>{{
         $t("vote.majority", { count: Math.ceil(players.length / 2) })
       }}</em>
@@ -152,6 +162,12 @@ export default {
     ...mapState("players", ["players"]),
     ...mapState(["session", "grimoire"]),
     ...mapGetters({ alive: "players/alive" }),
+    // today's top vote, if a new execution vote has to tie or beat it
+    toBeat: function () {
+      if (this.nominee.role.team === "traveller") return null;
+      const top = this.$store.getters["session/votesToBeat"];
+      return top && top.count >= Math.ceil(this.alive / 2) ? top : null;
+    },
     nominator: function () {
       return this.players[this.session.nomination[0]];
     },
@@ -273,7 +289,10 @@ export default {
     },
     finish() {
       clearInterval(this.voteTimer);
-      this.$store.commit("session/addHistory", this.players);
+      this.$store.commit("session/addHistory", {
+        players: this.players,
+        day: this.$store.state.grimoire.nightCount,
+      });
       this.$store.commit("session/nomination");
     },
     vote(vote) {
@@ -357,6 +376,9 @@ export default {
     font-weight: bold;
     &.blue {
       color: $townsfolk;
+    }
+    &.to-tie {
+      display: block;
     }
   }
 

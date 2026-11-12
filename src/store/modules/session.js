@@ -71,6 +71,26 @@ const getters = {
     ),
     bluffs: rootState.bluffs.map((role) => (role && role.id) || ""),
   }),
+  /**
+   * Today's highest execution vote that reached the majority, the one a new
+   * nomination has to tie or beat: { count, nominees: [names] }, or null.
+   * Two or more at the top are tied (nobody is about to die).
+   */
+  votesToBeat: (state, getters, rootState) => {
+    const day = rootState.grimoire.nightCount;
+    const today = state.voteHistory.filter(
+      (vote) =>
+        vote.day === day &&
+        vote.type === "Execution" &&
+        vote.count >= vote.majority,
+    );
+    if (!today.length) return null;
+    const count = Math.max(...today.map((vote) => vote.count));
+    const nominees = today
+      .filter((vote) => vote.count === count)
+      .map(({ nominee }) => nominee);
+    return { count, nominees };
+  },
   /** Players: the grimoire to show instead of theirs, if any. */
   revealedGrimoire: (state) =>
     state.isSpectator ? state.gameOver || state.shownGrimoire : null,
@@ -207,9 +227,13 @@ const mutations = {
    * Create an entry in the vote history log. Requires current player array because it might change later in the game.
    * Only stores votes that were completed.
    * @param state
-   * @param players
+   * @param payload { players, day } (day: the day count, to know today's
+   * votes), or just the players
    */
-  addHistory(state, players) {
+  addHistory(state, payload) {
+    const { players, day } = Array.isArray(payload)
+      ? { players: payload }
+      : payload;
     if (!state.isVoteHistoryAllowed && state.isSpectator) return;
     if (!state.nomination || state.lockedVote <= players.length) return;
     const isExile = players[state.nomination[1]].role.team === "traveller";
@@ -227,6 +251,7 @@ const mutations = {
 
     state.voteHistory.push({
       timestamp: new Date(),
+      day,
       nominator: players[state.nomination[0]].name,
       nominee: players[state.nomination[1]].name,
       type: isExile ? "Exile" : "Execution",
