@@ -74,6 +74,7 @@ export default (store) => {
   const client = new ChatClient({ serverUrl, ...callbacks });
   const practice = new PracticeChat({
     ...callbacks,
+    selfPeerId,
     // a made-up player got an info card: the storyteller sees it for them
     onDelivered: (message) =>
       store.commit("practice/receive", {

@@ -2,11 +2,22 @@
   <div class="practice-badge" v-if="practice.active && players.length">
     <font-awesome-icon icon="user-graduate" />
     <span>{{ $t("practice.badge") }}</span>
-    <span class="leave" @click="leave">{{ $t("practice.leave") }}</span>
+    <template v-if="viewing">
+      <span class="viewing">
+        <font-awesome-icon icon="theater-masks" />
+        {{ $t("practice.viewing", { name: viewing.name }) }}
+      </span>
+      <span class="nominate" @click="$store.dispatch('practice/leaveView')">
+        {{ $t("practice.backToGrimoire") }}
+      </span>
+    </template>
+    <span class="leave" v-else @click="leave">
+      {{ $t("practice.leave") }}
+    </span>
     <!-- by day: a made-up player nominates another, at random -->
     <span
       class="nominate"
-      v-if="canNominate"
+      v-if="canNominate && !viewing"
       :title="$t('practice.nominateHint')"
       @click="$store.dispatch('practice/randomNomination')"
     >
@@ -16,6 +27,7 @@
     <!-- the made-up players answer cards and choices by themselves -->
     <span
       class="nominate auto"
+      v-if="!viewing"
       :class="{ on: practice.auto }"
       :title="$t('practice.autoHint')"
       @click="$store.commit('practice/setAuto', !practice.auto)"
@@ -38,6 +50,11 @@ export default {
     ...mapState(["practice"]),
     ...mapState("players", ["players"]),
     ...mapGetters("practice", ["canNominate"]),
+    // the made-up player the storyteller is viewing the game as
+    viewing() {
+      const { viewAs } = this.practice;
+      return (viewAs && this.players.find(({ id }) => id === viewAs)) || null;
+    },
   },
   methods: {
     leave() {

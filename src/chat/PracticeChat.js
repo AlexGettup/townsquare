@@ -25,6 +25,7 @@ export default class PracticeChat {
     onSeen,
     onChoice,
     onDelivered,
+    selfPeerId,
   }) {
     this.onStatus = onStatus;
     this.onHistory = onHistory;
@@ -33,15 +34,19 @@ export default class PracticeChat {
     this.onSeen = onSeen;
     this.onChoice = onChoice;
     this.onDelivered = onDelivered;
+    // who we are now: the storyteller, or the made-up player being viewed as
+    this.selfPeerId = selfPeerId || (() => STORYTELLER);
     this.messages = [];
     this.lastId = 0;
     this.isConnected = false;
   }
 
+  // called again on every sync (viewing as a player too), after the live
+  // chat client has said "off": the status has to come back each time
   connect() {
+    this.onStatus("connected");
     if (this.isConnected) return;
     this.isConnected = true;
-    this.onStatus("connected");
     this.onHistory([...this.messages]);
   }
 
@@ -54,8 +59,16 @@ export default class PracticeChat {
   // the server only uses this to keep players quiet at night
   setNight() {}
 
-  /** Storyteller: write in the plaza, or privately (to = player ID). */
+  /**
+   * Storyteller: write in the plaza, or privately (to = player ID). Viewing
+   * as a made-up player, they write as them (privately: to the storyteller).
+   */
   sendMessage(text, to = null) {
+    const self = this.selfPeerId();
+    if (self !== STORYTELLER) {
+      this._post(self, to ? "dm:" + self : PLAZA, text);
+      return;
+    }
     this._post(STORYTELLER, to ? "dm:" + to : PLAZA, text);
   }
 
@@ -65,9 +78,13 @@ export default class PracticeChat {
     this.onDelivered(message);
   }
 
-  // what players do, not used by the storyteller
-  markSeen() {}
-  answerCard() {}
+  // what players do: viewing as a made-up player, the storyteller does it
+  markSeen(id) {
+    this.seenBy(id);
+  }
+  answerCard(id, players) {
+    this.answerAs(id, players);
+  }
 
   clear() {
     this.messages = [];
