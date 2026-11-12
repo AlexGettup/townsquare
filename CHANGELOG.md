@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.28.0
+- Game diary for players (book button, top right): what the Storyteller told you and what you answered, deaths, the grimoire shown to you, and each day's nominations with who voted, night by night and day by day, newest first. Kept on the device for each game, so it survives a reload
+- Each day in the diary sums up who is on the block, how many votes tie and how many execute someone else. It replaces the vote table button for players
+- The vote panel tells dead players whether voting yes spends their ghost vote: not in exiles, nor with two votes; once they vote yes, the warning stands out
+- Storyteller: "Change character" moved under "More" in the player menu
+
 ### Version 3.27.0
 - Ghost votes are spent by themselves: when a vote goes all the way round and the Storyteller closes it, dead players who raised their hand lose their ghost vote. Not in exiles, nor for a Banshee with her ability; a vote reset or closed halfway spends nothing
 - The ghost vote icon no longer takes clicks: taking it away or giving it back by hand is under "More" in a dead player's menu. A double tap in the public grimoire only kills or revives

@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.28.0",
+    "date": "2026-11-12",
+    "title": {
+      "en": "The game diary",
+      "es": "El diario de la partida"
+    },
+    "en": [
+      "Game diary (book button, top right): what the Storyteller told you, deaths and each day's votes, night by night and day by day",
+      "Each day in the diary says who is on the block, how many votes tie and how many execute someone else",
+      "If you are dead, the vote panel tells you whether voting yes spends your ghost vote (it doesn't in exiles)",
+      "Storyteller: \"Change character\" is now under \"More\" in the player's menu"
+    ],
+    "es": [
+      "Diario de la partida (botón del libro, arriba a la derecha): lo que te dijo el Narrador, las muertes y las votaciones de cada día, noche a noche y día a día",
+      "Cada día del diario dice quién está en el patíbulo, cuántos votos empatan y cuántos ejecutan a otro",
+      "Si estás muerto, el panel de voto te dice si votar SÍ gasta tu voto fantasma (en los exilios no)",
+      "Narrador: «Cambiar personaje» está ahora en «Más», en el menú del jugador"
+    ]
+  },
+  {
     "version": "3.27.0",
     "date": "2026-11-12",
     "title": {
