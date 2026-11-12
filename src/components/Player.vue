@@ -344,6 +344,10 @@
             </template>
             <!-- storyteller: what is used less often -->
             <template v-if="submenu === 'more'">
+              <li @click="changeRole" v-if="player.role.id">
+                <font-awesome-icon icon="theater-masks" />
+                {{ $t("player.changeRole") }}
+              </li>
               <li
                 @click="showGrimoire"
                 v-if="
@@ -454,7 +458,12 @@
                 }}
               </li>
             </template>
-            <li @click="changeRole" v-if="canChangeRole">
+            <!-- players guess characters often; the storyteller rarely
+                 changes one once dealt (then it's under "More") -->
+            <li
+              @click="changeRole"
+              v-if="canChangeRole && (session.isSpectator || !player.role.id)"
+            >
               <font-awesome-icon icon="theater-masks" />
               {{ $t("player.changeRole") }}
             </li>
