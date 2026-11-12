@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.28.2
+- Upright phones with the guided night open: the edition logo, the counters and the vote move up with the seats, which they didn't in 3.28.1
+
 ### Version 3.28.1
 - The vote overlay showed two majorities in executions (the living's and the exile's): now only the one that applies, with the "to tie" line below it when someone is already on the block
 - Upright phones: the town square moves up into the free space above the guided night panel, which covered the bottom seats
