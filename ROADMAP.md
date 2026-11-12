@@ -92,6 +92,10 @@ panels you can drag around the screen.
 - [x] **Night order on touch screens** (3.20.0): tap the night order number next to a token to
       read its text (no hover there). Chosen over a long press, which nobody would find. A
       token's ability is covered by "Ability in the player menu" (For players).
+- [x] **Shorter player menu** (next release): the storyteller's seat menu keeps what each
+      phase uses most (wake or nominate, send info, kill, character, reminder); alignment,
+      note, show the grimoire and "view as" go under "More", the seat setup under "Seat".
+      A player's own seat puts pronouns, rename and leaving the seat under "My seat".
 - [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
       the bottom instead of floating over the seats.
 
