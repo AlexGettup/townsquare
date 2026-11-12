@@ -110,6 +110,16 @@ panels you can drag around the screen.
       sent to them show up as "What Ana sees", and the storyteller answers for them (seats
       chosen, a reply in the private chat); ticks and the book icon work as in a real game.
       In votes they raise hands at random. The chat of a practice game is lost on reload.
+- [x] **Automatic players in the practice game** (next release): a switch next to the badge
+      makes the made-up players answer by themselves, at random, a second or two later
+      (seats, a character, yes/no, closing cards and the grimoire).
+- [x] **View as a player in the practice game** (next release): "View as Ana" in a seat's
+      menu shows the game as Ana's device would (only her character, her cards and chat),
+      and the storyteller answers from there as she would. "Back to the grimoire" puts the
+      grimoire back as it was, also after a reload.
+- [x] **Reminders in the card window** (next release): under "Players", each player's
+      character and reminders, those of the recipient's character highlighted, so the
+      Investigator's two players are picked without closing the window.
 - [x] **Info cards** *(official)*: the storyteller sends a player a screen with what they learn —
       characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
       (Fortune Teller), players. Shown on the player's device and kept in their private chat.
@@ -204,6 +214,9 @@ cards, because characters like the Lunatic make an automatic version misleading.
       storyteller sets the value by hand (3.11.0).
 - [x] **Give back ghost votes** *(official)* (Ferryman) (3.25.0): one button returns the spent ghost
       vote to every dead player.
+- [x] **Votes to tie** (next release): when an earlier execution vote today reached the
+      majority, a new vote shows "(3 to tie with Ana, 4 to execute)". Players see it too if
+      they keep the vote history (hidden votes they didn't see don't count for them).
 - [ ] **Voudon vote** (traveller, rare): only the Voudon and the dead vote, and no majority
       is needed. The storyteller can adjust it by hand, but the count and majority shown would
       be wrong. No priority.
@@ -253,6 +266,8 @@ Ranked with the same criteria as the [next steps](#next-steps).
 
 ### Storyteller setup
 
+- [x] **Characters right after the edition** (next release): picking a script opens the
+      character selection (with five players or more) instead of closing the menu.
 - [ ] **Character selection rules** *(official)*: characters that can't go in the bag (Drunk,
       Marionette) and characters that can go in more than once (Legion, Riot; with the
       Atheist or Pope, any character). Check first what the character selector already does.
