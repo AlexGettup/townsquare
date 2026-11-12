@@ -37,9 +37,13 @@
           session.isSpectator ? $t("vote.hiddenPlayer") : $t("vote.hiddenST")
         }}
       </div>
+      <!-- executions count the living, exiles everyone -->
       <em v-if="nominee.role.team !== 'traveller'">
         {{ $t("vote.majority", { count: Math.ceil(alive / 2) }) }}
       </em>
+      <em v-else>{{
+        $t("vote.majority", { count: Math.ceil(players.length / 2) })
+      }}</em>
       <!-- someone is already about to die today: what this vote needs -->
       <em class="to-tie" v-if="toBeat">
         {{
@@ -50,9 +54,6 @@
           })
         }}
       </em>
-      <em v-else>{{
-        $t("vote.majority", { count: Math.ceil(players.length / 2) })
-      }}</em>
 
       <template v-if="!session.isSpectator">
         <div

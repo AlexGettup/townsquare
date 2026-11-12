@@ -339,6 +339,18 @@ export default {
   justify-content: center;
 }
 
+// upright phones: centred in the room above a bottom sheet (the guided
+// night), as far as the space at the top allows. "body" outweighs the
+// small screens' padding, set elsewhere
+@media (orientation: portrait) and (max-width: 767.98px) {
+  body #townsquare {
+    padding-bottom: calc(
+      10px + min(var(--bottom-sheet, 0px), max(0px, 100vh - 100vw - 100px))
+    );
+    transition: padding-bottom 200ms;
+  }
+}
+
 .circle {
   padding: 0;
   width: 100%;
