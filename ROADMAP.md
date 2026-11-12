@@ -223,6 +223,8 @@ cards, because characters like the Lunatic make an automatic version misleading.
 - [x] **Ghost votes spent by themselves** (next release): when a vote goes all the way round
       and is closed, dead players who raised their hand lose their ghost vote. Not in exiles,
       nor for a Banshee with her ability; a vote reset or closed halfway spends nothing.
+      The ghost vote icon no longer takes clicks: taking it away or giving it back by hand
+      is in the seat menu's "More", and a double tap only kills or revives.
 - [x] **Votes to tie** (3.26.0): when an earlier execution vote today reached the
       majority, a new vote shows "(3 to tie with Ana, 4 to execute)". Players see it too if
       they keep the vote history (hidden votes they didn't see don't count for them).

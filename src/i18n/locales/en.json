@@ -273,6 +273,8 @@
   },
   "player": {
     "ghostVote": "Ghost vote",
+    "spendGhostVote": "Take away the ghost vote",
+    "giveBackGhostVote": "Give back the ghost vote",
     "hasTwoVotes": "Has two votes",
     "cancel": "Cancel",
     "swapWithPlayer": "Swap seats with this player",
