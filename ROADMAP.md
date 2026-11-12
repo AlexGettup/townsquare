@@ -216,6 +216,9 @@ cards, because characters like the Lunatic make an automatic version misleading.
       storyteller sets the value by hand (3.11.0).
 - [x] **Give back ghost votes** *(official)* (Ferryman) (3.25.0): one button returns the spent ghost
       vote to every dead player.
+- [x] **Ghost votes spent by themselves** (next release): when a vote goes all the way round
+      and is closed, dead players who raised their hand lose their ghost vote. Not in exiles,
+      nor for a Banshee with her ability; a vote reset or closed halfway spends nothing.
 - [x] **Votes to tie** (3.26.0): when an earlier execution vote today reached the
       majority, a new vote shows "(3 to tie with Ana, 4 to execute)". Players see it too if
       they keep the vote history (hidden votes they didn't see don't count for them).
