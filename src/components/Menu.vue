@@ -1,8 +1,22 @@
 <template>
   <div id="controls">
+    <!-- players: the diary of the game (its votes included) -->
+    <span
+      class="nomlog-summary diary"
+      v-if="
+        session.isSpectator &&
+        (session.sessionId || $store.state.practice.active)
+      "
+      @click="toggleModal('diary')"
+      :title="$t('diary.title')"
+    >
+      <font-awesome-icon icon="book" />
+    </span>
     <span
       class="nomlog-summary"
-      v-show="session.voteHistory.length && session.sessionId"
+      v-show="
+        !session.isSpectator && session.voteHistory.length && session.sessionId
+      "
       @click="toggleModal('voteHistory')"
       :title="
         $tc('menu.recentNominations', session.voteHistory.length, {

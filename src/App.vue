@@ -39,6 +39,7 @@
     <ReferenceModal />
     <NightOrderModal />
     <VoteHistoryModal />
+    <DiaryModal />
     <GameStateModal />
     <ChangelogModal />
     <Gradients />
@@ -73,6 +74,7 @@ import Gradients from "./components/Gradients";
 import NightOrderModal from "./components/modals/NightOrderModal";
 import NpcModal from "@/components/modals/NpcModal";
 import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
+import DiaryModal from "@/components/modals/DiaryModal";
 import GameStateModal from "@/components/modals/GameStateModal";
 import ChangelogModal from "@/components/modals/ChangelogModal";
 import VoiceCorner from "@/components/VoiceCorner";
@@ -107,6 +109,7 @@ export default {
     GameStateModal,
     ChangelogModal,
     VoteHistoryModal,
+    DiaryModal,
     NpcModal,
     NightOrderModal,
     Vote,
