@@ -37,6 +37,7 @@ const faIcons = [
   "Crosshairs",
   "Dice",
   "Dragon",
+  "EllipsisH",
   "ExchangeAlt",
   "Eye",
   "Robot",
