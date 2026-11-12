@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.28.1",
+    "date": "2026-11-12",
+    "title": {
+      "en": "Fixes for votes and phones",
+      "es": "Arreglos en votos y móviles"
+    },
+    "en": [
+      "The vote showed two majorities: now only the one that counts",
+      "Storyteller on a phone: the guided night panel no longer covers the bottom seats"
+    ],
+    "es": [
+      "La votación mostraba dos mayorías: ahora solo la que cuenta",
+      "Narrador en el móvil: el panel de la noche guiada ya no tapa los asientos de abajo"
+    ]
+  },
+  {
     "version": "3.28.0",
     "date": "2026-11-12",
     "title": {

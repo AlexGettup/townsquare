@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.28.1
+- The vote overlay showed two majorities in executions (the living's and the exile's): now only the one that applies, with the "to tie" line below it when someone is already on the block
+- Upright phones: the town square moves up into the free space above the guided night panel, which covered the bottom seats
+
 ### Version 3.28.0
 - Game diary for players (book button, top right): what the Storyteller told you and what you answered, deaths, the grimoire shown to you, and each day's nominations with who voted, night by night and day by day, newest first. Kept on the device for each game, so it survives a reload
 - Each day in the diary sums up who is on the block, how many votes tie and how many execute someone else. It replaces the vote table button for players
