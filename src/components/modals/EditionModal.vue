@@ -178,6 +178,7 @@ export default {
     loadOfficial(edition) {
       this.$store.commit("setNpcs", {});
       this.$store.commit("setEdition", edition);
+      this.openRoles();
     },
     parseRoles(roles) {
       if (!roles || !roles.length) return;
@@ -206,6 +207,14 @@ export default {
         Object.assign({}, meta, { id: "custom" }),
       );
       this.isCustom = false;
+      this.openRoles();
+    },
+    // next step after picking the script: choosing the characters (that
+    // window needs five players or more)
+    openRoles() {
+      if (this.$store.getters["players/nonTravellers"] >= 5) {
+        this.toggleModal("roles");
+      }
     },
     ...mapMutations(["toggleModal"]),
   },
