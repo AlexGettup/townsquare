@@ -156,6 +156,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
+import { valueFromReminders } from "../store/voteValue";
 
 export default {
   computed: {
@@ -289,11 +290,31 @@ export default {
     },
     finish() {
       clearInterval(this.voteTimer);
+      this.spendGhostVotes();
       this.$store.commit("session/addHistory", {
         players: this.players,
         day: this.$store.state.grimoire.nightCount,
       });
       this.$store.commit("session/nomination");
+    },
+    /**
+     * The vote went all the way round: dead players who raised their hand
+     * used their ghost vote. Not in an exile (everyone votes there), nor for
+     * a Banshee with her ability (she votes while dead as often as she likes).
+     */
+    spendGhostVotes() {
+      if (this.session.lockedVote <= this.players.length) return;
+      if (this.nominee.role.team === "traveller") return;
+      this.players.forEach((player, index) => {
+        if (!player.isDead || player.isVoteless) return;
+        if (!this.session.votes[index]) return;
+        if (valueFromReminders(player.reminders) === 2) return;
+        this.$store.commit("players/update", {
+          player,
+          property: "isVoteless",
+          value: true,
+        });
+      });
     },
     vote(vote) {
       if (!this.canVote) return false;
