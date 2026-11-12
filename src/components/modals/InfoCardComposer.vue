@@ -109,16 +109,33 @@
       </ul>
     </section>
 
+    <!-- each with their character and reminders, as in the grimoire, so
+         "the Investigator's Minion and Wrong" can be picked without
+         closing the window -->
     <section>
       <h4>{{ $t("cards.players") }}</h4>
-      <ul class="chips">
+      <ul class="chips seats">
         <li
           v-for="(player, index) in players"
           :key="index"
-          :class="{ selected: line.players.includes(player.name) }"
+          :class="{
+            selected: line.players.includes(player.name),
+            dead: player.isDead,
+          }"
           @click="toggle(line.players, player.name)"
         >
-          {{ player.name }}
+          <span class="name">{{ player.name }}</span>
+          <span class="seat-role" v-if="player.role && player.role.id">
+            {{ localizeRole(player.role).name }}
+          </span>
+          <span
+            v-for="(reminder, n) in player.reminders"
+            :key="n"
+            class="seat-reminder"
+            :class="{ mine: recipientRoles.includes(reminder.role) }"
+          >
+            {{ reminderLabel(reminder) }}
+          </span>
         </li>
       </ul>
     </section>
@@ -236,6 +253,13 @@ export default {
     scriptRoles: function () {
       return [...this.roleMap.values()];
     },
+    // characters of whoever gets the card: their reminders stand out
+    recipientRoles: function () {
+      return this.seatedPlayers
+        .filter(({ id }) => this.recipients.includes(id))
+        .map(({ role }) => role && role.id)
+        .filter(Boolean);
+    },
     // the line being written: tokens, characters, players… go into it
     line: function () {
       return this.lines[this.current] || this.lines[0];
@@ -301,7 +325,7 @@ export default {
       );
     },
     ...mapState(["chat", "grimoire", "bluffs"]),
-    ...mapGetters(["localizeRole", "rolesJSONbyId"]),
+    ...mapGetters(["localizeRole", "localizeReminder", "rolesJSONbyId"]),
     ...mapState({ roleMap: "roles" }),
     ...mapState("players", ["players"]),
   },
@@ -322,6 +346,14 @@ export default {
   },
   methods: {
     lookOf,
+    // "Investigator: Minion"; a written reminder is just its text
+    reminderLabel(reminder) {
+      const text = this.localizeReminder(reminder);
+      const role =
+        this.roleMap.get(reminder.role) ||
+        this.rolesJSONbyId.get(reminder.role);
+      return role ? `${this.localizeRole(role).name}: ${text}` : text;
+    },
     /**
      * A token starts a new line, like the official app; on an empty line it
      * goes into that one. Only one line can be a choice: tapping "Make a
@@ -538,6 +570,30 @@ h4 {
   &.numbers li {
     min-width: 2em;
     text-align: center;
+  }
+  // players: name, then their character and reminders in small print
+  &.seats li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    border-radius: 10px;
+    padding: 3px 10px;
+    &.dead .name {
+      text-decoration: line-through;
+    }
+    .seat-role,
+    .seat-reminder {
+      font-size: 80%;
+      opacity: 0.75;
+    }
+    .seat-reminder.mine {
+      opacity: 1;
+      padding: 0 5px;
+      border-radius: 6px;
+      background: #c9a227;
+      color: black;
+    }
   }
 }
 
