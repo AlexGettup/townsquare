@@ -54,8 +54,24 @@
       <p class="hint" v-if="me.player.hasTwoVotes && !isLocked">
         {{ $t("vote.twoVotesHint") }}
       </p>
-      <p class="hint" v-if="me.player.isDead && !isLocked">
-        {{ $t("vote.ghostVoteHint") }}
+      <!-- dead: whether a yes costs the ghost vote -->
+      <p
+        class="ghost"
+        :class="{ spends: spendsGhostVote, armed: spendsGhostVote && myVote }"
+        v-if="me.player.isDead && !isLocked"
+      >
+        <font-awesome-icon :icon="spendsGhostVote ? 'skull' : 'check'" />
+        {{
+          $t(
+            !spendsGhostVote
+              ? isExile
+                ? "vote.ghostVoteExile"
+                : "vote.ghostVoteKept"
+              : myVote
+                ? "vote.ghostVoteArmed"
+                : "vote.ghostVoteHint",
+          )
+        }}
       </p>
     </template>
   </div>
@@ -90,6 +106,13 @@ export default {
     },
     noGhostVote: function () {
       return this.me.player.isVoteless && !this.isExile;
+    },
+    // a dead player's yes uses up their ghost vote, except in an exile or
+    // with two votes (as Vote.spendGhostVotes does)
+    spendsGhostVote: function () {
+      return (
+        this.me.player.isDead && !this.isExile && !this.me.player.hasTwoVotes
+      );
     },
     myVote: function () {
       // the keyboard shortcuts store true / false instead of 1 / 0
@@ -172,6 +195,27 @@ export default {
   .hint {
     color: gray;
     font-size: 90%;
+  }
+
+  .ghost {
+    font-size: 90%;
+    color: lightgray;
+    svg {
+      margin-right: 4px;
+    }
+    &.spends {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 200, 80, 0.6);
+      background: rgba(255, 200, 80, 0.12);
+      color: #ffd88a;
+    }
+    &.armed {
+      border-color: $demon;
+      background: rgba(206, 1, 0, 0.25);
+      color: white;
+      font-weight: bold;
+    }
   }
 
   .mine strong {

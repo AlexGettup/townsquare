@@ -270,9 +270,13 @@ Ranked with the same criteria as the [next steps](#next-steps).
    think they are. Only for touch screens: computers already show it on hover.
 3. [x] **Day and night counter** (3.19.0): "Day 3" / "Night 2" instead of only day or night, synced from
    the storyteller. Passive and clear; also gives the diary and the notes a reference.
-4. [ ] **Game diary**: everything you learnt, night by night ("Night 1: you are the Empath;
-   Night 2: you learn 1"), in one list. Info cards are kept in the private chat today, mixed
-   with the messages. Another place to look, so it goes after the counter, which labels it.
+4. [x] **Game diary** (next release): everything you learnt, night by night and day by day,
+   newest first: info cards and your answers, the storyteller's messages, deaths, the
+   grimoire shown to you, and each day's nominations with their votes. Kept on the device
+   per game, so it survives a reload. Each day says who is on the block, how many votes
+   tie and how many execute someone else (replaces the vote table button for players).
+   The dead see in the vote panel whether a yes spends their ghost vote (not in exiles,
+   nor with two votes).
 5. [ ] **Claims on the reference sheet**: tap a character on the reference sheet and note who
    claims it, so a double claim stands out. Hard to find and overlaps with the notes: better
    as a later extension of them than as a separate feature.

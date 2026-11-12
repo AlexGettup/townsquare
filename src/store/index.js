@@ -6,6 +6,7 @@ import voicePlugin from "./voice";
 import chatPlugin from "./chat";
 import practicePlugin from "./practice";
 import notesPlugin from "./notes";
+import diaryPlugin from "./diary";
 import wakeLockPlugin from "./wakeLock";
 import alertsPlugin from "./alerts";
 import voteValuePlugin from "./voteValue";
@@ -15,6 +16,7 @@ import voice from "./modules/voice";
 import chat from "./modules/chat";
 import alerts from "./modules/alerts";
 import notes from "./modules/notes";
+import diary from "./modules/diary";
 import practice from "./modules/practice";
 import editionJSON from "../editions.json";
 import rolesJSON from "../roles.json";
@@ -134,6 +136,7 @@ export default new Vuex.Store({
     chat,
     alerts,
     notes,
+    diary,
     practice,
   },
   state: {
@@ -168,6 +171,7 @@ export default new Vuex.Store({
       role: false,
       roles: false,
       voteHistory: false,
+      diary: false,
     },
     edition: editionJSONbyId.get("tb"),
     roles: getRolesByEdition(),
@@ -501,6 +505,7 @@ export default new Vuex.Store({
     wakeLockPlugin,
     alertsPlugin,
     notesPlugin,
+    diaryPlugin,
     voteValuePlugin,
   ],
 });
