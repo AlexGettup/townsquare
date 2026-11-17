@@ -25,8 +25,26 @@
 import MicProcessor, { isSupported as canProcessMic } from "./MicProcessor";
 
 const TRACK_NAME = "microphone";
-const PING_INTERVAL = 30 * 1000;
+const PING_INTERVAL = 15 * 1000;
 const RECONNECT_DELAY = 2000;
+// nothing from the server for this long (not even the pong): the socket is
+// dead without knowing it (phones changing network), so open another
+const SOCKET_SILENCE = 40 * 1000;
+// the audio connection "disconnected" often comes back by itself: wait
+const ICE_DISCONNECTED_WAIT = 8 * 1000;
+// the audio connection failed: join again after each of these, then give up
+const RECOVER_DELAYS = [1000, 2000, 4000, 8000, 15000, 30000];
+// errors with the microphone itself: joining again wouldn't help
+const FATAL_ERRORS = [
+  "InsecureContext",
+  "NotAllowedError",
+  "NotFoundError",
+  "NotReadableError",
+  "OverconstrainedError",
+  "SecurityError",
+];
+// reports to the voice server's logs, at most this many a minute
+const REPORTS_PER_MINUTE = 20;
 // voice activity detection
 const SPEAKING_THRESHOLD = 0.02; // RMS of the signal
 const SPEAKING_HOLD = 400; // ms to keep "speaking" after the last sound
@@ -40,6 +58,15 @@ const SENDING_CHECK_INTERVAL = 150;
 
 // changes when a peer rejoins with a new connection
 const remoteKey = (peer) => `${peer.peerId}/${peer.since}`;
+
+const connectionLost = (state) => {
+  const error = new Error(`audio connection ${state}`);
+  error.name = "ConnectionLost";
+  return error;
+};
+
+const errorText = (error) =>
+  error && error.name ? `${error.name}: ${error.message}` : String(error);
 
 export default class VoiceClient {
   constructor({
@@ -65,7 +92,20 @@ export default class VoiceClient {
     this.volumes = new Map();
     // noise suppression and voice gate: { denoise, auto, threshold (dB) }
     this.processing = { denoise: true, auto: true, threshold: -50 };
+    // getting back by ourselves after the connection failed (see _recover)
+    this.wasConnected = false;
+    this.recoverAttempt = 0;
+    this.recoverTimer = null;
+    this.reports = [];
     this._reset();
+    // a phone back from the background, or the network back: check at once
+    // instead of waiting for timers the browser may have paused
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") this._checkNow();
+      });
+      window.addEventListener("online", () => this._checkNow());
+    }
   }
 
   /** Send a room message (conversations, invitations…) to the server. */
@@ -87,6 +127,8 @@ export default class VoiceClient {
     this.socket = null;
     this.pingTimer = null;
     this.reconnectTimer = null;
+    this.lastHeard = 0;
+    this.iceTimer = null;
     this.pullRetryTimer = null;
     this.pullFailures = 0;
     // the latest room state from the voice server
@@ -107,16 +149,24 @@ export default class VoiceClient {
     this.night = null;
   }
 
+  // in voice chat, or getting back into it
   get isActive() {
-    return !!this.pc;
+    return !!this.pc || !!this.recoverTimer;
   }
 
   /**
    * Join the voice room of a game session. Must be called from a user
    * gesture (click), as browsers only allow microphone and audio then.
    */
-  async join({ channel, peerId, muted = false }) {
-    if (this.pc) await this.leave();
+  async join({ channel, peerId, muted = false, recovering = false }) {
+    if (!recovering) {
+      // joining by hand: whatever recovery was going on is over
+      clearTimeout(this.recoverTimer);
+      this.recoverTimer = null;
+      this.recoverAttempt = 0;
+      this.wasConnected = false;
+    }
+    if (this.pc) this._teardown();
     this.channel = channel;
     this.peerId = peerId;
     this.muted = muted;
@@ -144,9 +194,20 @@ export default class VoiceClient {
         bundlePolicy: "max-bundle",
       });
       this.pc.ontrack = (event) => this._onTrack(event);
-      this.pc.onconnectionstatechange = () => {
-        if (this.pc && this.pc.connectionState === "failed") {
-          this._fail(new Error("connection-lost"));
+      const pc = this.pc;
+      pc.onconnectionstatechange = () => {
+        if (this.pc !== pc) return;
+        const state = pc.connectionState;
+        clearTimeout(this.iceTimer);
+        if (state === "failed") {
+          this._fail(connectionLost("failed"));
+        } else if (state === "disconnected") {
+          // usually comes back by itself in a few seconds
+          this.iceTimer = setTimeout(() => {
+            if (this.pc === pc && pc.connectionState === "disconnected") {
+              this._fail(connectionLost("disconnected"));
+            }
+          }, ICE_DISCONNECTED_WAIT);
         }
       };
 
@@ -158,6 +219,11 @@ export default class VoiceClient {
       if (!this.pc) return;
       this._openSocket();
       this.vadTimer = setInterval(() => this._detectSpeaking(), 100);
+      if (recovering) {
+        this._report("recovered", `after ${this.recoverAttempt} attempt(s)`);
+      }
+      this.wasConnected = true;
+      this.recoverAttempt = 0;
       this.onStatus("connected");
     } catch (error) {
       this._fail(error);
@@ -165,13 +231,27 @@ export default class VoiceClient {
   }
 
   async leave() {
+    clearTimeout(this.recoverTimer);
+    this.recoverTimer = null;
+    this.recoverAttempt = 0;
+    this.wasConnected = false;
+    this._teardown();
+    this.onPeers([]);
+    this.onStatus("off");
+  }
+
+  /** Close everything of this call. `leaving`: tell the server it's on purpose. */
+  _teardown(leaving = true) {
     clearInterval(this.pingTimer);
     clearTimeout(this.reconnectTimer);
     clearTimeout(this.pullRetryTimer);
+    clearTimeout(this.iceTimer);
     clearInterval(this.vadTimer);
     if (this.socket) {
       this.socket.onclose = null;
-      this.socket.close(1000, "Leaving");
+      // 1000 tells the server we left; otherwise it keeps our place a while
+      if (leaving) this.socket.close(1000, "Leaving");
+      else this.socket.close(4001, "Reconnecting");
     }
     this.remotes.forEach((remote) => this._disposeRemote(remote));
     if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
@@ -179,8 +259,93 @@ export default class VoiceClient {
     if (this.pc) this.pc.close();
     if (this.audioContext) this.audioContext.close().catch(() => {});
     this._reset();
+  }
+
+  /**
+   * The audio connection failed during a call: join again by ourselves, a
+   * few times, waiting longer each time, before giving up with an error.
+   * The server keeps our place meanwhile (the socket closes as "reconnecting").
+   */
+  _recover(error) {
+    const { channel, peerId, muted } = this;
+    const why = errorText(error);
+    this._teardown(false);
+    this.channel = channel;
+    this.peerId = peerId;
+    this.muted = muted;
+    if (this.recoverAttempt >= RECOVER_DELAYS.length) {
+      this._report("gave-up", why);
+      this.recoverAttempt = 0;
+      this.wasConnected = false;
+      this.onPeers([]);
+      this.onStatus("error", error && error.name ? error.name : String(error));
+      return;
+    }
+    const delay = RECOVER_DELAYS[this.recoverAttempt++];
+    this._report("recovering", `${why} (attempt ${this.recoverAttempt})`);
     this.onPeers([]);
-    this.onStatus("off");
+    this.onStatus("connecting");
+    this.recoverTimer = setTimeout(() => this._retryJoin(), delay);
+  }
+
+  _retryJoin() {
+    clearTimeout(this.recoverTimer);
+    this.recoverTimer = null;
+    if (!this.channel) return;
+    this.join({
+      channel: this.channel,
+      peerId: this.peerId,
+      muted: this.muted,
+      recovering: true,
+    });
+  }
+
+  /** Back in the foreground or online: don't wait for timers to notice. */
+  _checkNow() {
+    if (this.recoverTimer) {
+      this._retryJoin();
+      return;
+    }
+    if (!this.pc) return;
+    if (this.pc.connectionState === "failed") {
+      this._fail(connectionLost("failed"));
+      return;
+    }
+    const socket = this.socket;
+    if (!socket || socket.readyState > WebSocket.OPEN) {
+      clearTimeout(this.reconnectTimer);
+      this._openSocket();
+    } else if (
+      socket.readyState === WebSocket.OPEN &&
+      Date.now() - this.lastHeard > SOCKET_SILENCE
+    ) {
+      this._restartSocket("silent after the background");
+    } else {
+      this._sendSocket({ type: "ping" });
+    }
+  }
+
+  /**
+   * Tell the voice server's logs what went wrong here, which it can't see
+   * (no personal data: the player ID it knows already, and the browser).
+   */
+  _report(event, detail = "") {
+    const now = Date.now();
+    this.reports = this.reports.filter((at) => now - at < 60 * 1000);
+    if (this.reports.length >= REPORTS_PER_MINUTE || !this.channel) return;
+    this.reports.push(now);
+    const room = encodeURIComponent(this.channel);
+    fetch(`${this.serverUrl}/rooms/${room}/report`, {
+      method: "POST",
+      keepalive: true,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        peer: this.peerId,
+        event,
+        detail: String(detail).slice(0, 300),
+        device: navigator.userAgent.slice(0, 200),
+      }),
+    }).catch(() => {});
   }
 
   setMuted(muted) {
@@ -340,8 +505,14 @@ export default class VoiceClient {
 
   _fail(error) {
     console.error("Voice chat error", error);
-    const message = error && error.name ? error.name : String(error);
-    this.leave().then(() => this.onStatus("error", message));
+    const name = error && error.name ? error.name : String(error);
+    // during a call, anything but the microphone itself: try again
+    if (this.wasConnected && !FATAL_ERRORS.includes(name)) {
+      this._recover(error);
+      return;
+    }
+    this._report("join-failed", errorText(error));
+    this.leave().then(() => this.onStatus("error", name));
   }
 
   _applyMute() {
@@ -455,6 +626,7 @@ export default class VoiceClient {
           this.remotes.delete(peer.peerId);
           this._schedulePullRetry();
         }
+        this._report("pull-failed", `${peer.peerId}: ${errorText(error)}`);
         throw error;
       }
       // the track may have arrived during the negotiation
@@ -745,6 +917,7 @@ export default class VoiceClient {
     const socket = new WebSocket(url);
     this.socket = socket;
     socket.onopen = () => {
+      this.lastHeard = Date.now();
       this._sendSocket({
         type: "join",
         sessionId: this.sessionId,
@@ -753,18 +926,23 @@ export default class VoiceClient {
       });
       if (this.night) this._sendSocket({ type: "night", ...this.night });
       clearInterval(this.pingTimer);
-      this.pingTimer = setInterval(
-        () => this._sendSocket({ type: "ping" }),
-        PING_INTERVAL,
-      );
+      this.pingTimer = setInterval(() => {
+        if (Date.now() - this.lastHeard > SOCKET_SILENCE) {
+          this._restartSocket("no answer from the server");
+        } else {
+          this._sendSocket({ type: "ping" });
+        }
+      }, PING_INTERVAL);
     };
     socket.onmessage = ({ data }) => {
+      this.lastHeard = Date.now();
       let message;
       try {
         message = JSON.parse(data);
       } catch (e) {
         return;
       }
+      if (message.type === "pong") return;
       if (message.type === "peers") {
         this._onPeers(message.peers, message.hear);
       } else if (message.type === "mute") this.onForceMute();
@@ -786,6 +964,21 @@ export default class VoiceClient {
         );
       }
     };
+  }
+
+  /**
+   * The socket looks open but nothing comes through: drop it and open
+   * another. Closed as "reconnecting", so the server keeps our place.
+   */
+  _restartSocket(why) {
+    this._report("socket-restart", why);
+    clearInterval(this.pingTimer);
+    clearTimeout(this.reconnectTimer);
+    if (this.socket) {
+      this.socket.onclose = null;
+      this.socket.close(4001, "Reconnecting");
+    }
+    if (this.pc) this._openSocket();
   }
 
   _sendSocket(message) {
