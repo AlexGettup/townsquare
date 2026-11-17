@@ -64,6 +64,40 @@ const callSfu = (env, method, path, body) =>
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
+// one log line, as JSON, so Workers Logs can filter by its fields
+const log = (event, fields) =>
+  console.log(JSON.stringify({ event, ...fields }));
+
+/**
+ * What went wrong on a client (its audio connection failed, it reconnected
+ * by itself…), told by the client: the server can't see it. Only logged.
+ */
+const logReport = async (request, room) => {
+  if (request.method !== "POST") return new Response(null, { status: 405 });
+  const raw = (await request.text()).slice(0, 2000);
+  let report;
+  try {
+    report = JSON.parse(raw);
+  } catch (e) {
+    return new Response(null, { status: 400 });
+  }
+  log("client", {
+    room: shortString(decodeURIComponent(room), 80),
+    peer: shortString(report.peer, 80),
+    what: shortString(report.event, 40),
+    detail: shortString(report.detail, 300),
+    device: shortString(report.device, 200),
+  });
+  return new Response(null, { status: 204 });
+};
+
+// the game session's channel, from a room URL (for the logs)
+const roomOf = (url) =>
+  shortString(
+    decodeURIComponent((url.pathname.match(/^\/rooms\/([^/]+)/) || [])[1]),
+    80,
+  );
+
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {
     status,
@@ -81,7 +115,12 @@ export default {
       return withCors(new Response(null, { status: 204 }), origin);
     }
 
-    const room = url.pathname.match(/^\/rooms\/([^/]+)\/(ws|chat|sfu\/.+)$/);
+    const room = url.pathname.match(
+      /^\/rooms\/([^/]+)\/(ws|chat|report|sfu\/.+)$/,
+    );
+    if (room && room[2] === "report") {
+      return withCors(await logReport(request, room[1]), origin);
+    }
     if (room) {
       const channel = decodeURIComponent(room[1]).toLowerCase();
       const stub = env.ROOMS.get(env.ROOMS.idFromName(channel));
@@ -102,6 +141,9 @@ const STORYTELLER = "host";
 // open rooms anyone can walk into
 const FIXED_ROOMS = ["tavern", "church", "graveyard"];
 const PLAZA = "plaza";
+// how long someone whose connection dropped keeps their place (and is still
+// heard): enough to reconnect, or for a phone to come back from the background
+const DEPARTED_GRACE = 30 * 1000;
 const isConversation = (location) =>
   typeof location === "string" && location.startsWith("conv-");
 // text chat: longest message, and how many messages the room remembers
@@ -250,6 +292,15 @@ export class VoiceRoom {
         PRIMARY KEY (session, mid)
       )`,
     );
+    // people whose voice socket dropped, kept for a while: { peer, state, at }
+    // (state is their socket's attachment)
+    this.sql.exec(
+      `CREATE TABLE IF NOT EXISTS departed (
+        peer TEXT PRIMARY KEY,
+        state TEXT NOT NULL,
+        at INTEGER NOT NULL
+      )`,
+    );
     // day or night, set by the storyteller
     this.night = false;
     ctx.blockConcurrencyWhile(async () => {
@@ -273,8 +324,14 @@ export class VoiceRoom {
       return new Response("Missing peer", { status: 400 });
     }
     if (url.pathname.endsWith("/chat")) return this.acceptChat(peerId);
-    // a peer reconnecting (new tab, network change) replaces its old socket
+    // a peer reconnecting (new tab, network change) replaces its old socket,
+    // and gets back where it was when it joins (see "join")
+    const room = roomOf(url);
     this.ctx.getWebSockets(peerId).forEach((old) => {
+      if (isChat(old)) return;
+      const state = old.deserializeAttachment() || {};
+      if (state.sessionId) this.keepDeparted(state, old);
+      log("replaced", { room, peer: peerId });
       try {
         old.close(4000, "Replaced by a new connection");
       } catch (e) {
@@ -285,6 +342,7 @@ export class VoiceRoom {
     this.ctx.acceptWebSocket(server, [peerId]);
     server.serializeAttachment({
       peerId,
+      room,
       sessionId: null,
       trackName: null,
       muted: false,
@@ -295,27 +353,112 @@ export class VoiceRoom {
     return new Response(null, { status: 101, webSocket: client });
   }
 
+  /**
+   * A peer whose voice socket dropped without leaving: kept in the room for a
+   * while, as it was. Its audio still reaches the SFU (only the socket broke),
+   * so the others keep hearing it, and if it comes back in time nobody
+   * notices. Once that time is up it's gone (alarm).
+   */
+  keepDeparted(state, except) {
+    const { peerId } = state;
+    // a newer socket of theirs already joined: that one counts
+    const isBack = this.sockets(except).some((ws) => {
+      const other = ws.deserializeAttachment() || {};
+      return other.peerId === peerId && other.sessionId;
+    });
+    if (isBack) return;
+    this.sql.exec(
+      `INSERT OR REPLACE INTO departed (peer, state, at) VALUES (?, ?, ?)`,
+      peerId,
+      JSON.stringify(state),
+      Date.now(),
+    );
+    this.scheduleAlarm().catch((e) => log("alarm-error", { error: String(e) }));
+  }
+
+  forgetDeparted(peerId) {
+    this.sql.exec(`DELETE FROM departed WHERE peer = ?`, peerId);
+  }
+
+  departedState(peerId) {
+    const row = this.sql
+      .exec(`SELECT state FROM departed WHERE peer = ?`, peerId)
+      .toArray()[0];
+    return row ? JSON.parse(row.state) : null;
+  }
+
+  // departed peers still in their time, unless they are back already
+  departed(except) {
+    const back = new Set(
+      this.sockets(except)
+        .map((ws) => ws.deserializeAttachment() || {})
+        .filter((peer) => peer.sessionId)
+        .map((peer) => peer.peerId),
+    );
+    const since = Date.now() - DEPARTED_GRACE;
+    return this.sql
+      .exec(`SELECT peer, state FROM departed WHERE at > ?`, since)
+      .toArray()
+      .filter(({ peer }) => !back.has(peer))
+      .map(({ state }) => JSON.parse(state));
+  }
+
+  async scheduleAlarm() {
+    const row = this.sql
+      .exec(`SELECT MIN(at) AS first FROM departed`)
+      .toArray()[0];
+    if (!row || row.first === null) return;
+    const when = row.first + DEPARTED_GRACE + 500;
+    const current = await this.ctx.storage.getAlarm();
+    if (current === null || current > when) {
+      await this.ctx.storage.setAlarm(when);
+    }
+  }
+
+  // time's up for departed peers that didn't come back: they left
+  async alarm() {
+    const since = Date.now() - DEPARTED_GRACE;
+    const gone = this.sql
+      .exec(`SELECT peer, state FROM departed WHERE at <= ?`, since)
+      .toArray();
+    this.sql.exec(`DELETE FROM departed WHERE at <= ?`, since);
+    gone.forEach(({ peer, state }) =>
+      log("gone", { room: JSON.parse(state).room, peer }),
+    );
+    if (gone.length) {
+      this.cleanUp();
+      this.broadcastPeers();
+      await this.enforce();
+    }
+    await this.scheduleAlarm();
+  }
+
+  // everyone sending audio (live sockets, then departed peers still in their
+  // time), as their attachment, except an optional closing socket
+  states(except) {
+    const live = this.sockets(except)
+      .map((ws) => ws.deserializeAttachment())
+      .filter((peer) => peer && peer.sessionId);
+    return [...live, ...this.departed(except)];
+  }
+
   // everyone currently sending audio, except an optional closing socket.
   // Pending invitations stay private to the invited peer.
   peers(except) {
-    return this.sockets(except)
-      .map((ws) => ws.deserializeAttachment())
-      .filter((peer) => peer && peer.sessionId)
-      .map((peer) => {
-        const visible = withDefaults(peer);
-        delete visible.invitedBy;
-        // the SFU session stays secret: tracks are pulled by peerId
-        delete visible.sessionId;
-        delete visible.trackName;
-        return visible;
-      });
+    return this.states(except).map((peer) => {
+      const visible = withDefaults(peer);
+      delete visible.invitedBy;
+      // the SFU session stays secret: tracks are pulled by peerId
+      delete visible.sessionId;
+      delete visible.trackName;
+      delete visible.room;
+      return visible;
+    });
   }
 
   // the voice state of everyone sending audio (SFU session included)
   voicePeers(except) {
-    return this.sockets(except)
-      .map((ws) => withDefaults(ws.deserializeAttachment() || {}))
-      .filter((peer) => peer.sessionId);
+    return this.states(except).map(withDefaults);
   }
 
   /**
@@ -384,9 +527,9 @@ export class VoiceRoom {
    * the plaza) and forget requests to join conversations that are gone.
    */
   cleanUp(except) {
+    // whoever is reconnecting still counts: the conversation waits for them
     const counts = {};
-    this.sockets(except).forEach((ws) => {
-      const { location } = ws.deserializeAttachment() || {};
+    this.states(except).forEach(({ location }) => {
       if (isConversation(location))
         counts[location] = (counts[location] || 0) + 1;
     });
@@ -497,10 +640,21 @@ export class VoiceRoom {
       const everyone = this.voicePeers();
       const host = everyone.find((peer) => peer.peerId === STORYTELLER);
       const listener = everyone.find((peer) => peer.sessionId === session);
-      if (!listener) return json({ errorCode: "not_in_room" }, 403);
+      const room = roomOf(new URL(request.url));
+      if (!listener) {
+        log("pull-refused", { room, why: "not_in_room" });
+        return json({ errorCode: "not_in_room" }, 403);
+      }
       for (const track of remote) {
         const speaker = everyone.find((peer) => peer.peerId === track.peerId);
         if (!speaker || !this.canPull(listener, speaker, host)) {
+          // usually a moment out of step (moved, night fell): it retries
+          log("pull-refused", {
+            room,
+            peer: listener.peerId,
+            speaker: shortString(track.peerId, 80),
+            why: speaker ? "not_allowed" : "speaker_gone",
+          });
           return json({ errorCode: "not_allowed" }, 403);
         }
         pulled.push({ track, speaker: speaker.peerId });
@@ -512,6 +666,26 @@ export class VoiceRoom {
 
     const response = await callSfu(this.env, request.method, path, body);
     const data = await response.json().catch(() => ({}));
+
+    // what failed at the SFU: the whole call, or some of its tracks
+    const failedTracks = (data.tracks || []).filter((track) => track.errorCode);
+    if (!response.ok || data.errorCode || failedTracks.length) {
+      const listener = this.voicePeers().find(
+        (peer) => peer.sessionId === session,
+      );
+      log("sfu-error", {
+        room: roomOf(new URL(request.url)),
+        peer: listener ? listener.peerId : null,
+        call: path.replace(/^sessions\/[\w-]+\//, ""),
+        status: response.status,
+        error: data.errorCode || null,
+        description: shortString(data.errorDescription, 200) || null,
+        tracks: failedTracks.map(
+          (track) => `${track.errorCode}: ${track.errorDescription || ""}`,
+        ),
+        speakers: pulled.map(({ speaker }) => speaker),
+      });
+    }
 
     if (session && response.ok) {
       if (pulled.length) {
@@ -562,17 +736,40 @@ export class VoiceRoom {
     }
     const me = withDefaults(ws.deserializeAttachment());
     switch (message.type) {
-      case "join":
+      case "join": {
+        // back after a dropped connection (or a reload): where they were
+        const before = this.departedState(me.peerId);
+        this.forgetDeparted(me.peerId);
+        const sessionId = String(message.sessionId);
+        const sameAudio = !!before && before.sessionId === sessionId;
+        const kept = before
+          ? {
+              location: before.location || PLAZA,
+              invitedBy: before.invitedBy || [],
+              awake: before.awake,
+              broadcast: before.broadcast,
+            }
+          : {};
         ws.serializeAttachment({
           ...me,
-          sessionId: String(message.sessionId),
+          ...kept,
+          requesting: null,
+          sessionId,
           trackName: String(message.trackName),
           muted: !!message.muted,
-          // tells clients a peer rejoined with a new connection
-          since: Date.now(),
+          // tells clients a peer rejoined with a new connection; the same
+          // audio connection after a dropped socket goes on as it was
+          since: sameAudio && before.since ? before.since : Date.now(),
         });
+        log("join", {
+          room: me.room,
+          peer: me.peerId,
+          back: before ? (sameAudio ? "same-audio" : "new-audio") : "new",
+        });
+        this.cleanUp();
         this.broadcastPeers();
         break;
+      }
       case "update":
         ws.serializeAttachment({ ...me, muted: !!message.muted });
         this.broadcastPeers();
@@ -911,20 +1108,37 @@ export class VoiceRoom {
     }
   }
 
-  async webSocketClose(ws, code) {
+  async webSocketClose(ws, code, reason) {
     try {
       ws.close(code === 1005 ? 1000 : code, "Closed");
     } catch (e) {
       // already closed
     }
-    if (isChat(ws)) return;
-    this.cleanUp(ws);
-    this.broadcastPeers(ws);
-    await this.enforce(ws);
+    await this.departs(ws, code, reason);
   }
 
-  async webSocketError(ws) {
+  async webSocketError(ws, error) {
+    await this.departs(ws, 1006, String(error));
+  }
+
+  /**
+   * A socket closed. Leaving voice on purpose (1000) is final; anything else
+   * (network, phone in the background) keeps the place for a while.
+   */
+  async departs(ws, code, reason) {
+    const state = ws.deserializeAttachment() || {};
+    log("closed", {
+      room: state.room,
+      peer: state.peerId,
+      kind: isChat(ws) ? "chat" : "voice",
+      code,
+      reason: shortString(reason, 100),
+    });
     if (isChat(ws)) return;
+    if (state.sessionId) {
+      if (code === 1000) this.forgetDeparted(state.peerId);
+      else this.keepDeparted(state, ws);
+    }
     this.cleanUp(ws);
     this.broadcastPeers(ws);
     await this.enforce(ws);

@@ -2,6 +2,11 @@ name = "townsquare-voice"
 main = "src/index.js"
 compatibility_date = "2025-10-01"
 
+# Workers Logs (free plan: 200,000 lines a day, kept 3 days): what goes wrong
+# in a game (closed sockets, SFU errors, clients' reports) can be read later
+[observability]
+enabled = true
+
 [vars]
 # pages allowed to use the voice server (localhost and LAN are always allowed)
 ALLOWED_ORIGINS = "https://alexgettup.github.io"
