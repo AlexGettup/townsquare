@@ -349,6 +349,13 @@
                 {{ $t("player.changeRole") }}
               </li>
               <li
+                @click="sendCharacter"
+                v-if="player.id && (session.sessionId || practice.active)"
+              >
+                <font-awesome-icon icon="user-tag" />
+                {{ $t("player.sendCharacter") }}
+              </li>
+              <li
                 @click="showGrimoire"
                 v-if="
                   grimoire.isNight &&
@@ -1045,6 +1052,10 @@ export default {
     changeRole() {
       this.isMenuOpen = false;
       this.$emit("trigger", ["openRoleModal"]);
+    },
+    sendCharacter() {
+      this.isMenuOpen = false;
+      this.$emit("trigger", ["openSendCharacterModal"]);
     },
     removePlayer() {
       this.isMenuOpen = false;

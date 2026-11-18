@@ -63,6 +63,7 @@ export const emptyPart = (phrase = null) => ({
   players: [],
   number: null,
   answer: null,
+  alignment: null,
 });
 
 export const isEmptyPart = (part) =>
@@ -70,7 +71,33 @@ export const isEmptyPart = (part) =>
   !part.roles.length &&
   !part.players.length &&
   part.number === null &&
-  !part.answer;
+  !part.answer &&
+  !part.alignment;
+
+/** Good or evil on a "You are" line (Snake Charmer, Fang Gu, Goon). */
+export const ALIGNMENTS = ["good", "evil"];
+
+/**
+ * A character token's alignment, "good" or "evil" (travellers can also be
+ * neither: null). `alignmentIndex` flips the team's usual side.
+ */
+export const alignmentOf = (team, alignmentIndex) => {
+  if (team === "traveller")
+    return [null, "good", "evil"][alignmentIndex] || null;
+  if (team === "townsfolk" || team === "outsider")
+    return alignmentIndex ? "evil" : "good";
+  if (team === "minion" || team === "demon")
+    return alignmentIndex ? "good" : "evil";
+  return null;
+};
+
+/** The `alignmentIndex` that gives a character of `team` that alignment. */
+export const alignmentIndexOf = (team, alignment) => {
+  if (team === "traveller") return { good: 1, evil: 2 }[alignment] || 0;
+  if (team === "minion" || team === "demon")
+    return alignment === "good" ? 1 : 0;
+  return alignment === "evil" ? 1 : 0;
+};
 
 /** A card's lines; cards from before lines existed are one line. */
 export const partsOf = (card) =>
@@ -83,6 +110,7 @@ export const partsOf = (card) =>
           players: card.players || [],
           number: card.number === undefined ? null : card.number,
           answer: card.answer || null,
+          alignment: card.alignment || null,
         },
       ].filter((part) => !isEmptyPart(part));
 
@@ -119,6 +147,7 @@ export const describePart = (part, t, roleName) => {
     ...part.players,
     ...(part.number !== null ? [String(part.number)] : []),
     ...(part.answer ? [t(`cards.${part.answer}`)] : []),
+    ...(part.alignment ? [t(`modals.role.alignment.${part.alignment}`)] : []),
   ].join(", ");
   if (!part.phrase) return items;
   const phrase = t(`cards.phrases.${part.phrase}`);

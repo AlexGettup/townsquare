@@ -114,6 +114,7 @@
 
     <ReminderModal :player-index="selectedPlayer"></ReminderModal>
     <NoteModal :player-index="selectedPlayer"></NoteModal>
+    <SendCharacterModal :player-index="selectedPlayer"></SendCharacterModal>
     <RoleModal :player-index="selectedPlayer"></RoleModal>
   </div>
 </template>
@@ -124,6 +125,7 @@ import Player from "./Player";
 import Token from "./Token";
 import ReminderModal from "./modals/ReminderModal";
 import NoteModal from "./modals/NoteModal";
+import SendCharacterModal from "./modals/SendCharacterModal";
 import RoleModal from "./modals/RoleModal";
 
 export default {
@@ -133,6 +135,7 @@ export default {
     RoleModal,
     ReminderModal,
     NoteModal,
+    SendCharacterModal,
   },
   computed: {
     ...mapGetters({ nightOrder: "players/nightOrder" }),
@@ -203,6 +206,10 @@ export default {
     openNoteModal(playerIndex) {
       this.selectedPlayer = playerIndex;
       this.$store.commit("toggleModal", "note");
+    },
+    openSendCharacterModal(playerIndex) {
+      this.selectedPlayer = playerIndex;
+      this.$store.commit("toggleModal", "sendCharacter");
     },
     openRoleModal(playerIndex) {
       const player = this.players[playerIndex];

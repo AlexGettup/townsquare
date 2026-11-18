@@ -189,6 +189,9 @@ class LiveSession {
       case "player":
         this._updatePlayer(params);
         break;
+      case "newRole":
+        this._receiveNewRole(params);
+        break;
       case "claim":
         this._updateSeat(params);
         break;
@@ -737,16 +740,7 @@ class LiveSession {
           role.team !== "traveller"
         ) {
           this._store.dispatch("players/clearRoles");
-          if (!this._store.state.grimoire.isMuted) {
-            this._notify.currentTime = 0;
-            if (this._notify.setSinkId) {
-              const { outputId } = this._store.state.voice;
-              this._notify.setSinkId(outputId).catch(() => {});
-            }
-            this._notify.play().catch((err) => {
-              console.warn("Audio play prevented by browser policy - ", err);
-            });
-          }
+          this._ring();
         }
         this._store.commit("players/update", {
           player,
@@ -758,6 +752,62 @@ class LiveSession {
       // just update the player otherwise
       this._store.commit("players/update", { player, property, value });
     }
+  }
+
+  /** The sound of getting a character, unless muted. */
+  _ring() {
+    if (this._store.state.grimoire.isMuted) return;
+    this._notify.currentTime = 0;
+    if (this._notify.setSinkId) {
+      const { outputId } = this._store.state.voice;
+      this._notify.setSinkId(outputId).catch(() => {});
+    }
+    this._notify.play().catch((err) => {
+      console.warn("Audio play prevented by browser policy - ", err);
+    });
+  }
+
+  /**
+   * Player: the storyteller gave us a new character mid-game (Snake Charmer,
+   * Pit-Hag…). Unlike dealing, what we noted on the other seats stays.
+   */
+  _receiveNewRole({ index, role: roleId, alignmentIndex }) {
+    if (!this._isSpectator) return;
+    const player = this._store.state.players.players[index];
+    if (!player || player.id !== this._store.state.session.playerId) return;
+    const role =
+      this._store.state.roles.get(roleId) ||
+      this._store.getters.rolesJSONbyId.get(roleId) ||
+      this._store.state.otherTravellers.get(roleId);
+    if (!role) return;
+    this._store.commit("players/update", {
+      player,
+      property: "role",
+      value: role,
+    });
+    this._store.commit("players/update", {
+      player,
+      property: "alignmentIndex",
+      value: alignmentIndex || 0,
+    });
+    this._ring();
+  }
+
+  /**
+   * Storyteller: send one player their new character and alignment (see the
+   * session/sendCharacter action). Only that player gets it.
+   */
+  sendNewRole({ playerId, roleId, alignmentIndex }) {
+    if (this._isSpectator) return;
+    const index = this._store.state.players.players.findIndex(
+      (player) => player.id === playerId,
+    );
+    if (index < 0) return;
+    this._sendDirect(playerId, "newRole", {
+      index,
+      role: roleId,
+      alignmentIndex,
+    });
   }
 
   /**
@@ -958,6 +1008,15 @@ class LiveSession {
       property: "role",
       value: roleId,
     });
+    // an alignment sent with a new character (Snake Charmer, Goon…)
+    const alignmentIndex = this._store.state.session.dealtAlignments[playerId];
+    if (alignmentIndex) {
+      this._sendDirect(playerId, "player", {
+        index,
+        property: "alignmentIndex",
+        value: alignmentIndex,
+      });
+    }
   }
 
   /**
@@ -1075,6 +1134,7 @@ class LiveSession {
       }
     });
     this._store.commit("session/setDealtRoles", dealtRoles);
+    this._store.commit("session/setDealtAlignments", {});
     if (Object.keys(message).length) {
       this._send("direct", message);
     }
@@ -1387,6 +1447,9 @@ export default (store) => {
         break;
       case "session/claimSeat":
         session.claimSeat(payload);
+        break;
+      case "session/setDealtRole":
+        session.sendNewRole(payload);
         break;
       case "session/distributeRoles":
         if (payload) {
