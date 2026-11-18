@@ -364,7 +364,7 @@ export default class VoiceClient {
   }
 
   /**
-   * "I can't hear anyone": send the voice server's logs what this device
+   * "I can't hear someone": send the voice server's logs what this device
    * sees (whom it should hear, whether their audio arrives, whether it plays
    * it), then receive everyone again from scratch. `extra`: what the app
    * knows (day or night, place). Returns the snapshot.

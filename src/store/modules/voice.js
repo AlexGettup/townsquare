@@ -236,7 +236,7 @@ const actions = {
     return this.$voice.leave();
   },
   /**
-   * "I can't hear anyone": tell the voice server's logs what this device
+   * "I can't hear someone": tell the voice server's logs what this device
    * sees, and receive everyone again.
    */
   async checkAudio({ state, getters, rootState, commit }) {
