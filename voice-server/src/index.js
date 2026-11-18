@@ -74,7 +74,7 @@ const log = (event, fields) =>
  */
 const logReport = async (request, room) => {
   if (request.method !== "POST") return new Response(null, { status: 405 });
-  const raw = (await request.text()).slice(0, 2000);
+  const raw = (await request.text()).slice(0, 5000);
   let report;
   try {
     report = JSON.parse(raw);
@@ -85,7 +85,7 @@ const logReport = async (request, room) => {
     room: shortString(decodeURIComponent(room), 80),
     peer: shortString(report.peer, 80),
     what: shortString(report.event, 40),
-    detail: shortString(report.detail, 300),
+    detail: shortString(report.detail, 3000),
     device: shortString(report.device, 200),
   });
   return new Response(null, { status: 204 });

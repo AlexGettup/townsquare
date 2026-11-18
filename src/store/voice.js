@@ -64,7 +64,8 @@ export default (store) => {
     serverUrl: process.env.VUE_APP_VOICE_URL || "",
     onStatus: (status, error) =>
       store.commit("voice/setStatus", { status, error }),
-    onPeers: (peers, self) => store.commit("voice/setPeers", { peers, self }),
+    onPeers: (peers, self, hear) =>
+      store.commit("voice/setPeers", { peers, self, hear }),
     onSpeaking: (peerId, speaking) =>
       store.commit("voice/setSpeaking", { peerId, speaking }),
     onForceMute: () => {

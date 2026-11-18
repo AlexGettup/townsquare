@@ -11,8 +11,9 @@
  *
  * Events (callbacks passed to the constructor):
  * - onStatus(status, error)   "connecting" | "connected" | "off" | "error"
- * - onPeers(peers, self)      everyone else in voice, and our own entry:
- *                             { peerId, muted, location, requesting, … }
+ * - onPeers(peers, self, hear) everyone else in voice, and our own entry:
+ *                             { peerId, muted, location, requesting, … };
+ *                             hear: the peerIds the server lets us receive
  * - onSpeaking(peerId, bool)  voice activity, also for the local peer
  * - onForceMute()             the storyteller muted us
  * - onEvent(message)          invite / request / declined / gather
@@ -343,7 +344,7 @@ export default class VoiceClient {
    * Tell the voice server's logs what went wrong here, which it can't see
    * (no personal data: the player ID it knows already, and the browser).
    */
-  _report(event, detail = "") {
+  _report(event, detail = "", maxLength = 300) {
     const now = Date.now();
     this.reports = this.reports.filter((at) => now - at < 60 * 1000);
     if (this.reports.length >= REPORTS_PER_MINUTE || !this.channel) return;
@@ -356,10 +357,89 @@ export default class VoiceClient {
       body: JSON.stringify({
         peer: this.peerId,
         event,
-        detail: String(detail).slice(0, 300),
+        detail: String(detail).slice(0, maxLength),
         device: navigator.userAgent.slice(0, 200),
       }),
     }).catch(() => {});
+  }
+
+  /**
+   * "I can't hear anyone": send the voice server's logs what this device
+   * sees (whom it should hear, whether their audio arrives, whether it plays
+   * it), then receive everyone again from scratch. `extra`: what the app
+   * knows (day or night, place). Returns the snapshot.
+   */
+  async checkAudio(extra = {}) {
+    if (!this.pc) return null;
+    const packetsOf = async (rtc, type, field) => {
+      let total = 0;
+      try {
+        (await rtc.getStats()).forEach((report) => {
+          if (report.type === type) total += report[field] || 0;
+        });
+      } catch (error) {
+        return null;
+      }
+      return total;
+    };
+    const now = Date.now();
+    const transceivers = this.pc.getTransceivers();
+    const peers = {};
+    for (const { peerId } of this.roomPeers) {
+      const remote = this.remotes.get(peerId);
+      const transceiver =
+        remote && remote.mid && transceivers.find((t) => t.mid === remote.mid);
+      // one short line each, to fit 20 players in a log line. Flags: H the
+      // server lets us hear them, A we play them (not silenced here), C the
+      // server stopped them, P pulled, > playing, M element muted (volume
+      // through Web Audio, or silenced); then packets received, seconds
+      // without audio and volume. "-" where a flag is off.
+      const flag = (on, letter) => (on ? letter : "-");
+      const hear = flag(this.hear.includes(peerId), "H");
+      if (!remote) {
+        peers[peerId] = `${hear} not received`;
+        continue;
+      }
+      const packets = transceiver
+        ? await packetsOf(
+            transceiver.receiver,
+            "inbound-rtp",
+            "packetsReceived",
+          )
+        : null;
+      const volume = this.volumes.has(peerId) ? this.volumes.get(peerId) : 1;
+      peers[peerId] =
+        hear +
+        flag(this.audible.get(peerId) !== false, "A") +
+        flag(remote.closed, "C") +
+        flag(!!remote.mid, "P") +
+        flag(!!remote.audio && !remote.audio.paused, ">") +
+        flag(!!remote.audio && remote.audio.muted, "M") +
+        ` n${packets} s${Math.round((now - remote.packetsAt) / 1000)}` +
+        ` v${volume}`;
+    }
+    const snapshot = {
+      ...extra,
+      muted: this.muted,
+      sent: this.micSender
+        ? await packetsOf(this.micSender, "outbound-rtp", "packetsSent")
+        : null,
+      audioContext: this.audioContext ? this.audioContext.state : null,
+      connection: this.pc.connectionState,
+      ice: this.pc.iceConnectionState,
+      socket: this.socket ? this.socket.readyState : null,
+      peers,
+    };
+    this._report("no-audio", JSON.stringify(snapshot), 3000);
+
+    // then fix what can be fixed from here
+    if (this.audioContext && this.audioContext.state !== "running") {
+      this.audioContext.resume().catch(() => {});
+    }
+    [...this.remotes.keys()].forEach((peerId) => this._drop(peerId));
+    this._syncRemotes();
+    this._checkNow();
+    return snapshot;
   }
 
   setMuted(muted) {
@@ -858,7 +938,7 @@ export default class VoiceClient {
       requesting: requesting || null,
     });
     const self = peers.find((peer) => peer.peerId === this.peerId);
-    this.onPeers(others.map(visible), self ? visible(self) : null);
+    this.onPeers(others.map(visible), self ? visible(self) : null, hear);
   }
 
   /** Match what we receive to the latest room state. */

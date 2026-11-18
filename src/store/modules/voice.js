@@ -31,6 +31,8 @@ const state = () => ({
   // where we are, and which private conversation we asked to join
   location: PLAZA,
   requesting: null,
+  // the peerIds the voice server lets us hear now (day, night, places)
+  hear: [],
   // peerId -> true while that person is talking (includes ourselves)
   speaking: {},
   // storyteller only, the source of the night state shared with players
@@ -74,12 +76,19 @@ const getters = {
     state.volumes[peerId] === undefined ? 1 : state.volumes[peerId],
   /** Can we hear this peer right now? */
   canHear: (state, getters, rootState) => (peerId) => {
-    if (!rootState.grimoire.isNight) {
-      return getters.locationOf(peerId) === state.location;
+    // the storyteller's own day or night is the one that counts (the server
+    // lets them receive everyone; they only listen to who is with them, or
+    // awake at night)
+    if (getters.isStoryteller) {
+      return rootState.grimoire.isNight
+        ? getters.isAwake(peerId)
+        : getters.locationOf(peerId) === state.location;
     }
-    if (getters.isStoryteller) return getters.isAwake(peerId);
-    if (peerId !== STORYTELLER) return false;
-    return getters.night.broadcast || getters.isAwake(getters.selfPeerId);
+    // a player follows the voice server, which hears day and night from the
+    // storyteller's voice chat. The player's own idea of it comes from the
+    // game server and can lag behind: if it stays at night, everyone would
+    // stay silent while the audio keeps arriving
+    return state.hear.includes(peerId);
   },
   /**
    * Should we show that this peer is talking? The storyteller sees everyone;
@@ -138,7 +147,8 @@ const mutations = {
   setMuted(state, muted) {
     state.muted = muted;
   },
-  setPeers(state, { peers, self }) {
+  setPeers(state, { peers, self, hear }) {
+    state.hear = hear || [];
     state.peers = Object.fromEntries(
       peers.map(({ peerId, muted, awake, broadcast, location, requesting }) => [
         peerId,
@@ -224,6 +234,21 @@ const actions = {
   leave({ commit }) {
     commit("clearInvitations");
     return this.$voice.leave();
+  },
+  /**
+   * "I can't hear anyone": tell the voice server's logs what this device
+   * sees, and receive everyone again.
+   */
+  async checkAudio({ state, getters, rootState, commit }) {
+    const snapshot = await this.$voice.checkAudio({
+      night: rootState.grimoire.isNight,
+      location: state.location,
+      storyteller: getters.isStoryteller,
+      canHear: Object.keys(state.peers).filter((peerId) =>
+        getters.canHear(peerId),
+      ),
+    });
+    if (snapshot) commit("addNotice", { key: "voice.checkSent" });
   },
   // both say if it worked, and otherwise leave things as they were
   async setInputDevice({ commit }, deviceId) {
