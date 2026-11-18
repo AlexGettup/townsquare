@@ -166,9 +166,6 @@
             <li v-else @click="undoEndGame">
               {{ $t("menu.undoEndGame") }}
             </li>
-            <li @click="newGame">
-              {{ $t("menu.newGame") }}
-            </li>
           </template>
         </template>
 
@@ -390,10 +387,18 @@
             {{ $t("menu.addNpcs") }}
             <em><font-awesome-icon icon="dragon" /></em>
           </li>
-          <li @click="clearRoles" v-if="players.length">
-            {{ $t("menu.clearAll") }}
-            <em><font-awesome-icon icon="trash-alt" /></em>
-          </li>
+          <!-- storyteller: start over with the same players; a player only
+            clears the roles in their own grimoire -->
+          <template v-if="players.length">
+            <li v-if="!session.isSpectator" @click="newGame">
+              {{ $t("menu.newGame") }}
+              <em><font-awesome-icon icon="trash-alt" /></em>
+            </li>
+            <li v-else @click="clearRoles">
+              {{ $t("menu.clearAll") }}
+              <em><font-awesome-icon icon="trash-alt" /></em>
+            </li>
+          </template>
         </template>
 
         <template v-if="tab === 'help'">
