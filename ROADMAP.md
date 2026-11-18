@@ -57,6 +57,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   (30 s grace on the server, automatic recovery on the client) and logs what goes wrong
 - **3.30.0** "New game" with the same seats; automatic "Time's up" announcement; second and
   last call for nominations
+- **3.30.1** Voice chat receives again anyone whose audio stopped arriving
 
 ## Planned
 
