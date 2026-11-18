@@ -2,28 +2,102 @@
 
 ![social](https://user-images.githubusercontent.com/325521/102897760-d1147b00-4468-11eb-9d7b-63a204bc9fc1.png)
 
-This is an unofficial online tool to run Blood on the Clocktower games through Discord or other digital means.
-It is supposed to aid storytellers and players by allowing them to quickly set up games, run votes and much more.
+An unofficial online tool to play Blood on the Clocktower: the Storyteller's grimoire and a
+shared town square, with live voting, character distribution and much more.
 
-[You can try it online!](https://alexgettup.github.io/townsquare/)
+**[Play it online](https://alexgettup.github.io/townsquare/)**
 
-If you want to learn more about how to use the app as a player, [JayBotC](https://www.youtube.com/channel/UCNZy-4Rp877XtTHaIZdWYFQ) kindly created two tutorial videos.
+## Where it comes from
 
-### How to host a game
-[![How to host a game](https://img.youtube.com/vi/lVRJPBXfqxg/0.jpg)](https://www.youtube.com/watch?v=lVRJPBXfqxg)
+This app is a fork. The original Townsquare was created by
+**[Bra1n (Steffen Baumgart)](https://github.com/bra1n/townsquare)**, and **[nicholas-eden and
+contributors](https://github.com/nicholas-eden/townsquare)** kept it up to date with new
+characters, Loric, alternate alignments, custom jinxes and night orders. Everything listed under
+[Original features](#original-features) is their work, and live game sessions still run on the original project's server.
 
-### How to play a game
-[![How to play a game](https://img.youtube.com/vi/VCpFnJFiCbk/0.jpg)](https://www.youtube.com/watch?v=VCpFnJFiCbk)
+This version, by [Alex (AlexGettup)](https://github.com/AlexGettup), aims to play a whole game
+**without Discord**, as comfortably on a phone or tablet as on a computer. The changes of each
+version are in [CHANGELOG.md](CHANGELOG.md) (also in the app's menu, under "What's New"), and
+the plans in [ROADMAP.md](ROADMAP.md).
 
-## Features
+## What this version adds
+
+### Talk without Discord
+
+- **Voice chat** built in. At night players are isolated and the Storyteller wakes them one by
+  one or talks to everyone. During the day: the town square, private conversations by invitation
+  or by asking to join, open rooms (Tavern, Church, Graveyard) and "Call everyone to the square"
+  with a bell
+- The voice server decides whose audio each player receives, so nobody can listen in on a private
+  conversation or on other players at night
+- **Text chat** following the same rules, plus a private channel between each player and the
+  Storyteller (the only one open at night). Works without a microphone
+- Background noise suppression and a voice gate, like Discord; volume per person; choice of
+  microphone and speaker on computers
+- Steady connections: someone whose connection drops keeps their place for 30 seconds, audio
+  that stops arriving is received again by itself, and the voice chat recovers after a phone
+  comes back from the background
+- A **voice problems button** (warning sign next to the voice button): receive everyone again,
+  reconnect without losing your place, or report what happened
+
+### For the Storyteller
+
+- **Guided night**: a panel steps through tonight's night order, only the characters in play
+  with their players. Wake them, send them information, see their answers, then sleep and next.
+  It knows the Toymaker
+- **Info cards** like the official app: "You are", "This is the Demon", "These characters are
+  not in play"… built line by line, filled in from the grimoire as a suggestion, sent to one or
+  several players. Players answer with one tap or choose seats on the town square, and their
+  token shows whether they have seen it
+- Characters are sent as a "You are" card when dealt
+- **Show the grimoire** (Spy, Widow) to a single player, optionally edited first
+- **Announcements** with a bullhorn: everyone to the town square, nominations open, second and
+  last call, or free text, shown at the top of everyone's screen with a bell
+- **Day and night counter** and a **day timer** everyone sees; "Time's up" is announced when it
+  runs out
+- **New game** with the same players in the same seats, and **End the game**: everyone sees
+  who won and the whole grimoire
+- Votes: **secret vote** (Organ Grinder), **pointing vote** (Boomdandy, Fiddler), vote value
+  per player (Banshee, Bureaucrat, Thief, also set by their reminders), ghost votes spent by
+  themselves, "to tie" and "to execute" counts
+- **Practice game** with made-up players to rehearse alone, with automatic answers and "View
+  as" to see the game from a player's device
+- Reloading the page or losing the connection keeps the seats, the night, the vote under way and
+  the session settings
+
+### For players
+
+- "**Your vote**" panel with big Yes / No buttons, telling dead players whether they spend their
+  ghost vote
+- **Game diary**: what the Storyteller told you and what you answered, deaths, and each day's
+  nominations and votes
+- **Notes** per player, only on your device
+- Alerts (sound, vibration, tab title) when you are woken up or get an info card
+- The seat comes back by itself after switching apps on a phone
+
+### Phones, tablets and Spanish
+
+- Designed for touch screens: tap a token for the player menu, double tap for death, menus as
+  bottom panels, token size adapted to the screen
+- Installable on the home screen; the screen stays on during a game
+- **Spanish**: the interface and the game texts (characters, reminders, night order and
+  jinxes) from the official translations
+- No Google Analytics
+
+## Original features
 
 - Public Town Square and Storyteller Grimoire (toggle with **shortcut \[G\]**)
-- Supports custom script JSON generated by the [Script Tool](https://bloodontheclocktower.com/script)
-- Live Session for Storyteller / Players including live voting and character distribution!
-- Includes all 3 base editions, Travellers, Fabled and Loric plus all experimental characters!
+- Supports custom script JSON generated by the [Script Tool](https://script.bloodontheclocktower.com/)
+- Live Session for Storyteller / Players including live voting and character distribution
+- Includes all 3 base editions, Travellers, Fabled and Loric plus all experimental characters
 - Night sheet and reminder text for each character ability to help storytellers
 - Full homebrew support for hosting and playing games with your own sets of characters
-- Many other customization options!
+- Many other customization options
+
+[JayBotC](https://www.youtube.com/channel/UCNZy-4Rp877XtTHaIZdWYFQ) made two tutorial videos
+for the original app. This version looks different in places, but the basics are the same:
+[how to host a game](https://www.youtube.com/watch?v=lVRJPBXfqxg) and
+[how to play a game](https://www.youtube.com/watch?v=VCpFnJFiCbk).
 
 ### Custom Script Support
 
@@ -41,8 +115,15 @@ your script further, there is an additional `"_meta"` object that you can add/ed
     "hideTitle": false,
     "background": "https://example.com/background.png",
     "bootlegger": ["Bootlegger rule 1", "Bootlegger rule 2", "etc"],
-    "firstNight": ["dusk","minioninfo","demoninfo","poisoner","...","dawn"],
-    "otherNight": ["dusk","poisoner","...","dawn"]
+    "firstNight": [
+      "dusk",
+      "minioninfo",
+      "demoninfo",
+      "poisoner",
+      "...",
+      "dawn"
+    ],
+    "otherNight": ["dusk", "poisoner", "...", "dawn"]
   }
 ]
 ```
@@ -67,10 +148,7 @@ definition file might be written:
     "firstNightReminder": "",
     "otherNight": 18,
     "otherNightReminder": "The Acrobat points to a player. If that player is or becomes drunk or poisoned tonight, the Acrobat dies.",
-    "reminders": [
-      "Chosen",
-      "Dead"
-    ],
+    "reminders": ["Chosen", "Dead"],
     "remindersGlobal": [],
     "setup": false,
     "name": "Acrobat",
@@ -110,18 +188,23 @@ For further details on the JSON structure, see the official app's [JSON Schema](
 
 ## [Contributing](CONTRIBUTING.md)
 
+How to run it locally, the project structure and how releases are made.
+
 ## Acknowledgements and Copyrights
 
-* [Blood on the Clocktower](https://bloodontheclocktower.com/) is a trademark of Steven Medway and [The Pandemonium Institute](https://www.thepandemoniuminstitute.com/)
-* Night reminders and other auxiliary text written by [Ben Finney](http://bignose.whitetree.org/projects/botc/diy/)
-* Iconography by [Font Awesome](https://fontawesome.com/)
-* Background image copyright and permission granted by [Ryan Maloney](https://www.artstation.com/maloney94)
-* Webfonts by [Google Fonts](https://fonts.google.com/) and [Online Web Fonts](https://www.onlinewebfonts.com/)
-* All other images and icons are copyright to their respective owners
+- [Blood on the Clocktower](https://bloodontheclocktower.com/) is a trademark of Steven Medway and [The Pandemonium Institute](https://www.thepandemoniuminstitute.com/)
+- Night reminders and other auxiliary text written by [Ben Finney](http://bignose.whitetree.org/projects/botc/diy/)
+- Spanish game texts from the official translations of The Pandemonium Institute
+- Iconography by [Font Awesome](https://fontawesome.com/)
+- Background image copyright and permission granted by [Ryan Maloney](https://www.artstation.com/maloney94)
+- Webfonts by [Google Fonts](https://fonts.google.com/) and [Online Web Fonts](https://www.onlinewebfonts.com/)
+- Voice chat audio through [Cloudflare Realtime](https://developers.cloudflare.com/realtime/)
+- All other images and icons are copyright to their respective owners
 
 This project and its website are provided free of charge and not affiliated with The Pandemonium Institute in any way.
 
 ## Credits
-* Bra1n (Steffen Baumgart) for building the original tool
-* nicholas-eden and contributors for maintaining the version this one is based on
-* Alex ([AlexGettup](https://github.com/AlexGettup)) for this version
+
+- [Bra1n (Steffen Baumgart)](https://github.com/bra1n/townsquare) for creating the original tool
+- [nicholas-eden and contributors](https://github.com/nicholas-eden/townsquare) for maintaining the version this one is based on
+- [Alex (AlexGettup)](https://github.com/AlexGettup) for this version
