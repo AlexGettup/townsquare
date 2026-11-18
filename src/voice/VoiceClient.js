@@ -55,6 +55,12 @@ const PULL_RETRY_MAX_DELAY = 5 * 1000;
 // how long to wait for our microphone to reach the SFU before joining the room
 const SENDING_TIMEOUT = 8 * 1000;
 const SENDING_CHECK_INTERVAL = 150;
+// someone we should hear whose audio stopped arriving (a muted microphone
+// still sends silence): after this long, receive them again from scratch
+const SILENT_CHECK_INTERVAL = 4 * 1000;
+const SILENT_TIMEOUT = 12 * 1000;
+// still silent after that (a locked phone sends nothing): wait longer each time
+const SILENT_MAX_TIMEOUT = 2 * 60 * 1000;
 
 // changes when a peer rejoins with a new connection
 const remoteKey = (peer) => `${peer.peerId}/${peer.since}`;
@@ -136,6 +142,9 @@ export default class VoiceClient {
     this.hear = [];
     this.audioContext = null;
     this.vadTimer = null;
+    this.silentTimer = null;
+    // peerId -> times in a row we received them again for being silent
+    this.silentRetries = new Map();
     // serializes SDP negotiations, which can't run concurrently
     this.queue = Promise.resolve();
     // peerId -> { key, mid, audio, analyser, speaking, lastSound }
@@ -219,6 +228,10 @@ export default class VoiceClient {
       if (!this.pc) return;
       this._openSocket();
       this.vadTimer = setInterval(() => this._detectSpeaking(), 100);
+      this.silentTimer = setInterval(
+        () => this._checkSilent(),
+        SILENT_CHECK_INTERVAL,
+      );
       if (recovering) {
         this._report("recovered", `after ${this.recoverAttempt} attempt(s)`);
       }
@@ -247,6 +260,7 @@ export default class VoiceClient {
     clearTimeout(this.pullRetryTimer);
     clearTimeout(this.iceTimer);
     clearInterval(this.vadTimer);
+    clearInterval(this.silentTimer);
     if (this.socket) {
       this.socket.onclose = null;
       // 1000 tells the server we left; otherwise it keeps our place a while
@@ -602,6 +616,9 @@ export default class VoiceClient {
       audio: null,
       analyser: null,
       closed: false,
+      // audio packets received so far, and when that last went up
+      packets: 0,
+      packetsAt: Date.now(),
     };
     this.remotes.set(peer.peerId, remote);
     return this._enqueue(async () => {
@@ -863,6 +880,62 @@ export default class VoiceClient {
         this._drop(peerId);
       }
     });
+  }
+
+  /**
+   * Receive again anyone we should hear whose audio stopped arriving. Both
+   * ends may believe the audio is flowing when it isn't (a connection lost
+   * halfway through receiving someone), and nothing else would notice until
+   * people moved somewhere else. A muted microphone still sends silence, so
+   * no packets at all means it's broken.
+   */
+  async _checkSilent() {
+    if (!this.pc) return;
+    const now = Date.now();
+    // in the background a phone may stop receiving: start counting again
+    if (typeof document !== "undefined" && document.hidden) {
+      this.remotes.forEach((remote) => (remote.packetsAt = now));
+      return;
+    }
+    const transceivers = this.pc.getTransceivers();
+    for (const remote of [...this.remotes.values()]) {
+      if (!remote.mid || remote.closed) {
+        remote.packetsAt = now;
+        continue;
+      }
+      const transceiver = transceivers.find((t) => t.mid === remote.mid);
+      if (!transceiver) continue;
+      let packets = 0;
+      try {
+        const stats = await transceiver.receiver.getStats();
+        stats.forEach((report) => {
+          if (report.type === "inbound-rtp") packets += report.packetsReceived;
+        });
+      } catch (error) {
+        continue;
+      }
+      if (this.remotes.get(remote.peerId) !== remote) continue;
+      const retries = this.silentRetries.get(remote.peerId) || 0;
+      const timeout = Math.min(
+        SILENT_TIMEOUT * 2 ** retries,
+        SILENT_MAX_TIMEOUT,
+      );
+      if (packets > remote.packets) {
+        remote.packets = packets;
+        remote.packetsAt = now;
+        this.silentRetries.delete(remote.peerId);
+      } else if (now - remote.packetsAt > timeout) {
+        this.silentRetries.set(remote.peerId, retries + 1);
+        this._report(
+          "silent-track",
+          `${remote.peerId}: no audio for ${Math.round(
+            (now - remote.packetsAt) / 1000,
+          )} s, receiving again`,
+        );
+        this._drop(remote.peerId);
+        this._syncRemotes();
+      }
+    }
   }
 
   // --- voice activity detection --------------------------------------------
