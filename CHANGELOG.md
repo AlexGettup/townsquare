@@ -4,6 +4,14 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.32.0
+
+- Storyteller: "Send their character" (seat menu, under "More") gives one player a new character and Good or Evil (Snake Charmer, Pit-Hag, Barber, Fang Gu, Goon…). Their token changes here and on their device, they get a "You are" card with the alignment, what they noted on other seats stays, and it survives reloads. Nobody else gets anything
+- Info cards: a "You are" line can say Good or Evil
+- Storyteller's night summary (clipboard button next to the bullhorn, by day, and at the end of the guided night): what was sent and answered each night, player by player in seat order, with the grimoire shown; players who got nothing last. Arrows go to earlier nights
+- Guided night with the Toymaker: minion and demon info with fewer than 7 players, the Toymaker's reminder as a step, and a warning on the Demon's step when it carries "Final Night: No Attack"
+- The voice server keeps the alignment on cards (deployed with this version)
+
 ### Version 3.31.0
 
 - Voice chat problems button (warning sign, right of the voice button): "I can't hear someone" receives everyone's audio again without leaving, "Reconnect voice chat" leaves and comes back in the same place (also after a voice error), and a free text report. Each one sends the voice server logs what that device sees (connection, who it receives and how many packets), never any audio. Replaces the "can't hear" option inside the voice panel

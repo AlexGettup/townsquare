@@ -60,6 +60,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.30.1** Voice chat receives again anyone whose audio stopped arriving
 - **3.31.0** Voice chat problems button (receive again, reconnect, report); players hear
   whoever the voice server allows
+- **3.32.0** Send one player their new character and alignment; Storyteller's night
+  summary; the Toymaker in the guided night
 
 ## Planned
 
@@ -72,21 +74,10 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 ### Next steps
 
-1. [ ] **Send one player their new character**, with **alignment on cards** (Night without
-       talking): without them Sects & Violets can't be played well.
-2. [ ] **Storyteller's night summary** (Night without talking).
+Nothing chosen yet: the owner picks from the ideas below.
 
 ### Night without talking
 
-- [ ] **Send one player their new character** (Snake Charmer, Pit-Hag, Barber, Fang Gu, and
-      the Imp passing the Demon to a Minion): "Send their character" in a seat's menu changes
-      only that player's token, sends them the "You are" card and is kept for reloads. Today
-      "Send characters" deals to everyone again, so the whole table learns something changed.
-- [ ] **Alignment on cards** (Snake Charmer, Fang Gu, Goon): "You are: Evil" as a choice on
-      the card, instead of free text. Goes with the item above.
-- [ ] **Storyteller's night summary**: at dawn (and reopenable during the day) one list of
-      what the storyteller sent and got back that night, player by player. Today it is spread
-      over each player's private chat.
 - [ ] **Open eyes at night** _(official)_ (Wraith): one player keeps their eyes open at night
       and sees who is awake and the cards sent.
 
