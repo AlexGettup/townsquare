@@ -70,6 +70,14 @@
             {{ $t("voice.leave") }}
             <em><font-awesome-icon icon="sign-out-alt" /></em>
           </li>
+          <li
+            class="action"
+            :title="$t('voice.cantHearHint')"
+            @click="checkAudio"
+          >
+            {{ $t("voice.cantHear") }}
+            <em><font-awesome-icon icon="redo-alt" /></em>
+          </li>
 
           <!-- Night: one list, where the storyteller wakes people up -->
           <template v-if="grimoire.isNight">
@@ -364,6 +372,9 @@ export default {
     },
     leave() {
       this.$store.dispatch("voice/leave");
+    },
+    checkAudio() {
+      this.$store.dispatch("voice/checkAudio");
     },
     toggleMute() {
       this.$store.dispatch("voice/toggleMute");
