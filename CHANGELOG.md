@@ -4,41 +4,54 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.31.0
+
+- Voice chat problems button (warning sign, right of the voice button): "I can't hear someone" receives everyone's audio again without leaving, "Reconnect voice chat" leaves and comes back in the same place (also after a voice error), and a free text report. Each one sends the voice server logs what that device sees (connection, who it receives and how many packets), never any audio. Replaces the "can't hear" option inside the voice panel
+- Players hear exactly whoever the voice server allows, instead of working it out on their own device: a player who got the day or night wrong (as when nobody heard anybody, even after moving to the tavern) no longer silences everyone
+
 ### Version 3.30.1
+
 - Voice chat notices when someone's audio stops arriving (both ends thought it was flowing, as when nobody heard anybody until everyone moved to the tavern) and receives them again by itself after 12 seconds. Someone who stays silent (a locked phone) is retried less and less often, up to every 2 minutes. Each case goes to the voice server logs as "silent-track"
 
 ### Version 3.30.0
+
 - Storyteller: "New game" (Characters tab, replaces "Remove all") starts over with the same players in the same seats: roles, reminders, bluffs, deaths, votes, the day count, the timer and the end of the game are cleared, and players clear their role, reminders and diary. The chat stays
 - When the day timer runs out, "Time's up" is announced like the Storyteller's announcements (top of the screen, bell, chat, diary); it replaces the chime at zero, which also played when the timer was stopped
 - Announcements: "Second call for nominations" and "Last call for nominations" replace "nominations closed", "a few minutes left" and "night is about to fall"
 - Phones: the top-left panel (practice, Storyteller) no longer covers the bullhorn button
 
 ### Version 3.29.0
+
 - Storyteller announcements: a bullhorn button opens the usual announcements (everyone to the town square, nominations open or closed, a few minutes left, night is about to fall) or a free text. Players see it at the top of the screen for 8 seconds with one soft bell, and it stays in the chat and the diary
 - Voice chat keeps going through dropped connections: someone whose connection drops keeps their place for 30 seconds (still heard, same conversation) and nobody notices if they come back in time
 - Voice chat recovers by itself when the audio connection fails, instead of leaving it; it also checks the connection when a phone comes back from the background or the network comes back
 - The voice server logs dropped connections, audio errors and what clients report, to find what goes wrong in a game (needs the voice server deployed)
 
 ### Version 3.28.2
+
 - Upright phones with the guided night open: the edition logo, the counters and the vote move up with the seats, which they didn't in 3.28.1
 
 ### Version 3.28.1
+
 - The vote overlay showed two majorities in executions (the living's and the exile's): now only the one that applies, with the "to tie" line below it when someone is already on the block
 - Upright phones: the town square moves up into the free space above the guided night panel, which covered the bottom seats
 
 ### Version 3.28.0
+
 - Game diary for players (book button, top right): what the Storyteller told you and what you answered, deaths, the grimoire shown to you, and each day's nominations with who voted, night by night and day by day, newest first. Kept on the device for each game, so it survives a reload
 - Each day in the diary sums up who is on the block, how many votes tie and how many execute someone else. It replaces the vote table button for players
 - The vote panel tells dead players whether voting yes spends their ghost vote: not in exiles, nor with two votes; once they vote yes, the warning stands out
 - Storyteller: "Change character" moved under "More" in the player menu
 
 ### Version 3.27.0
+
 - Ghost votes are spent by themselves: when a vote goes all the way round and the Storyteller closes it, dead players who raised their hand lose their ghost vote. Not in exiles, nor for a Banshee with her ability; a vote reset or closed halfway spends nothing
 - The ghost vote icon no longer takes clicks: taking it away or giving it back by hand is under "More" in a dead player's menu. A double tap in the public grimoire only kills or revives
 - Shorter player menu: the Storyteller keeps what each phase uses most (wake or nominate, send info, kill, change character, add reminder); show the grimoire, alignment, note and "view as" go under "More", next to "Seat". On their own seat, players find pronouns, rename and leaving the seat under "My seat"
 - Practice game: dead made-up players raise their hand half as often when it costs them their ghost vote
 
 ### Version 3.26.0
+
 - Practice game: "Automatic" next to the practice badge makes the made-up players answer by themselves, a second or two later (seats, a character, yes or no to using their ability, closing cards and the grimoire)
 - Practice game: "View as Ana" in a made-up player's seat menu shows the game as her device would (only her character, her cards and her private chat), and the Storyteller answers from there as she would. "Back to the grimoire" puts the grimoire back as it was, also after a reload
 - Info card window: under "Players", each player's character and reminders, with those of the recipient's character highlighted (the Investigator's "Minion" and "Wrong")
@@ -47,6 +60,7 @@ release of this fork; older versions belong to the original project.
 - Practice game: the chat no longer stays disconnected after switching who you are
 
 ### Version 3.25.0
+
 - Info cards fill themselves: "This is the Demon", "These are your minions", "These characters are not in play" and "You are" come with the players or characters from the grimoire, as a suggestion the Storyteller can change before sending
 - Quick answers on info cards, like the official app: players answer with one tap (Got it, Yes, No, players, characters or a few words). The answer goes to the Storyteller's private chat and the card counts as answered
 - Show the grimoire edited: before showing it to a player (Spy, Widow) the Storyteller can change characters, remove reminders and change the bluffs in the copy sent, without touching the real grimoire
@@ -58,15 +72,18 @@ release of this fork; older versions belong to the original project.
 - Practice game: "Random nomination" makes a made-up player nominate another, and "At random" / "All at random" answer cards for the made-up players (seats, a character, yes or no)
 
 ### Version 3.24.0
+
 - Guided night for the Storyteller: at nightfall a panel steps through tonight's night order, only the characters in play with their players (dead ones skipped unless their ability is about dying), and the current seat glows on the town square. Each step: wake, open the info card window for those players, see their answers as they come, then sleep and next. Top right on computers, a bottom sheet on phones; it folds, hides for the night, and can be turned off in Menu > Grimoire
 - Info cards built line by line, like the official app: each info token tapped starts a new line, and the characters, players or number picked next go into it, so one card can say "These are your minions: Ana, Belén" and "These characters are not in play: …". Up to 6 lines, at most one of them a choice
 - Info cards: character tokens are really centred now (also in the practice game's "What Ana sees")
 
 ### Version 3.23.1
+
 - Info cards: character tokens and player names are centred again (they were pushed to the right, also in the practice game's "What Ana sees")
 - First screen: removed the line about preparing a game without connecting from the menu, which read as if the practice game was there
 
 ### Version 3.23.0
+
 - Practice game: "Practice" on the first screen sets up a game with made-up players, for the Storyteller to rehearse alone. Info cards and the grimoire sent to them show up as "What Ana sees", and the Storyteller answers for them (seats chosen, a reply in the private chat), with the usual sent, seen and answered marks on the seats. In votes they raise hands at random. "Practice · Leave" in the top left corner ends it; creating or joining a real game ends it too
 - Info cards like the official app: only the game's eight info tokens, each with its own colour and icon. "Make a choice" says what to choose: 1 player, 2 players or a character. "You learn" is gone
 - The info card window shows what the player's character does tonight (from the night order) and what they were sent and answered since nightfall
@@ -74,22 +91,27 @@ release of this fork; older versions belong to the original project.
 - Computers: a seat's "add reminder" button no longer covers the day timer
 
 ### Version 3.22.0
+
 - Background noise in voice chat, like Discord: noise suppression removes fans, keyboards and similar noise, and a voice gate sends silence while you aren't talking. Both are on by default, in the voice panel under "Background noise". Sensitivity is automatic; untick it to set the threshold by hand on a live level meter. Settings are saved on the device. It favours letting some noise through over cutting a soft voice. Browsers that can't run the noise suppression (possibly Firefox) keep only the voice gate
 
 ### Version 3.21.0
+
 - Show the grimoire (Spy, Widow): at night, "Show the grimoire" in a seated player's menu sends only that player the grimoire as it is now: real characters, reminders and the Demon's bluffs, on their town square. It goes away when they close it or day comes, and nobody else gets anything. A book on their seat tells the Storyteller it was sent (grey) and that they closed it (gold)
 
 ### Version 3.20.0
+
 - End of game: "End the game" in the Storyteller's menu (Grimoire tab) asks who won, Good or Evil. Everyone sees "Good wins!" or "Evil wins!" in the middle of the town square with the town bell, it turns to day, the vote and the timer stop, and voice brings everyone back to the plaza
 - Players then see the whole grimoire: everyone's real character (the Drunk shows as the Drunk), the reminders and the Demon's bluffs. Nothing of it reaches players before the end. It survives reloads, "Back to the game" undoes it, and dealing again or a new game clears it
 - Info cards: a "To" row in the card window sends the same card to several players at once, each in their own private chat
 - Touch screens: tapping the night order number next to a token shows its text; tapping again or anywhere else hides it. The "First Night" / "Other Nights" labels now follow the language
 
 ### Version 3.19.0
+
 - Day and night counter in the middle of the town square: "Setting up", "Night 1", "Day 1", "Night 2"… It goes up each time the Storyteller switches to night, and everyone sees it. The Storyteller can correct it by clicking it
 - Day timer: the Storyteller starts it from the hourglass next to the counter and chooses the minutes. Everyone sees the same countdown; it turns orange in the last 30 seconds, and at zero plays a sound (unless muted) and shows "Time's up!" for 15 seconds. Clicking it stops it, and nightfall stops it too. It survives reloads
 
 ### Version 3.18.0
+
 - Notes per player: "Add note" in the player menu opens a box to write what you know or suspect. A small mark on the name shows who has a note; hovering it shows the note, and clicking or tapping it opens it. Notes are only on your device, per game session, never sent to anyone. They survive a reload, follow a player who changes name or seat, and are dropped after 12 hours
 - Computers: choose the microphone and speaker in the voice panel ("Microphone and speaker"). The microphone changes mid-call without reconnecting; an unplugged one falls back to the default, with a notice. Choices are saved on the device. The game's sounds use the chosen speaker too
 - Touch screens: the player panel shows the character's ability, and the tooltip that stayed over other seats after a tap is gone
@@ -97,6 +119,7 @@ release of this fork; older versions belong to the original project.
 - Touch screens: no "+" button on the seats; reminders are added from the player menu
 
 ### Version 3.17.0
+
 - On computers, one click on the top of a token no longer kills: one click anywhere on the token opens the player menu and a double click toggles death, same as on touch screens. The menu entry stays, and the shroud no longer shows on hover
 - Token size now depends on the number of players and the screen, and follows rotating and resizing. Up to 12 players neither tokens nor names touch on the screen sizes measured; with more, names may touch on small screens
 - Trash button in the character selector to clear the selection; its buttons wrap on phones instead of running off the screen
@@ -104,12 +127,14 @@ release of this fork; older versions belong to the original project.
 - Less lag: the night clouds no longer move, and adding a reminder has shorter animations that redraw much less. Windows open and close faster too
 
 ### Version 3.16.0
+
 - The Storyteller reloading the page or losing the connection no longer empties the seats: players stay seated without claiming them again
 - A reload also keeps the night (before, it turned to day for everyone), who is awake, the vote under way (it comes back paused, to be resumed), the vote history, the player marked for execution, the session settings, the dealt characters and the card ticks. A game saved more than 12 hours ago counts as a new one
 - A Storyteller coming back while the server still has their old connection retries instead of being thrown out of the game
 - "Send characters" is always in the Storyteller's menu, except with Tor in play, for someone who wasn't seated when dealing
 
 ### Version 3.15.0
+
 - "Choose a player" and "Choose 2 players" cards are answered on the town square: the player taps the seats and confirms in a small box outside the circle. They can pick themselves and dead players
 - The Storyteller gets the names in the private chat, a mark on the token, a chime and an unread count
 - The card closes when the server confirms the answer, and says so if it didn't arrive. A vote pauses the choice, and a reminder stays on screen while it is unanswered
@@ -117,55 +142,66 @@ release of this fork; older versions belong to the original project.
 - The voice server has to be deployed with this version
 
 ### Version 3.14.0
+
 - When the characters are really dealt (from the roles window or the menu, not a mock assignment), each seated player gets an info card in their private chat with the Storyteller: "You are" and their character. Dealing again sends everyone a new card, even with the same character, and earlier ones are struck through
 - Volume per person: tapping a name in the voice panel shows a slider from 0 to 200%, saved on the device. Other than 100% it plays through Web Audio, which also works on iPhones
 - Menus close on a click or tap outside them: player menu, settings, and the voice panel on touch screens. On computers the voice panel stays open, and it opens on joining voice
 - On phones, the private conversations going on are listed in small print below the voice button during the day; tapping the list opens the panel
 
 ### Version 3.13.0
+
 - One voice panel instead of a menu opening over the conversations panel: your own controls on top and, below, the places (plaza, private conversations, rooms) with the people in each, so nobody is listed twice
 - Tapping a name in the panel offers the invitation to talk; at night it is one list, where the storyteller wakes people up and puts them back to sleep
 - A side panel on computers, opening when you join voice; the bottom panel on touch screens, opening only when asked
 - Fixed people who joined voice not being heard by those already there, sometimes for over a minute: a client now joins the room once its microphone is sending, and failed attempts to receive someone are retried on a timer
 
 ### Version 3.12.3
+
 - Fixed on-screen notices blocking the menu of the seats below them, so "Claim seat" only closed the menu; notices no longer catch clicks, and any click dismisses them
 - Fixed claiming a seat taking up to 30 seconds to take effect when the player connected before the Storyteller created the game
 - Fixed the player count being one too high after claiming a seat
 
 ### Version 3.12.2
+
 - Fixed "Join a game" doing nothing, even after a reload, once a session with no game was saved (a wrong code, or joining before the game was created); "Create a game" had the same problem
 - Fixed replacing a session clearing the new one as well
 - After joining a session with no game yet, the first screen says it's waiting for the Storyteller and shows the code; "You're in!" only appears when the seats arrive, and the chat stays hidden until then
 
 ### Version 3.12.1
+
 - Fixed the logo and the "Community Created Content" badge being cut off on the first screen on laptops; the buttons now fit side by side there, and the screen scrolls on very short windows
 
 ### Version 3.12.0
+
 - New first screen with two buttons, each saying what comes next: "Create a game (Storyteller)" and "Join a game (Player)"
 - Creating a game asks how many players there are (up to 20), creates the seats ("Player 1", "Player 2"…, "Jugador 1"… in Spanish), hosts the session and copies the players' link
 - Joining asks for the session code or the link, and a notice explains how to claim a seat
 
 ### Version 3.11.0
+
 - Vote value per player, set by the storyteller in the "Seat" submenu: x1, x2 (Banshee), x3 (Bureaucrat) or -1 (Thief). Replaces the "Voting Twice" session switch and "Has Two Votes" entry
 - Banshee (x2) is public: the player's vote panel offers "Yes", "Yes x2" and "No", with an explanation
 - Bureaucrat (x3) and Thief (-1) stay with the storyteller: a mark on the token, counted in the circle and the vote history (the Thief's target listed as "-Name"), and back to x1 when night starts
 
 ### Version 3.10.0
+
 - "Your vote" panel for players at the bottom of the screen during a nomination: the question ("Execute Ana?", or "Exile" for travellers), big Yes / No buttons that light up with the current choice, the vote shown in words, how many seats the clock hand is from you, when your vote is locked, and why you can't vote (no seat, disconnected, ghost vote already used); dead players are told that voting yes uses their ghost vote. The Hand UP / Hand DOWN buttons in the middle of the circle are gone
 - Alerts for players: a notice, a sound (unless muted), vibration on phones and a mark in the tab title (while in the background) when the storyteller wakes you up at night; info cards also mark the tab title
 
 ### Version 3.9.0
+
 - Touch screens: the player menu opens as a panel at the bottom of the screen, with the player's name and character on top, bigger rows that are easier to tap, and the "Seat" submenu as a second page; a double tap on a token still toggles death without pressing anything in the panel
 - Touch screens: the add reminder and change character windows no longer open the keyboard (the search box is rarely needed)
 
 ### Version 3.8.0
+
 - Nomination marks: after a nomination, the nominator gets a blue pointing hand in the bottom left corner of their token and the nominee a red gavel in the bottom right; they are cleared when night or day starts
 - Touch screens: one tap anywhere on a token opens the player menu, and the storyteller toggles death with a double tap (the shroud was easy to hit by mistake)
 - Reorganized player menu: for the storyteller, the actions each phase uses most come first (night: wake up and send info; day: nominate and invite), with new "Mark as Dead / Revive" and "Add Reminder" entries, the alignment showing its current value, and the seat setup (rename, pronouns, two votes, move, swap, empty seat, remove) in a "Seat" submenu
 - Players: "Claim seat" comes first on an empty seat, reminders can be added from the menu, and the disabled "Seat Occupied" entry is gone
 
 ### Version 3.7.0
+
 - "What's New" in the menu: the changes of each version, in English or Spanish
 - New Settings tab in the menu with the personal preferences (zoom, background, art, animations, sounds, language); the Grimoire tab keeps the game
 - Storyteller: a sun/moon button next to the reference sheet switches between day and night
@@ -178,13 +214,16 @@ release of this fork; older versions belong to the original project.
 - Fixed an error when cancelling the Join Session dialog
 
 ### Version 3.6.2
+
 - Fixed info cards not opening again when clicked in the chat
 - The chat shows what each info card says (text, characters, players, number, yes/no), not only its phrase
 
 ### Version 3.6.1
+
 - Fixed the info card windows being wider than the screen on phones (they could be scrolled sideways)
 
 ### Version 3.6.0
+
 - Info cards: the storyteller can send a player what they learn (a phrase such as "You are" or "This is the Demon", text, characters, players, a number or yes/no) from the player menu; it pops up on the player's screen and stays in the private chat
 - Choice cards ("Choose a player", "Choose 2 players", "Choose a character"): the player answers in the private chat
 - The storyteller sees on each token whether the player has seen the last info card (envelope until seen, then a thumbs up)
@@ -195,30 +234,37 @@ release of this fork; older versions belong to the original project.
 - Fixed a chat connection error in the console when joining a session
 
 ### Version 3.5.0
+
 - The screen stays on during a live session, so phones don't lock in the middle of a game
 - The app can be installed on the home screen (phones and tablets) and opens without the browser bar
 - Added the project roadmap (ROADMAP.md)
 
 ### Version 3.4.0
+
 - The text chat is open by default
 - On phones the chat is compact (the last few lines) and grows while typing
 
 ### Version 3.3.1
+
 - Fixed players losing their seat and missing their character after switching apps on a phone: the seat is restored automatically when they come back, and the storyteller sends them the character they were dealt
 
 ### Version 3.3.0
+
 - Moved the voice chat button and the conversations panel to the top left corner; the NPC panel moves to the top right, below the menu
 - Fixed NPC ability and night order tooltips opening off screen
 - Fixed night order descriptions going off screen on phones
 
 ### Version 3.2.0
+
 - Voice chat: the voice server now decides whose audio each player receives, so nobody can listen to a private conversation or to other players at night by tweaking their browser; it also uses much less data (requires deploying the voice server together with the app)
 - Only one player menu stays open: clicking elsewhere (the empty square or another player) closes it
 
 ### Version 3.1.0
+
 - Clicking a character token now opens the player menu, with a new "Change Character" entry (the shroud on top of the token still toggles death)
 
 ### Version 3.0.0
+
 - Added Spanish: language selector in the Grimoire menu, translated interface and translated
   game content (characters, reminders, night order and jinxes, from the official translations)
 - Added a reference sheet button next to the menu
@@ -234,13 +280,16 @@ release of this fork; older versions belong to the original project.
 - Deployed to GitHub Pages; project links now point to AlexGettup/townsquare
 
 ### Version 2.22.8
+
 - Fixed errors when only the firstNight list is provided in the JSON
 - Improved consistency of night order overlay when only one of the firstNight and otherNight lists are provided in the JSON
 
 ### Version 2.22.7
+
 - Updated Magician/Legion and Mathematician jinxes
 
 ### Version 2.22.6
+
 - Made Organ Grinder secret vote timed instead of instantaneous
 - Added question marks on unknown votes for players during Organ Grinder secret vote
 - Made Organ Grinder not revealed to be in play until the vote starts
@@ -250,17 +299,21 @@ release of this fork; older versions belong to the original project.
 - Made hand raise button in player menu hidden while a nomination is active, as the hand is hidden regardless and this could easily be confused with the player's voting hand
 
 ### Version 2.22.5
+
 - Added Tor to first night order
 
 ### Version 2.22.4
+
 - Updated character data to match Gardener and Bootlegger changes
 
 ### Version 2.22.3
+
 - Fixed Game State Modal not opening with custom scripts selected
 - Fixed loading scripts sequentially with the same homebrew character(s) in them causing an error
 - Fixed custom reminders behaving like regular reminders on the grimoire
 
 ### Version 2.22.2
+
 - Added Knaves and God of Ug
 - Made the app default to the "Grimoire" view instead of the "Town Square" view when first opened
 - Implemented official "generic" character icons
@@ -269,9 +322,11 @@ release of this fork; older versions belong to the original project.
 - Fixed NPCs showing on the intro screen
 
 ### Version 2.22.1
+
 - Made the Drunk, Marionette, and Lil' Monsta tokens able to be selected again, so that the randomiser may still "choose" these characters, but instead made the bag unable to be sent until these characters are deselected
 
 ### Version 2.22.0
+
 - Migrated to official character art as default (with explicit permission from TPI), with an option to still use the unofficial art if desired
 - Changed all night reminder texts to the official night reminder texts
 - Added the official "Community Created Content" logo to the main page
@@ -282,34 +337,42 @@ release of this fork; older versions belong to the original project.
 - Added support for the "background" property from the script meta
 
 ### Version 2.21.7
+
 - Added Ventriloquist
 - Added small warning for STs on the voting screen to inform them if there are some unoccupied seats
 
 ### Version 2.21.6
+
 - Added Pope
 
 ### Version 2.21.5
+
 - Added support for hand-raising (with explicit permission from TPI) using the space bar and from the player menu - the ST may force lower all player hands from the Players tab
 - Moved the "Allow Self-Naming" setting from the Session tab to the Players tab
 
 ### Version 2.21.4
+
 - Added Hindu
 - Fixed Tor appearing at the top of the night order on base-3 scripts
 
 ### Version 2.21.3
+
 - Fixed roles received sound effect not muting when sound effects were muted
 
 ### Version 2.21.2
+
 - Added Zenomancer
 - Added sound effect for players when roles are received
 
 ### Version 2.21.1
+
 - Fixed custom reminders
 - Changed custom reminders to use the default fabled icon instead
 - Fixed night order modal not displaying with NPCs in play
 - Fixed overlapping keys in edition modal
 
 ### Version 2.21.0
+
 - Added the Loric character type, including the Big Wig and Tor
 - Changed the character type of Bootlegger, Gardener and Storm Catcher to Loric
 - Converted all logic using the term "Fabled" in the backend to "NPC"
@@ -333,25 +396,32 @@ release of this fork; older versions belong to the original project.
 - Added recommended Travellers for Catfishing
 
 ### Version 2.20.9
+
 - Updated jinxes and night order to match official changes
 
 ### Version 2.20.8
+
 - Added more vote time per player intervals (0.5s --> 0.1s)
 
 ### Version 2.20.7
+
 - Added Wraith and Cacklejack
 
 ### Version 2.20.6
+
 - Added Deus ex Fiasco and Princess
 
 ### Version 2.20.5
+
 - Added setup leaf to Hermit
 - Fixed Widow's firstNightReminder to no longer reference a non-existent night card
 
 ### Version 2.20.4
+
 - Added Hermit
 
 ### Version 2.20.3
+
 - Corrected Atheist, Fearmonger, Lord of Typhon, Beggar, Fibbin, Bone Collector, Pit-Hag, Scarlet Woman, & Voudon ability texts to match the official app and existing/upcoming physical tokens
 - Changed Town Square view to hide the alignment of Travellers
 - Added the ability to hide a custom script's title and author following the recent change to the official [JSON Schema](https://github.com/ThePandemoniumInstitute/botc-release/blob/main/script-schema.json)
@@ -360,14 +430,17 @@ release of this fork; older versions belong to the original project.
 - Renamed "Remove All" characters to "Clear All" to disambiguate this menu option with "Remove All" players
 
 ### Version 2.20.2
+
 - Corrected Fool & Bishop ability texts to match the official app and physical game
 - Added missing "About To Die" reminder for the Organ Grinder
 
 ### Version 2.20.1
+
 - Reverted change to hide name and author of script if a custom logo is being used
 - Renamed remaining options that were still labelled "vote watching"
 
 ### Version 2.20.0
+
 - Added opposing alignment functionality for both official and homebrew characters (with explicit permission from TPI)
 - Added menu option for changing a players' alignment - this functionality is only client side and will never be shown to players, even for travellers
 - Reduced player menu font size slightly to accommodate more options
@@ -397,10 +470,12 @@ release of this fork; older versions belong to the original project.
 - Removed Riot from night order, as it was not added in any official tools
 
 ### Version 2.19.1
+
 - Added Wizard
 - Fixed character setup warning overlapping with character tokens on large scripts in fullscreen mode
 
 ### Version 2.19.0
+
 - Added Xaan
 - Updated jinx list to include reordered list, new Leviathan/Riot jinxes, and removed Alchemist/Vizier jinx
 - Updated Alchemist, Riot, and Al-Hadikhia ability texts
@@ -408,9 +483,11 @@ release of this fork; older versions belong to the original project.
 - Change "traveler" to "traveller" internally, and added continuing support for old scripts that use "traveler"
 
 ### Version 2.18.5
+
 - Always display pronouns when set
 
 ### Version 2.18.4
+
 - Add Gnome
 - Update Boomdandy, Lycanthrope, Snitch, Nightwatchman, Damsel, King, Vizier, Plague Doctor, Farmer, and Ahsaahir abilities, as well as Kazali/Soldier and Kazali/Goon jinxes
 - Add new Cannibal/Poppy Grower jinx
@@ -420,6 +497,7 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.18.3
+
 - Fix homebrew character reminders (again)
 - Fix homebrew character icons in night order and character sheet
 - Update the image clone scripts to use rimraf and copyfiles
@@ -427,12 +505,14 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.18.2
+
 - Fix homebrew characters with multiple alignment-shifted images failing to display character icons on reminders
 - Update Acrobat and Organ Grinder
 
 ---
 
 ### Version 2.18.1
+
 - Fix players being able to vote while not connected to their seat
 - Hosting a new Session now clears all reserved seats
 - Added a ToolTip to the seat icon to clarify the reserved/connected state
@@ -440,6 +520,7 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.18.0
+
 - Players that lose connection to their active session have their seats reserved in case they reconnect
 - Reserved seats cannot be claimed by another player and have their chair icon display as red
 - If a player reconnects they can claim their reserved seat using the "Claim seat" button as if it were an unclaimed seat
@@ -449,6 +530,7 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.17.1
+
 - updated fabled json to include Bootlegger, Ferryman, and Gardener
 - fixed inconsistency with official app and physical game where characters with multiple of the same reminder would only show one leaf
 - fixed icon spacing in the night order modal
@@ -459,6 +541,7 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.17.0
+
 - cleaned up character JSON to create consistent reminder tokens and ability texts
 - updated nightsheet.json as per latest updates
 - update the build to pull images from https://github.com/tomozbot/botc-icons
@@ -468,17 +551,20 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.16.4
+
 - fixed minor spelling mistakes in code documentation
 - fixed Banshee votes being shown as the singular form "2 vote" during a nomination if no other players voted
 
 ---
 
 ### Version 2.16.3
+
 - adjusted the Add Fabled and Choose & Assign windows to be more mobile friendly
 
 ---
 
 ### Version 2.16.2
+
 - fixed issue regarding the grimoire being clipped on mobile devices ([#11](https://github.com/nicholas-eden/townsquare/issues/11))
 - fixed issue with demon head image in center being clipped on mobile devices
 - increased text sizes on mobile devices
@@ -487,28 +573,33 @@ release of this fork; older versions belong to the original project.
 ---
 
 ### Version 2.16.1
+
 Updated character night order to be consistent with script tool
 
 ---
 
 ### Version 2.16.0
+
 - Add ability to use json from clipboard to upload script (by @alexanderfletcher)
 
 ---
 
 ### Version 2.15.4
+
 - fixed flickering of add reminder token
 - added redirect to Chinese version
 
 ---
 
 ### Version 2.15.3
+
 - add Huntsman/Damsel, Noble, Al-Hadikhia, Golem, Fearmonger, Puzzlemaster, Alchemist, Engineer, Riot, Psychopath, Atheist, Nightwatchman to list of available characters
 - fixed game state JSON not handling custom Fabled correctly
 
 ---
 
 ### Version 2.15.2
+
 - added mobile web application support
 - show correct number of leaves on roles with global reminders
 - fixed a bug with traveler list showing up when assigning demon bluffs
@@ -517,23 +608,27 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.15.1
+
 - fix Mephit not showing up on scripts, futureproof Mephit name change
 - add Boomdandy to list of available characters
 
 ---
 
 ### Version 2.15.0
+
 - clean up transparent portions of icons
 - add Magician & LLeech to list of available characters
 
 ---
 
 ### Version 2.14.0
+
 - added Farmer to list of available characters
 
 ---
 
 ### Version 2.13.0
+
 - fix players being moved or removed during nomination
 - add vue linter
 - use "Exile" rather than "Banishment" for exiles
@@ -546,6 +641,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.12.0
+
 - tweak reference sheet to better fit screen in single column layout
 - add warning icon overlay for setup roles on character assignment modal
 - added Heretic and Marionette plus King/Choirboy and the Gangster to list of available characters
@@ -553,6 +649,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.11.0
+
 - new design for character reference sheet
 - automatically switch to grimoire view when joining a session through a link
 - fixed demon bluffs showing on public town square
@@ -561,7 +658,8 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.10.0
-- added [nomination log indicator](https://fontawesome.com/icons/book-dead).  When a nomination log [v] is available, the number of currently visible entries is displayed. Clicking the indicator can reveal/hide the nomination log.
+
+- added [nomination log indicator](https://fontawesome.com/icons/book-dead). When a nomination log [v] is available, the number of currently visible entries is displayed. Clicking the indicator can reveal/hide the nomination log.
 - fix issue where a player and storyteller updating the same players pronouns at around the same time causes an infinite loop disconnecting the session.
 - fix bug with shifting roles when the storyteller deletes a player
 - added Poppygrower to list of available characters
@@ -569,10 +667,11 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.9.1
+
 - fix gamestate JSON not showing (custom) roles and failing to load states with custom scripts properly
 - fix gamestate not stripping out special characters from role.id on load
 - made character assignment modal a bit prettier
-- got rid of the extra pixels on the  Soldier icon
+- got rid of the extra pixels on the Soldier icon
 - fixed lengthy live session channel names not being correctly cut off
 - hide player names in night order / character reference popup when town square is public
 - fix (pre-)vote calculation being off by one if the nominee votes
@@ -580,6 +679,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.9.0
+
 - added support for assigning pronouns to players and display of the pronouns in a tooltip on the player name.
 - added button to modals that allows the user to maximize them
 - added Mephit and Snitch to roles.json
@@ -587,12 +687,14 @@ Updated character night order to be consistent with script tool
 ---
 
 ### Version 2.8.0
+
 - added hands-off live session support for homebrew / custom characters again!
 - added custom image opt-in that will prevent any (potentially malicious / harmful) images from loading until a player manually allows them to
 
 ---
 
 ## Version 2.7.0
+
 - added support for assigning duplicate characters to more than one player (like Legion)
 - further live session bandwidth optimizations
 - sessions can now be joined by pasting the whole link into the popup (thanks @davotronic5000)
@@ -604,18 +706,21 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.6.0
+
 - night mode can be toggeled with [S] now (thanks @davotronic5000)
 - night order shows which players are dead
 
 ---
 
 ## Version 2.5.0
+
 - all travelers from the base editions are now optionally available (thanks @davotronic5000)
 - night order shows player names near roles now
 
 ---
 
 ## Version 2.4.0
+
 - added spoiler role (Pixie!)
 - fixed bug with ST sending out roles that are not part of the current edition / script (ie. travelers or base set roles)
 - better Lycanthrope icon (thanks @AWConant)
@@ -623,6 +728,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.3.1
+
 - better vote history design and added timestamps
 - adjusted player menu styling on smaller screens
 - improved CONTRIBUTING.md description of hosting your own copy
@@ -630,6 +736,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.3.0
+
 - added spoiler role (Lycanthrope!)
 - fixed copy to clipboard in Firefox
 - fixed non-countdown votes still playing countdown sound for a split second
@@ -637,12 +744,14 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.2.1
+
 - clearing players / roles now also clears Fabled
 - fix list of locked votes showing unlocked votes sometimes
 
 ---
 
 ## Version 2.2.0
+
 - added [V] hotkey to open nomination history (thanks @lilserf)
 - updated roles according to official Wiki changes
 - adjusted roles night order
@@ -650,14 +759,15 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.1.1
+
 - show vote results at the end of a vote
 - fixed global reminders not showing up anymore when the associated role is assigned to a player
 - adjusted backend metrics
 
-
 ---
 
 ## Version 2.1.0
+
 - reduced countdown volume by 10db
 - added a mute toggle to the Grimoire menu (currently only silences the countdown)
 - pressing [J] while in a session will now leave the session
@@ -667,12 +777,14 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.0.4
+
 - fix bug with live sessions that contain travelers from a different set
 - fix server channel cleanup
 
 ---
 
 ## Version 2.0.3
+
 - load roles that belong to different editions (like travelers) from gamestate
 - close session when missing custom roles and open edition modal
 - added a few more metrics
@@ -680,6 +792,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.0.2
+
 - fix nomination history type not detecting travelers
 - fix live session domain whitelist
 - fix build path
@@ -688,6 +801,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.0.1
+
 - clearing the nomination history as the Storyteller clears it for the players too
 - vote buttons should work in all situations correctly now
 - fixed some minor styling and live session issues
@@ -695,6 +809,7 @@ Updated character night order to be consistent with script tool
 ---
 
 ## Version 2.0.0
+
 - The project is now available under its own domain: [clocktower.live](https://clocktower.live)
 - Added a feature that allows a live session Storyteller to automatically (and safely) distribute assigned
   characters to all players that have claimed a seat, eliminating the need to manually tell every player their role

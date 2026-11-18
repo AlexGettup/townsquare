@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.31.0",
+    "date": "2026-11-18",
+    "title": {
+      "en": "Voice chat problems",
+      "es": "Problemas con el chat de voz"
+    },
+    "en": [
+      "New warning button beside the voice button: if you can't hear someone, reconnect the voice chat or tell us what happened",
+      "Voice chat: fixed times when nobody heard anybody, even after moving to another room"
+    ],
+    "es": [
+      "Nuevo botón de advertencia junto al de voz: si no oyes a alguien, reconecta el chat de voz o cuéntanos qué ha pasado",
+      "Chat de voz: arreglado que a veces nadie oyera a nadie, aunque os cambiarais de sala"
+    ]
+  },
+  {
     "version": "3.30.1",
     "date": "2026-11-18",
     "title": {
