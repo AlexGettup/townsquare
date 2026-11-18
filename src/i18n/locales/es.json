@@ -493,7 +493,8 @@
     "seen": "visto",
     "waiting": "esperando…",
     "fold": "Plegar",
-    "hide": "Ocultar esta noche"
+    "hide": "Ocultar esta noche",
+    "toymakerNoAttack": "Juguetero: si un ataque puede terminar la partida, no despiertes al Demonio"
   },
   "practice": {
     "names": "Ana,Bruno,Carla,David,Elena,Fran,Gema,Hugo,Irene,Javi,Laura,Mario,Nuria,Óscar,Paula,Quique,Rosa,Sergio,Tere,Víctor",

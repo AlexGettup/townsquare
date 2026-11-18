@@ -493,7 +493,8 @@
     "seen": "seen",
     "waiting": "waiting…",
     "fold": "Fold",
-    "hide": "Hide tonight"
+    "hide": "Hide tonight",
+    "toymakerNoAttack": "Toymaker: if an attack could end the game, don't wake the Demon"
   },
   "practice": {
     "names": "Alice,Ben,Clara,Dan,Emma,Finn,Grace,Harry,Isla,Jack,Kate,Leo,Mia,Noah,Olivia,Paul,Quinn,Rose,Sam,Tom",
