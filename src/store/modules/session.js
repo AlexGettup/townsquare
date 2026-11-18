@@ -151,6 +151,28 @@ const actions = {
    * Storyteller: end the game. Everyone sees the winner and the grimoire as it
    * is now, by day, back in the plaza.
    */
+  /**
+   * Storyteller: start a new game with the same players in the same seats.
+   * Roles, reminders, deaths, votes, nights and the end of the last game go
+   * away; players clear theirs when they get "newGame" (socket.js).
+   */
+  newGame({ state, commit, dispatch, rootState }) {
+    if (state.isSpectator) return;
+    if (state.nomination) commit("nomination");
+    if (state.dayTimer) commit("setDayTimer", null);
+    if (rootState.grimoire.isNight)
+      commit("toggleNight", false, { root: true });
+    commit("setNightCount", 0, { root: true });
+    commit("setMarkedPlayer", -1);
+    commit("clearVoteHistory");
+    commit("setGameOver", null);
+    commit("setPointing", null);
+    commit("setGrimoireView", null);
+    commit("setDealtRoles", {});
+    commit("distributeRoles", false);
+    dispatch("players/clearRoles", undefined, { root: true });
+    commit("newGame");
+  },
   endGame({ state, commit, dispatch, getters, rootState }, winner) {
     if (state.isSpectator) return;
     if (state.nomination) commit("nomination");
@@ -269,6 +291,9 @@ const mutations = {
   clearVoteHistory(state) {
     state.voteHistory = [];
   },
+  /** Marks the start of a new game (see the newGame action); no state. */
+  // eslint-disable-next-line no-unused-vars
+  newGame(state) {},
   /**
    * Store a vote with and without syncing it to the live session.
    * This is necessary in order to prevent infinite voting loops.

@@ -107,8 +107,9 @@ export default (store) => {
       case "session/setVoteHistory":
         votesSeen = state.session.voteHistory.length;
         break;
-      // each practice game is a new game
+      // each practice game is a new game, and so is the storyteller's "New game"
       case "practice/setActive":
+      case "session/newGame":
         store.commit("diary/clear");
         notePhase();
         break;

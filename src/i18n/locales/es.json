@@ -24,6 +24,7 @@
     "switchToDay": "Pasar al día",
     "endGame": "Terminar partida",
     "undoEndGame": "Volver a la partida",
+    "newGame": "Nueva partida",
     "nightOrder": "Orden de noche",
     "guidedNight": "Noche guiada",
     "zoom": "Zoom",
@@ -218,6 +219,7 @@
     "playerPronouns": "Pronombres del jugador",
     "randomizeSeats": "¿Seguro que quieres aleatorizar los asientos?",
     "removeAllPlayers": "¿Seguro que quieres eliminar a todos los jugadores?",
+    "newGame": "¿Empezar una nueva partida con los mismos jugadores? Se borran los personajes, recordatorios, muertes, votaciones y noches.",
     "removeAllRoles": "¿Seguro que quieres quitar los personajes de todos los jugadores?",
     "removePlayer": "¿Seguro que quieres eliminar a {name}?",
     "customNote": "Añade una nota de recordatorio personalizada",
@@ -532,6 +534,9 @@
     "presets": {
       "toPlaza": "¡Todos a la plaza!",
       "nominationsOpen": "Se abren las nominaciones",
+      "secondCall": "Segunda llamada para nominar",
+      "lastCall": "Última llamada para nominar",
+      "timeUp": "Se acabó el tiempo",
       "nominationsClosed": "Se cierran las nominaciones",
       "fewMinutes": "Quedan pocos minutos de día",
       "nightFalls": "La noche está a punto de caer"

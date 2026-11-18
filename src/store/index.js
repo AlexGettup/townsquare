@@ -7,6 +7,7 @@ import chatPlugin from "./chat";
 import practicePlugin from "./practice";
 import notesPlugin from "./notes";
 import diaryPlugin from "./diary";
+import announcementsPlugin from "./announcements";
 import wakeLockPlugin from "./wakeLock";
 import alertsPlugin from "./alerts";
 import voteValuePlugin from "./voteValue";
@@ -507,6 +508,7 @@ export default new Vuex.Store({
     alertsPlugin,
     notesPlugin,
     diaryPlugin,
+    announcementsPlugin,
     voteValuePlugin,
   ],
 });
