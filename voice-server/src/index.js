@@ -172,13 +172,19 @@ const cleanPart = (part) => {
       ? Math.max(0, Math.min(99, part.number))
       : null,
     answer: part.answer === "yes" || part.answer === "no" ? part.answer : null,
+    // "You are: Evil" (Snake Charmer, Fang Gu, Goon)
+    alignment:
+      part.alignment === "good" || part.alignment === "evil"
+        ? part.alignment
+        : null,
   };
   const empty =
     !clean.phrase &&
     !clean.roles.length &&
     !clean.players.length &&
     clean.number === null &&
-    !clean.answer;
+    !clean.answer &&
+    !clean.alignment;
   return empty ? null : clean;
 };
 
@@ -199,6 +205,7 @@ const cleanCard = (card) => {
     players: [],
     number: null,
     answer: null,
+    alignment: null,
   };
   const text = shortString(card.text, 300).trim() || null;
   if (!text && !parts.length && !cleanPart(card)) return null;

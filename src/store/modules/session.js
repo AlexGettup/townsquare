@@ -1,3 +1,5 @@
+import { alignmentOf } from "../../cards";
+
 /**
  * Handle a vote request.
  * If the vote is from a seat that is already locked, ignore it.
@@ -37,6 +39,9 @@ const state = () => ({
   // ST: characters handed out to each player ID, so a player who was away
   // (phone in the background…) still gets theirs
   dealtRoles: {},
+  // ST: alignmentIndex sent to a player with their character (Snake
+  // Charmer, Fang Gu, Goon), by player ID, for the same reason
+  dealtAlignments: {},
   // ST: this page load picked up a saved game (see store/persistence.js)
   isGameResumed: false,
   // the day timer everyone sees: { endsAt (this device's clock), duration }
@@ -169,9 +174,50 @@ const actions = {
     commit("setPointing", null);
     commit("setGrimoireView", null);
     commit("setDealtRoles", {});
+    commit("setDealtAlignments", {});
     commit("distributeRoles", false);
     dispatch("players/clearRoles", undefined, { root: true });
     commit("newGame");
+  },
+  /**
+   * Storyteller: give one seated player a new character and alignment (Snake
+   * Charmer, Pit-Hag, Barber, Fang Gu, Goon…), on the grimoire and on their
+   * device only, with a "You are" card. Nobody else learns anything.
+   */
+  sendCharacter({ state, commit, dispatch }, { player, role, alignmentIndex }) {
+    if (state.isSpectator || !player || !player.id || !role || !role.id) return;
+    commit(
+      "players/update",
+      { player, property: "role", value: role },
+      { root: true },
+    );
+    commit(
+      "players/update",
+      { player, property: "alignmentIndex", value: alignmentIndex },
+      { root: true },
+    );
+    // the socket sends it to that player (store/socket.js)
+    commit("setDealtRole", {
+      playerId: player.id,
+      roleId: role.id,
+      alignmentIndex,
+    });
+    dispatch(
+      "chat/sendCard",
+      {
+        to: player.id,
+        card: {
+          phrase: "youAre",
+          text: "",
+          roles: [role.id],
+          players: [],
+          number: null,
+          answer: null,
+          alignment: alignmentOf(role.team, alignmentIndex),
+        },
+      },
+      { root: true },
+    );
   },
   endGame({ state, commit, dispatch, getters, rootState }, winner) {
     if (state.isSpectator) return;
@@ -207,6 +253,15 @@ const mutations = {
   claimSeat: set("claimedSeat"),
   distributeRoles: set("isRolesDistributed"),
   setDealtRoles: set("dealtRoles"),
+  setDealtAlignments: set("dealtAlignments"),
+  /** One player's new character (see the sendCharacter action). */
+  setDealtRole(state, { playerId, roleId, alignmentIndex }) {
+    state.dealtRoles = { ...state.dealtRoles, [playerId]: roleId };
+    state.dealtAlignments = {
+      ...state.dealtAlignments,
+      [playerId]: alignmentIndex,
+    };
+  },
   setGameResumed: set("isGameResumed"),
   /** Start ({ remaining, duration } in ms) or stop (null) the day timer. */
   setGameOver: set("gameOver"),

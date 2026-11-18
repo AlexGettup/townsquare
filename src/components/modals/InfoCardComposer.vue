@@ -183,6 +183,26 @@
           </li>
         </ul>
       </div>
+      <!-- "You are: Evil" (Snake Charmer, Fang Gu, Goon) -->
+      <div v-if="line.phrase === 'youAre'">
+        <h4>{{ $t("cards.alignment") }}</h4>
+        <ul class="chips">
+          <li
+            :class="{ selected: !line.alignment }"
+            @click="line.alignment = null"
+          >
+            {{ $t("cards.none") }}
+          </li>
+          <li
+            v-for="alignment in alignments"
+            :key="alignment"
+            :class="{ selected: line.alignment === alignment }"
+            @click="line.alignment = alignment"
+          >
+            {{ $t(`modals.role.alignment.${alignment}`) }}
+          </li>
+        </ul>
+      </div>
     </section>
 
     <div class="button-group">
@@ -203,6 +223,7 @@ import { mapGetters, mapState } from "vuex";
 import Modal from "./Modal";
 import Token from "../Token";
 import {
+  ALIGNMENTS,
   CHOICES,
   MAX_PARTS,
   PHRASES,
@@ -232,6 +253,7 @@ export default {
     return {
       phrases: PHRASES,
       choices: CHOICES,
+      alignments: ALIGNMENTS,
       ...this.emptyCard(),
     };
   },
@@ -451,6 +473,8 @@ export default {
       items.push(...part.players);
       if (part.number !== null) items.push(String(part.number));
       if (part.answer) items.push(this.$t(`cards.${part.answer}`));
+      if (part.alignment)
+        items.push(this.$t(`modals.role.alignment.${part.alignment}`));
       return items.join(" · ");
     },
     // one line for the history: the token and what the card shows
@@ -468,6 +492,7 @@ export default {
         ...part,
         roles: [...part.roles],
         players: [...part.players],
+        alignment: part.alignment || null,
       }));
       return {
         recipients: composePreset

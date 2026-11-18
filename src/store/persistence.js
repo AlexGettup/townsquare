@@ -29,6 +29,7 @@ const hostedGameOf = ({ session, grimoire, voice, chat }) =>
         isVoteWatchingAllowed: session.isVoteWatchingAllowed,
         voteHistory: session.voteHistory,
         dealtRoles: session.dealtRoles,
+        dealtAlignments: session.dealtAlignments,
         awake: voice.awake,
         broadcast: voice.broadcast,
         cardsSince: chat.cardsSince,
@@ -80,6 +81,7 @@ const restoreHostedGame = (store, game) => {
     })),
   );
   store.commit("session/setDealtRoles", game.dealtRoles);
+  store.commit("session/setDealtAlignments", game.dealtAlignments || {});
   store.commit("voice/setNight", {
     awake: game.awake,
     broadcast: game.broadcast,

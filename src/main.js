@@ -95,6 +95,7 @@ const faIcons = [
   "UserEdit",
   "UserPlus",
   "UserFriends",
+  "UserTag",
   "Users",
   "VenusMars",
   "VolumeUp",

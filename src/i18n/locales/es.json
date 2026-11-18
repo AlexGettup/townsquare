@@ -159,6 +159,13 @@
   "alerts": {
     "newInfo": "Nueva información"
   },
+  "sendCharacter": {
+    "title": "Enviar su personaje a {name}",
+    "character": "Personaje",
+    "alignment": "Bando",
+    "hint": "Cambia su ficha en tu grimorio y en el suyo, y le llega la tarjeta «Tú eres». Nadie más recibe nada.",
+    "send": "Enviar"
+  },
   "cards": {
     "send": "Enviar información",
     "title": "Información para {name}",
@@ -170,6 +177,7 @@
     "players": "Jugadores",
     "number": "Número",
     "answer": "Sí / No",
+    "alignment": "Bando",
     "none": "—",
     "yes": "Sí",
     "no": "No",
@@ -312,6 +320,7 @@
     "more": "Más",
     "mySeat": "Mi asiento",
     "changeRole": "Cambiar personaje",
+    "sendCharacter": "Enviar su personaje",
     "changePronouns": "Cambiar pronombres",
     "rename": "Renombrar",
     "voteValue": "Voto: {value}",

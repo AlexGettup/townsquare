@@ -159,6 +159,13 @@
   "alerts": {
     "newInfo": "New information"
   },
+  "sendCharacter": {
+    "title": "Send {name} their character",
+    "character": "Character",
+    "alignment": "Alignment",
+    "hint": "Changes their token in your grimoire and in theirs, and they get the \"You are\" card. Nobody else receives anything.",
+    "send": "Send"
+  },
   "cards": {
     "to": "To",
     "send": "Send Information",
@@ -170,6 +177,7 @@
     "players": "Players",
     "number": "Number",
     "answer": "Yes / No",
+    "alignment": "Alignment",
     "none": "—",
     "yes": "Yes",
     "no": "No",
@@ -312,6 +320,7 @@
     "more": "More",
     "mySeat": "My seat",
     "changeRole": "Change Character",
+    "sendCharacter": "Send their character",
     "changePronouns": "Change Pronouns",
     "rename": "Rename",
     "voteValue": "Vote: {value}",

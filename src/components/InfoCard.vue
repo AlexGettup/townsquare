@@ -32,6 +32,13 @@
       <div class="answer" v-if="part.answer" :class="part.answer">
         {{ $t(`cards.${part.answer}`) }}
       </div>
+      <div
+        class="alignment"
+        v-if="part.alignment"
+        :class="'alignment-' + part.alignment"
+      >
+        {{ $t(`modals.role.alignment.${part.alignment}`) }}
+      </div>
     </div>
     <p class="text" v-if="card.text">{{ card.text }}</p>
   </div>
@@ -217,6 +224,18 @@ h2 {
     color: $townsfolk;
   }
   &.no {
+    color: $demon;
+  }
+}
+
+.alignment {
+  font-family: PiratesBay, sans-serif;
+  font-size: 220%;
+  letter-spacing: 2px;
+  &.alignment-good {
+    color: $townsfolk;
+  }
+  &.alignment-evil {
     color: $demon;
   }
 }

@@ -175,6 +175,7 @@ export default new Vuex.Store({
       diary: false,
       announce: false,
       voiceHelp: false,
+      sendCharacter: false,
     },
     edition: editionJSONbyId.get("tb"),
     roles: getRolesByEdition(),

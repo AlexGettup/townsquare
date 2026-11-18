@@ -212,6 +212,8 @@ export default {
         if (part.players.length) items.push(part.players.join(", "));
         if (part.number !== null) items.push(String(part.number));
         if (part.answer) items.push(this.$t(`cards.${part.answer}`));
+        if (part.alignment)
+          items.push(this.$t(`modals.role.alignment.${part.alignment}`));
         const content = items.join(" · ");
         if (index === 0 || !part.phrase) return content;
         const phrase = this.$t(`cards.phrases.${part.phrase}`);
