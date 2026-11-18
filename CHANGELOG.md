@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.29.0
+- Storyteller announcements: a bullhorn button opens the usual announcements (everyone to the town square, nominations open or closed, a few minutes left, night is about to fall) or a free text. Players see it at the top of the screen for 8 seconds with one soft bell, and it stays in the chat and the diary
+- Voice chat keeps going through dropped connections: someone whose connection drops keeps their place for 30 seconds (still heard, same conversation) and nobody notices if they come back in time
+- Voice chat recovers by itself when the audio connection fails, instead of leaving it; it also checks the connection when a phone comes back from the background or the network comes back
+- The voice server logs dropped connections, audio errors and what clients report, to find what goes wrong in a game (needs the voice server deployed)
+
 ### Version 3.28.2
 - Upright phones with the guided night open: the edition logo, the counters and the vote move up with the seats, which they didn't in 3.28.1
 

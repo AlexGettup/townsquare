@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.29.0",
+    "date": "2026-11-18",
+    "title": {
+      "en": "Announcements and steadier voice chat",
+      "es": "Anuncios y un chat de voz más estable"
+    },
+    "en": [
+      "Storyteller: announce something to the whole town with the bullhorn button; everyone sees it at the top with a soft bell",
+      "Voice chat: if your connection drops for a moment, you keep your place and the others keep hearing you",
+      "Voice chat: if the audio fails, it reconnects by itself, also when your phone comes back from the background"
+    ],
+    "es": [
+      "Narrador: anuncia algo a todo el pueblo con el botón del megáfono; todos lo ven arriba con una campanada suave",
+      "Chat de voz: si se te corta la conexión un momento, conservas tu sitio y los demás te siguen oyendo",
+      "Chat de voz: si falla el audio, se reconecta solo, también cuando el móvil vuelve del segundo plano"
+    ]
+  },
+  {
     "version": "3.28.2",
     "date": "2026-11-13",
     "title": {

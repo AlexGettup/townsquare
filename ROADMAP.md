@@ -53,6 +53,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   clearer ghost vote warning; "Change character" under "More"
 - **3.28.1** One majority in the vote overlay; guided night clear of the circle on phones
 - **3.28.2** The town square's middle (logo, counters, vote) moves up with the seats too
+- **3.29.0** Storyteller announcements to the town; voice chat survives dropped connections
+  (30 s grace on the server, automatic recovery on the client) and logs what goes wrong
 
 ## Planned
 
