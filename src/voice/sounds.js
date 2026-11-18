@@ -28,13 +28,13 @@ const getContext = () => {
 };
 
 // one bell strike: a few harmonics with an exponential decay
-const strike = (ctx, at, frequency) => {
+const strike = (ctx, at, frequency, loudness = 1) => {
   [1, 2.01, 3.02].forEach((harmonic, index) => {
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     oscillator.type = "sine";
     oscillator.frequency.value = frequency * harmonic;
-    const volume = 0.25 / (index + 1);
+    const volume = (0.25 * loudness) / (index + 1);
     gain.gain.setValueAtTime(0.0001, at);
     gain.gain.exponentialRampToValueAtTime(volume, at + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, at + 1.6);
@@ -52,6 +52,13 @@ export const playGatherBell = () => {
   strike(ctx, now, 659);
   strike(ctx, now + 0.45, 523);
   strike(ctx, now + 0.9, 659);
+};
+
+/** One soft, low bell: the storyteller announces something to the town. */
+export const playAnnounceBell = () => {
+  const ctx = getContext();
+  if (!ctx) return;
+  strike(ctx, ctx.currentTime + 0.05, 523, 0.7);
 };
 
 /** Two rising notes: something needs the player (woken up, their vote). */

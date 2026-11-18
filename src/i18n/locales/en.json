@@ -524,8 +524,22 @@
     "reset": "Undo changes",
     "send": "Show the grimoire"
   },
+  "announce": {
+    "title": "Announce to the town",
+    "hint": "Everyone sees it at the top of the screen, with a bell.",
+    "placeholder": "Or write your announcement…",
+    "send": "Announce",
+    "presets": {
+      "toPlaza": "Everyone to the town square!",
+      "nominationsOpen": "Nominations are open",
+      "nominationsClosed": "Nominations are closed",
+      "fewMinutes": "A few minutes of day left",
+      "nightFalls": "Night is about to fall"
+    }
+  },
   "diary": {
     "title": "Game diary",
+    "announce": "The storyteller announces: {text}",
     "empty": "Nothing has happened yet. What the storyteller tells you, deaths and each day's votes will show up here.",
     "now": "now",
     "earlier": "Before",

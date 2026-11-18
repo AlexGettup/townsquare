@@ -124,6 +124,23 @@ export default (store) => {
   store.subscribe(({ type, payload }) => {
     switch (type) {
       // characters really dealt (a mock assignment doesn't come through here)
+      // the storyteller's announcement stays in the place tab
+      case "session/setAnnouncement":
+        if (payload) {
+          const { isOpen, tab } = store.state.chat;
+          store.commit("chat/addAnnouncement", {
+            message: {
+              id: "announce-" + payload.id,
+              at: Date.now(),
+              from: STORYTELLER,
+              channel: "announce",
+              text: "",
+              announce: { key: payload.key, text: payload.text },
+            },
+            unread: !isStoryteller() && (!isOpen || tab !== PLACE_TAB),
+          });
+        }
+        break;
       case "session/distributeRoles":
         if (payload) store.dispatch("chat/sendRoleCards");
         break;

@@ -40,6 +40,8 @@
     <NightOrderModal />
     <VoteHistoryModal />
     <DiaryModal />
+    <AnnounceModal />
+    <AnnouncementBanner />
     <GameStateModal />
     <ChangelogModal />
     <Gradients />
@@ -75,6 +77,8 @@ import NightOrderModal from "./components/modals/NightOrderModal";
 import NpcModal from "@/components/modals/NpcModal";
 import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import DiaryModal from "@/components/modals/DiaryModal";
+import AnnounceModal from "@/components/modals/AnnounceModal";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import GameStateModal from "@/components/modals/GameStateModal";
 import ChangelogModal from "@/components/modals/ChangelogModal";
 import VoiceCorner from "@/components/VoiceCorner";
@@ -110,6 +114,8 @@ export default {
     ChangelogModal,
     VoteHistoryModal,
     DiaryModal,
+    AnnounceModal,
+    AnnouncementBanner,
     NpcModal,
     NightOrderModal,
     Vote,

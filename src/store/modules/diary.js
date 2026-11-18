@@ -15,7 +15,8 @@ const PHASE_SETTLE = 2 * 1000;
 const state = () => ({
   // { at, night, isNight }: night is the day and night count
   phases: [],
-  // { at, kind: "death" | "revive" | "grimoire", name }
+  // { at, kind: "death" | "revive" | "grimoire", name }, or the storyteller's
+  // announcements: { at, kind: "announce", key, text }
   events: [],
   // { at, nominator, nominee, type: "Execution" | "Exile", count, majority,
   // votes: [names] }, as in the vote history

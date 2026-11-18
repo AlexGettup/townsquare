@@ -45,12 +45,17 @@
           v-for="message in messages"
           :key="message.id"
           :class="{
-            mine: message.from === selfPeerId,
+            mine: message.from === selfPeerId && !message.announce,
             replaced: isRoleCard(message) && message !== currentRoleCard,
+            announce: !!message.announce,
           }"
         >
           <small class="time">{{ time(message.at) }}</small>
-          <b>{{ peerName(message.from) }}:</b>
+          <template v-if="message.announce">
+            <font-awesome-icon icon="bullhorn" />
+            <b>{{ announceLine(message.announce) }}</b>
+          </template>
+          <b v-else>{{ peerName(message.from) }}:</b>
           <a
             v-if="message.card"
             class="card-link"
@@ -97,6 +102,7 @@ import peerNames from "../voice/peerNames";
 import { PLACE_TAB, isRoleCard } from "../store/modules/chat";
 import { STORYTELLER } from "../store/modules/voice";
 import { partsOf } from "../cards";
+import { announcementText } from "../announcements";
 
 /**
  * Text chat panel (bottom right): what is said around us, and the private
@@ -164,6 +170,9 @@ export default {
     },
   },
   methods: {
+    announceLine(announce) {
+      return announcementText(announce, (key) => this.$t(key));
+    },
     setOpen(isOpen) {
       this.$store.commit("chat/setOpen", isOpen);
     },
@@ -333,6 +342,13 @@ export default {
     overflow-wrap: anywhere;
     &.mine b {
       color: $townsfolk;
+    }
+    // the storyteller's announcements to the town
+    &.announce {
+      color: #ffd88a;
+      svg {
+        margin-right: 4px;
+      }
     }
     &.empty {
       color: gray;

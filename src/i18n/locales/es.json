@@ -524,8 +524,22 @@
     "reset": "Deshacer cambios",
     "send": "Enseñar grimorio"
   },
+  "announce": {
+    "title": "Anunciar al pueblo",
+    "hint": "Todos lo verán arriba de la pantalla, con un toque de campana.",
+    "placeholder": "O escribe tu anuncio…",
+    "send": "Anunciar",
+    "presets": {
+      "toPlaza": "¡Todos a la plaza!",
+      "nominationsOpen": "Se abren las nominaciones",
+      "nominationsClosed": "Se cierran las nominaciones",
+      "fewMinutes": "Quedan pocos minutos de día",
+      "nightFalls": "La noche está a punto de caer"
+    }
+  },
   "diary": {
     "title": "Diario de la partida",
+    "announce": "El narrador anuncia: {text}",
     "empty": "Aún no ha pasado nada. Aquí irá apareciendo lo que te diga el narrador, las muertes y las votaciones de cada día.",
     "now": "ahora",
     "earlier": "Antes",

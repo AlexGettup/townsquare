@@ -76,6 +76,7 @@ import Modal from "./Modal";
 import { describePart, lookOf, partsOf } from "../../cards";
 import { STORYTELLER } from "../../store/modules/voice";
 import { dmTab } from "../../store/modules/chat";
+import { announcementText } from "../../announcements";
 
 const timeOf = (at) => {
   const date = new Date(at);
@@ -142,6 +143,15 @@ export default {
     eventItems() {
       return this.diary.events.map((event, index) => {
         const base = { key: "e" + index, at: event.at, kind: event.kind };
+        if (event.kind === "announce") {
+          return {
+            ...base,
+            icon: "bullhorn",
+            text: this.$t("diary.announce", {
+              text: announcementText(event, this.$t.bind(this)),
+            }),
+          };
+        }
         if (event.kind === "grimoire") {
           return {
             ...base,
@@ -400,6 +410,9 @@ li {
   }
   &.death .icon {
     color: $demon;
+  }
+  &.announce {
+    color: #ffd88a;
   }
   &.said {
     opacity: 0.8;

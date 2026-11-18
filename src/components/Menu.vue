@@ -47,6 +47,18 @@
       <font-awesome-icon icon="broadcast-tower" />
       {{ session.playerCount }}
     </span>
+    <!-- storyteller: announce something to the whole town -->
+    <span
+      class="announce"
+      v-if="
+        !session.isSpectator &&
+        (session.sessionId || $store.state.practice.active)
+      "
+      @click="toggleModal('announce')"
+      :title="$t('announce.title')"
+    >
+      <font-awesome-icon icon="bullhorn" />
+    </span>
     <span
       class="day-night"
       v-if="!session.isSpectator"
@@ -726,6 +738,7 @@ export default {
   // storyteller's day / night switch.
   // Boxed like the menu cog: translucent black background, solid black border
   span.reference,
+  span.announce,
   span.day-night {
     display: inline-flex;
     align-items: center;
