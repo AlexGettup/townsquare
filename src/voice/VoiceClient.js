@@ -168,7 +168,13 @@ export default class VoiceClient {
    * Join the voice room of a game session. Must be called from a user
    * gesture (click), as browsers only allow microphone and audio then.
    */
-  async join({ channel, peerId, muted = false, recovering = false }) {
+  async join({
+    channel,
+    peerId,
+    muted = false,
+    recovering = false,
+    keepPlace = false,
+  }) {
     if (!recovering) {
       // joining by hand: whatever recovery was going on is over
       clearTimeout(this.recoverTimer);
@@ -176,7 +182,8 @@ export default class VoiceClient {
       this.recoverAttempt = 0;
       this.wasConnected = false;
     }
-    if (this.pc) this._teardown();
+    // keepPlace: like a dropped connection, the server keeps where we were
+    if (this.pc) this._teardown(!keepPlace);
     this.channel = channel;
     this.peerId = peerId;
     this.muted = muted;
@@ -344,18 +351,20 @@ export default class VoiceClient {
    * Tell the voice server's logs what went wrong here, which it can't see
    * (no personal data: the player ID it knows already, and the browser).
    */
-  _report(event, detail = "", maxLength = 300) {
+  _report(event, detail = "", maxLength = 300, target = {}) {
+    const channel = target.channel || this.channel;
+    const peerId = target.peerId || this.peerId;
     const now = Date.now();
     this.reports = this.reports.filter((at) => now - at < 60 * 1000);
-    if (this.reports.length >= REPORTS_PER_MINUTE || !this.channel) return;
+    if (this.reports.length >= REPORTS_PER_MINUTE || !channel) return;
     this.reports.push(now);
-    const room = encodeURIComponent(this.channel);
+    const room = encodeURIComponent(channel);
     fetch(`${this.serverUrl}/rooms/${room}/report`, {
       method: "POST",
       keepalive: true,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        peer: this.peerId,
+        peer: peerId,
         event,
         detail: String(detail).slice(0, maxLength),
         device: navigator.userAgent.slice(0, 200),
@@ -364,13 +373,12 @@ export default class VoiceClient {
   }
 
   /**
-   * "I can't hear someone": send the voice server's logs what this device
-   * sees (whom it should hear, whether their audio arrives, whether it plays
-   * it), then receive everyone again from scratch. `extra`: what the app
-   * knows (day or night, place). Returns the snapshot.
+   * What this device sees of the call, for the logs: whom it should hear,
+   * whether their audio arrives and whether it plays it, what it sends.
+   * `extra`: what the app knows (day or night, place).
    */
-  async checkAudio(extra = {}) {
-    if (!this.pc) return null;
+  async snapshot(extra = {}) {
+    if (!this.pc) return { ...extra, voice: "off" };
     const packetsOf = async (rtc, type, field) => {
       let total = 0;
       try {
@@ -430,9 +438,18 @@ export default class VoiceClient {
       socket: this.socket ? this.socket.readyState : null,
       peers,
     };
-    this._report("no-audio", JSON.stringify(snapshot), 3000);
+    return snapshot;
+  }
 
-    // then fix what can be fixed from here
+  /**
+   * "I can't hear someone": send the logs what this device sees, then
+   * receive everyone again from scratch, without leaving. Returns the
+   * snapshot, or null when not in voice.
+   */
+  async checkAudio(extra = {}) {
+    if (!this.pc) return null;
+    const snapshot = await this.snapshot(extra);
+    this._report("no-audio", JSON.stringify(snapshot), 3000);
     if (this.audioContext && this.audioContext.state !== "running") {
       this.audioContext.resume().catch(() => {});
     }
@@ -440,6 +457,43 @@ export default class VoiceClient {
     this._syncRemotes();
     this._checkNow();
     return snapshot;
+  }
+
+  /**
+   * Leave and join again, keeping our place (the server keeps it a while
+   * for a connection that drops). Must be called from a click.
+   */
+  async reconnect(extra = {}, target = {}) {
+    // after an error we are out of the call: `target` says where to go back
+    const inCall = !!this.pc;
+    const channel = inCall ? this.channel : target.channel;
+    const peerId = inCall ? this.peerId : target.peerId;
+    if (!channel || !peerId) return;
+    const snapshot = await this.snapshot(extra);
+    this._report("reconnect", JSON.stringify(snapshot), 3000, {
+      channel,
+      peerId,
+    });
+    await this.join({
+      channel,
+      peerId,
+      muted: inCall ? this.muted : !!target.muted,
+      keepPlace: true,
+    });
+  }
+
+  /**
+   * Someone tells what went wrong, in their own words: to the logs with what
+   * this device sees. Works outside voice too (`target`: the game session's
+   * channel and our peerId).
+   */
+  async sendReport(text, extra = {}, target = {}) {
+    const snapshot = await this.snapshot(extra);
+    const detail = JSON.stringify({
+      text: String(text || "").slice(0, 500),
+      ...snapshot,
+    });
+    this._report("user-report", detail, 3000, target);
   }
 
   setMuted(muted) {

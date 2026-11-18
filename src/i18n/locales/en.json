@@ -93,7 +93,7 @@
     "defaultDevice": "Default",
     "deviceFailed": "Couldn't use that device",
     "cantHear": "I can't hear someone",
-    "cantHearHint": "Reconnects the audio of everyone you should hear and sends what your device sees to the logs, to find the cause",
+    "cantHearHint": "Connects the others' audio again, without leaving the chat",
     "checkSent": "Audio reconnected. Sent to the logs what your device sees",
     "microphoneLost": "Microphone disconnected: using the default one",
     "playerMuted": "Microphone off",
@@ -133,6 +133,16 @@
       "NotReadableError": "The microphone is being used by another app.",
       "InsecureContext": "The microphone only works over HTTPS.",
       "Replaced": "Voice chat was opened in another tab."
+    },
+    "reportSent": "Report sent. Thanks!",
+    "help": {
+      "title": "Voice chat problems",
+      "hint": "If you can't hear someone, they can't hear you or something fails, try this. Each option sends the server logs what your device sees (never audio), to find the cause.",
+      "reconnect": "Reconnect the voice chat",
+      "reconnectHint": "You leave and join again, in the same place",
+      "describe": "What happened?",
+      "placeholder": "For example: I haven't heard one player for a while",
+      "send": "Send report"
     }
   },
   "chat": {
