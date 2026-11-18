@@ -72,6 +72,16 @@ export default (store) => {
           });
         }
         break;
+      case "session/setAnnouncement":
+        if (payload) {
+          store.commit("diary/addEvent", {
+            at: Date.now(),
+            kind: "announce",
+            key: payload.key,
+            text: payload.text,
+          });
+        }
+        break;
       case "session/setShownGrimoire":
         if (payload && state.session.isSpectator) {
           store.commit("diary/addEvent", { at: Date.now(), kind: "grimoire" });

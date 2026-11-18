@@ -45,6 +45,9 @@ const state = () => ({
   // alignmentIndex, reminders }] by seat, bluffs: [roleId] }. Players see
   // this grimoire instead of their own until the storyteller deals again
   gameOver: null,
+  // the storyteller's latest announcement to the town: { id, key, text }, a
+  // preset (key, translated on each device) or their own words (text)
+  announcement: null,
   // player: the storyteller's grimoire they were shown (Spy), same shape as
   // gameOver without the winner. Until they close it or day comes
   shownGrimoire: null,
@@ -185,6 +188,7 @@ const mutations = {
   setGameResumed: set("isGameResumed"),
   /** Start ({ remaining, duration } in ms) or stop (null) the day timer. */
   setGameOver: set("gameOver"),
+  setAnnouncement: set("announcement"),
   setShownGrimoire: set("shownGrimoire"),
   /** Player: done looking at the grimoire (tells the storyteller). */
   closeShownGrimoire(state) {

@@ -238,6 +238,14 @@ class LiveSession {
         if (!this._isSpectator) return;
         this._store.commit("session/setGameOver", params);
         break;
+      case "announce":
+        if (!this._isSpectator || !params || !params.id) return;
+        this._store.commit("session/setAnnouncement", {
+          id: String(params.id).slice(0, 40),
+          key: params.key ? String(params.key).slice(0, 40) : null,
+          text: params.text ? String(params.text).slice(0, 200) : null,
+        });
+        break;
       case "grimoire":
         // only sent to us (Spy): the storyteller's grimoire to look at
         if (!this._isSpectator) return;
@@ -1146,6 +1154,13 @@ class LiveSession {
     );
   }
 
+  /** Tell the whole town the storyteller's announcement. ST only */
+  announce() {
+    const { announcement } = this._store.state.session;
+    if (this._isSpectator || !announcement) return;
+    this._send("announce", announcement);
+  }
+
   /** Send the end of the game (winner and grimoire), or that it's over. ST only */
   setGameOver() {
     if (this._isSpectator) return;
@@ -1421,6 +1436,9 @@ export default (store) => {
         break;
       case "session/setGameOver":
         session.setGameOver();
+        break;
+      case "session/setAnnouncement":
+        session.announce();
         break;
       case "session/setGrimoireView":
         if (payload && payload.status === "sent") {

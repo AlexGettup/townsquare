@@ -39,6 +39,10 @@ const state = () => ({
   messages: [],
   isOpen: true,
   tab: PLACE_TAB,
+  // the storyteller's announcements to the town, as messages of the place
+  // tab ({ id, at, from, channel, announce: { key, text } }). Apart from the
+  // messages, which the server's history replaces on each reconnection
+  announcements: [],
   // tab -> number of messages not read yet
   unread: {},
   // last error from the server ("night"), shown for a few seconds
@@ -65,13 +69,17 @@ const getters = {
     rootGetters["voice/isConnected"] ? rootState.voice.location : PLAZA,
   // the place tab only shows what was said where we are now (the plaza, a
   // room or a private conversation), not the places we were before
-  messagesOf: (state, getters) => (tab) =>
-    state.messages.filter((message) =>
+  // (announcements are for everyone, wherever they are)
+  messagesOf: (state, getters) => (tab) => {
+    const messages = state.messages.filter((message) =>
       tab === PLACE_TAB
         ? tabOf(message) === PLACE_TAB &&
           message.channel === getters.currentPlace
         : tabOf(message) === tab,
-    ),
+    );
+    if (tab !== PLACE_TAB || !state.announcements.length) return messages;
+    return [...messages, ...state.announcements].sort((a, b) => a.at - b.at);
+  },
   /**
    * Private tabs: a player only talks with the storyteller; the storyteller
    * has one per seated player (and anyone else who wrote to them).
@@ -185,8 +193,14 @@ const mutations = {
   setCardsSince(state, cardsSince) {
     state.cardsSince = cardsSince;
   },
+  addAnnouncement(state, { message, unread }) {
+    if (state.announcements.some(({ id }) => id === message.id)) return;
+    state.announcements = [...state.announcements, message].slice(-50);
+    if (unread) addUnread(state, PLACE_TAB);
+  },
   clear(state) {
     state.messages = [];
+    state.announcements = [];
     state.unread = {};
     state.shownCard = null;
     state.picked = [];
