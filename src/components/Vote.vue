@@ -6,7 +6,10 @@
     </div>
     <div class="overlay">
       <audio src="../assets/sounds/countdown.mp3" preload="auto"></audio>
-      <i18n path="vote.nominated" tag="span">
+      <i18n
+        :path="isExile ? 'vote.exileProposed' : 'vote.nominated'"
+        tag="span"
+      >
         <template #nominator>
           <em class="blue">{{ nominator.name }}</em>
         </template>
@@ -44,6 +47,7 @@
       <em v-else>{{
         $t("vote.majority", { count: Math.ceil(players.length / 2) })
       }}</em>
+      <em class="exile" v-if="isExile">{{ $t("vote.exileHint") }}</em>
       <!-- someone is already about to die today: what this vote needs -->
       <em class="to-tie" v-if="toBeat">
         {{
@@ -164,6 +168,10 @@ export default {
     ...mapState("players", ["players"]),
     ...mapState(["session", "grimoire"]),
     ...mapGetters({ alive: "players/alive" }),
+    // travellers are exiled, not executed: everyone votes, ghost votes kept
+    isExile: function () {
+      return this.nominee.role.team === "traveller";
+    },
     // today's top vote, if a new execution vote has to tie or beat it
     toBeat: function () {
       if (this.nominee.role.team === "traveller") return null;
@@ -399,8 +407,12 @@ export default {
     &.blue {
       color: $townsfolk;
     }
-    &.to-tie {
+    &.to-tie,
+    &.exile {
       display: block;
+    }
+    &.exile {
+      color: $traveller;
     }
   }
 
