@@ -63,7 +63,7 @@
 
       <template v-else>
         <h4>
-          {{ roleName }} —
+          {{ roleName }}<template v-if="hasPlayers"> — </template>
           <span
             v-for="(player, i) in step.players"
             :key="player.id"
@@ -73,8 +73,12 @@
           >
         </h4>
         <p class="reminder" v-if="reminder" v-html="reminder"></p>
+        <p class="warning" v-if="noAttackMarked">
+          <font-awesome-icon icon="exclamation-triangle" />
+          {{ $t("guidedNight.toymakerNoAttack") }}
+        </p>
 
-        <div class="actions">
+        <div class="actions" v-if="hasPlayers">
           <span
             v-if="canWake"
             class="button"
@@ -100,7 +104,11 @@
 
         <div class="actions">
           <span class="button townsfolk" @click="next">
-            {{ canWake ? $t("guidedNight.sleepNext") : $t("guidedNight.next") }}
+            {{
+              canWake && hasPlayers
+                ? $t("guidedNight.sleepNext")
+                : $t("guidedNight.next")
+            }}
             <font-awesome-icon icon="chevron-right" />
           </span>
           <span class="button" @click="skip">{{ $t("guidedNight.skip") }}</span>
@@ -171,6 +179,21 @@ export default {
     },
     roleName() {
       return this.step ? this.localizeRole(this.step.role).name : "";
+    },
+    // a reminder-only step (Toymaker): nobody to wake or send info to
+    hasPlayers() {
+      return !!this.step && this.step.players.length > 0;
+    },
+    // the Demon carries the Toymaker's "Final Night: No Attack"
+    noAttackMarked() {
+      return (
+        !!this.step &&
+        this.grimoire.nightCount > 1 &&
+        this.step.role.team === "demon" &&
+        this.step.players.some((player) =>
+          (player.reminders || []).some(({ role }) => role === "toymaker"),
+        )
+      );
     },
     reminder() {
       if (!this.step) return "";
@@ -482,6 +505,14 @@ h4 {
   color: #ddd;
   max-height: 4.6em;
   overflow-y: auto;
+}
+
+.warning {
+  margin: 0 0 6px;
+  color: #ffb347;
+  svg {
+    margin-right: 4px;
+  }
 }
 
 .hint {

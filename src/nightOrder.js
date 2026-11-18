@@ -5,7 +5,8 @@
  *
  * Entries are roles (not localized) with `players` added; `first` picks the
  * first night or the other nights. Includes dusk and dawn, and on the first
- * night the minion and demon info when there are 7 or more players.
+ * night the minion and demon info when there are 7 or more players (or the
+ * Toymaker is in play).
  */
 const DUSK_DAWN = {
   firstNight: {
@@ -53,7 +54,9 @@ export function nightOrder(first, game) {
     }
   });
 
-  if (first && players.length > 6) {
+  // the Toymaker gives evil their starting info with fewer than 7 players too
+  const hasToymaker = npcs.some((npc) => npc.id === "toymaker");
+  if (first && (players.length > 6 || hasToymaker)) {
     const minionIndex = indexOf("minioninfo");
     const demonIndex = indexOf("demoninfo");
     if (minionIndex > 0) {
