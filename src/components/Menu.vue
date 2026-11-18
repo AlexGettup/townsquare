@@ -59,6 +59,19 @@
     >
       <font-awesome-icon icon="bullhorn" />
     </span>
+    <!-- storyteller, by day: what was sent and answered last night -->
+    <span
+      class="night-summary"
+      v-if="
+        !session.isSpectator &&
+        !grimoire.isNight &&
+        $store.state.nightLog.nights.length
+      "
+      @click="toggleModal('nightSummary')"
+      :title="$t('nightSummary.open')"
+    >
+      <font-awesome-icon icon="clipboard-list" />
+    </span>
     <span
       class="day-night"
       v-if="!session.isSpectator"
@@ -761,6 +774,7 @@ export default {
   // Boxed like the menu cog: translucent black background, solid black border
   span.reference,
   span.announce,
+  span.night-summary,
   span.day-night {
     display: inline-flex;
     align-items: center;

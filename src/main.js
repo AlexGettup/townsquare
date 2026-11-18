@@ -33,6 +33,8 @@ const faIcons = [
   "Cog",
   "Copy",
   "Clipboard",
+  "ClipboardList",
+  "Clock",
   "Church",
   "CommentDots",
   "Comments",

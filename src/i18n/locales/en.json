@@ -549,6 +549,19 @@
     "reset": "Undo changes",
     "send": "Show the grimoire"
   },
+  "nightSummary": {
+    "open": "Night summary",
+    "title": "Night {night} summary",
+    "hint": "What you sent and what came back, in seat order",
+    "noNights": "There hasn't been a night yet.",
+    "nothing": "nothing tonight",
+    "seen": "seen",
+    "notSeen": "{name} hasn't seen it yet",
+    "noAnswer": "No answer",
+    "grimoire": "Grimoire shown",
+    "closed": "closed it",
+    "notClosed": "still open"
+  },
   "announce": {
     "title": "Announce to the town",
     "hint": "Everyone sees it at the top of the screen, with a bell.",

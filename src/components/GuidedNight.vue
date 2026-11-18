@@ -55,6 +55,13 @@
             <font-awesome-icon icon="sun" />
             {{ $t("guidedNight.toDay") }}
           </span>
+          <span
+            class="button"
+            @click="$store.commit('toggleModal', 'nightSummary')"
+          >
+            <font-awesome-icon icon="clipboard-list" />
+            {{ $t("nightSummary.open") }}
+          </span>
           <span class="button" @click="goTo(0)">
             {{ $t("guidedNight.restart") }}
           </span>

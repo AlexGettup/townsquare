@@ -11,6 +11,8 @@ import announcementsPlugin from "./announcements";
 import wakeLockPlugin from "./wakeLock";
 import alertsPlugin from "./alerts";
 import voteValuePlugin from "./voteValue";
+import nightLogPlugin from "./nightLog";
+import nightLog from "./modules/nightLog";
 import players from "./modules/players";
 import session from "./modules/session";
 import voice from "./modules/voice";
@@ -139,6 +141,7 @@ export default new Vuex.Store({
     notes,
     diary,
     practice,
+    nightLog,
   },
   state: {
     grimoire: {
@@ -176,6 +179,7 @@ export default new Vuex.Store({
       announce: false,
       voiceHelp: false,
       sendCharacter: false,
+      nightSummary: false,
     },
     edition: editionJSONbyId.get("tb"),
     roles: getRolesByEdition(),
@@ -512,5 +516,6 @@ export default new Vuex.Store({
     diaryPlugin,
     announcementsPlugin,
     voteValuePlugin,
+    nightLogPlugin,
   ],
 });

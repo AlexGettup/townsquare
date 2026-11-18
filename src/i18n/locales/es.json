@@ -549,6 +549,19 @@
     "reset": "Deshacer cambios",
     "send": "Enseñar grimorio"
   },
+  "nightSummary": {
+    "open": "Resumen de la noche",
+    "title": "Resumen de la noche {night}",
+    "hint": "Lo que enviaste y te respondieron, por orden de asiento",
+    "noNights": "Todavía no ha habido ninguna noche.",
+    "nothing": "nada esta noche",
+    "seen": "visto",
+    "notSeen": "{name} aún no lo ha visto",
+    "noAnswer": "Sin responder",
+    "grimoire": "Grimorio enseñado",
+    "closed": "lo cerró",
+    "notClosed": "aún abierto"
+  },
   "announce": {
     "title": "Anunciar al pueblo",
     "hint": "Todos lo verán arriba de la pantalla, con un toque de campana.",

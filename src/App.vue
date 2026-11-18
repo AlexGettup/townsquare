@@ -42,6 +42,7 @@
     <DiaryModal />
     <AnnounceModal />
     <VoiceHelpModal />
+    <NightSummaryModal />
     <AnnouncementBanner />
     <GameStateModal />
     <ChangelogModal />
@@ -80,6 +81,7 @@ import VoteHistoryModal from "@/components/modals/VoteHistoryModal";
 import DiaryModal from "@/components/modals/DiaryModal";
 import AnnounceModal from "@/components/modals/AnnounceModal";
 import VoiceHelpModal from "@/components/modals/VoiceHelpModal";
+import NightSummaryModal from "@/components/modals/NightSummaryModal";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import GameStateModal from "@/components/modals/GameStateModal";
 import ChangelogModal from "@/components/modals/ChangelogModal";
@@ -118,6 +120,7 @@ export default {
     DiaryModal,
     AnnounceModal,
     VoiceHelpModal,
+    NightSummaryModal,
     AnnouncementBanner,
     NpcModal,
     NightOrderModal,
