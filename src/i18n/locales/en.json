@@ -92,7 +92,7 @@
     "speaker": "Speaker",
     "defaultDevice": "Default",
     "deviceFailed": "Couldn't use that device",
-    "cantHear": "I can't hear anyone",
+    "cantHear": "I can't hear someone",
     "cantHearHint": "Reconnects the audio of everyone you should hear and sends what your device sees to the logs, to find the cause",
     "checkSent": "Audio reconnected. Sent to the logs what your device sees",
     "microphoneLost": "Microphone disconnected: using the default one",

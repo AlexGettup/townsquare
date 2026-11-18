@@ -92,7 +92,7 @@
     "speaker": "Altavoz",
     "defaultDevice": "Predeterminado",
     "deviceFailed": "No se pudo usar ese dispositivo",
-    "cantHear": "No oigo a nadie",
+    "cantHear": "No oigo a alguien",
     "cantHearHint": "Reconecta el audio de todos los que deberías oír y manda a los logs lo que ve tu dispositivo, para encontrar la causa",
     "checkSent": "Audio reconectado. Enviado a los logs lo que ve tu dispositivo",
     "microphoneLost": "Se ha desconectado el micrófono: usando el predeterminado",
