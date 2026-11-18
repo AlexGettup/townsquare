@@ -24,65 +24,28 @@ the plans in [ROADMAP.md](ROADMAP.md).
 
 ### Talk without Discord
 
-- **Voice chat** built in. At night players are isolated and the Storyteller wakes them one by
-  one or talks to everyone. During the day: the town square, private conversations by invitation
-  or by asking to join, open rooms (Tavern, Church, Graveyard) and "Call everyone to the square"
-  with a bell
-- The voice server decides whose audio each player receives, so nobody can listen in on a private
-  conversation or on other players at night
-- **Text chat** following the same rules, plus a private channel between each player and the
-  Storyteller (the only one open at night). Works without a microphone
-- Background noise suppression and a voice gate, like Discord; volume per person; choice of
-  microphone and speaker on computers
-- Steady connections: someone whose connection drops keeps their place for 30 seconds, audio
-  that stops arriving is received again by itself, and the voice chat recovers after a phone
-  comes back from the background
-- A **voice problems button** (warning sign next to the voice button): receive everyone again,
-  reconnect without losing your place, or report what happened
+- **Voice chat** built in: players are isolated at night and woken by the Storyteller; during
+  the day there's the town square, private conversations and open rooms
+- **Text chat** with the same rules, plus a private channel with the Storyteller
+- Noise suppression, volume per person, and connections that recover by themselves
 
 ### For the Storyteller
 
-- **Guided night**: a panel steps through tonight's night order, only the characters in play
-  with their players. Wake them, send them information, see their answers, then sleep and next.
-  It knows the Toymaker
-- **Info cards** like the official app: "You are", "This is the Demon", "These characters are
-  not in play"… built line by line, filled in from the grimoire as a suggestion, sent to one or
-  several players. Players answer with one tap or choose seats on the town square, and their
-  token shows whether they have seen it
-- Characters are sent as a "You are" card when dealt
-- **Show the grimoire** (Spy, Widow) to a single player, optionally edited first
-- **Announcements** with a bullhorn: everyone to the town square, nominations open, second and
-  last call, or free text, shown at the top of everyone's screen with a bell
-- **Day and night counter** and a **day timer** everyone sees; "Time's up" is announced when it
-  runs out
-- **New game** with the same players in the same seats, and **End the game**: everyone sees
-  who won and the whole grimoire
-- Votes: **secret vote** (Organ Grinder), **pointing vote** (Boomdandy, Fiddler), vote value
-  per player (Banshee, Bureaucrat, Thief, also set by their reminders), ghost votes spent by
-  themselves, "to tie" and "to execute" counts
-- **Practice game** with made-up players to rehearse alone, with automatic answers and "View
-  as" to see the game from a player's device
-- Reloading the page or losing the connection keeps the seats, the night, the vote under way and
-  the session settings
+- **Guided night** through the night order, step by step
+- **Info cards** like the official app, which players answer with one tap
+- **Announcements**, a **day timer** and a day and night counter
+- **Votes** for special characters (secret, pointing, vote values) and automatic ghost votes
+- **Practice game** with made-up players to rehearse alone
 
 ### For players
 
-- "**Your vote**" panel with big Yes / No buttons, telling dead players whether they spend their
-  ghost vote
-- **Game diary**: what the Storyteller told you and what you answered, deaths, and each day's
-  nominations and votes
-- **Notes** per player, only on your device
-- Alerts (sound, vibration, tab title) when you are woken up or get an info card
-- The seat comes back by itself after switching apps on a phone
+- A clear **voting panel**, a **game diary** and private **notes** on each player
+- Alerts when you are woken up or get information
 
 ### Phones, tablets and Spanish
 
-- Designed for touch screens: tap a token for the player menu, double tap for death, menus as
-  bottom panels, token size adapted to the screen
-- Installable on the home screen; the screen stays on during a game
-- **Spanish**: the interface and the game texts (characters, reminders, night order and
-  jinxes) from the official translations
-- No Google Analytics
+- Designed for touch screens, installable on the home screen
+- **Spanish** interface and game texts, from the official translations
 
 ## Original features
 
