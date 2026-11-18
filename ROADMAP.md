@@ -64,306 +64,82 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 ## Planned
 
 The goal: play a whole game without Discord, as comfortably on a phone or tablet as on a
-computer. Marked _(official)_ when botc.app has something similar.
+computer. Ideas are ranked by **instinctive use** (it works where people already look or tap)
+and **UX clarity** (it removes doubts instead of adding a place to check), then by value and
+cost. **Computers and phones count the same**: about half the players use each. Marked
+_(official)_ when botc.app has something similar. Details of what is done are in the
+[CHANGELOG](CHANGELOG.md).
 
 ### Next steps
 
-The order to build in, across all the sections below (which are the full catalogue). Ranked by
-**instinctive use** (it works where people already look or tap, with nothing to learn) and
-**UX clarity** (it removes doubts instead of adding a new place to check), then by value for a
-game without Discord and by cost. **Computers and phones count the same**: about half the
-players use each, so a feature that only helps one of them is worth half as much.
-
-1. [ ] **Send one player their new character**, with **alignment on cards** (both in
-       [Night without talking](#night-without-talking)): without them Sects & Violets can't be
-       played well. Put first by the owner on 2026-11-10, after reviewing that script and Bad Moon
-       Rising.
-2. [ ] **Storyteller's night summary** (in [Night without talking](#night-without-talking)),
-       chosen by the owner on 2026-11-10.
-
-Other candidates: own live session server, quiet nominations with a speaking queue, portrait
-layout, analyse joining voice and text chat, game diary, push-to-talk, and the rest of the
-catalogue.
-
-Added 2026-11-10 from the official app (its tutorial video and the special features of its
-character data). Done in 3.25.0: cards that fill themselves, quick answers for players,
-edit the grimoire before showing it, pointing and hidden votes, vote multiplier from a
-reminder, give back ghost votes, the owner's idea of dimming who isn't with you, and (also
-his) random nominations and answers in the practice game. Not decided yet: marks on the night order sheet, open eyes at night, public reminders, character
-selection rules, a key to call everyone to the plaza.
-
-Discarded 2026-11-10: "thinks they are…" for the Lunatic, Drunk and Marionette (the
-storyteller handles the grimoire), whispers only between neighbours (players can already
-write to each other while in a conversation), the end-of-game reveal from a reminder, and
-panels you can drag around the screen.
-
-### Phones and tablets
-
-- [x] **Keep the screen on** (Screen Wake Lock API) during a game, so phones don't lock and
-      players don't drop from their seats.
-- [x] **Install as an app (PWA)**: home screen icon and full screen, without the browser bar.
-- [x] **Night order on touch screens** (3.20.0): tap the night order number next to a token to
-      read its text (no hover there). Chosen over a long press, which nobody would find. A
-      token's ability is covered by "Ability in the player menu" (For players).
-- [x] **Shorter player menu** (3.27.0): the storyteller's seat menu keeps what each
-      phase uses most (wake or nominate, send info, kill, character, reminder); alignment,
-      note, show the grimoire and "view as" go under "More", the seat setup under "Seat".
-      A player's own seat puts pronouns, rename and leaving the seat under "My seat".
-- [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
-      the bottom instead of floating over the seats.
+1. [ ] **Send one player their new character**, with **alignment on cards** (Night without
+       talking): without them Sects & Violets can't be played well.
+2. [ ] **Storyteller's night summary** (Night without talking).
 
 ### Night without talking
 
-- [x] **Cards like the official app** (3.23.0): only the game's eight info tokens
-      ("Make a choice" says what to choose: 1 player, 2 players or a character), each with
-      its own colour and icon. The card window shows what the player's character does
-      tonight and what they were sent and answered since nightfall, like the official
-      "Wake" window. Waking and the quick answer buttons (good/evil, directions) not copied.
-- [x] **Cards built line by line, like the official app** (3.24.0): each token tapped starts a line,
-      and the characters, players or number picked next go into it, so one card can say
-      "These are your minions: Ana, Belén" and
-      "These characters are not in play: …". Up to 6 lines, one of them a choice at most.
-      Older cards show as one line; older apps see the main line.
-- [x] **Practice game** (3.23.0): "Practice" on the first screen sets up a game with
-      made-up players, for the storyteller to rehearse alone. Info cards and the grimoire
-      sent to them show up as "What Ana sees", and the storyteller answers for them (seats
-      chosen, a reply in the private chat); ticks and the book icon work as in a real game.
-      In votes they raise hands at random. The chat of a practice game is lost on reload.
-- [x] **Automatic players in the practice game** (3.26.0): a switch next to the badge
-      makes the made-up players answer by themselves, at random, a second or two later
-      (seats, a character, yes/no, closing cards and the grimoire).
-- [x] **View as a player in the practice game** (3.26.0): "View as Ana" in a seat's
-      menu shows the game as Ana's device would (only her character, her cards and chat),
-      and the storyteller answers from there as she would. "Back to the grimoire" puts the
-      grimoire back as it was, also after a reload.
-- [x] **Reminders in the card window** (3.26.0): under "Players", each player's
-      character and reminders, those of the recipient's character highlighted, so the
-      Investigator's two players are picked without closing the window.
-- [x] **Info cards** _(official)_: the storyteller sends a player a screen with what they learn —
-      characters ("these are your minions", "not in play"), a number (Empath "1"), yes/no
-      (Fortune Teller), players. Shown on the player's device and kept in their private chat.
-- [x] **Role card when dealing** (3.14.0): when the storyteller really deals the characters (sending them
-      to the players, not a mock assignment), each seated player also gets an info card in
-      their private chat with the storyteller: "You are" plus their character. It stays there
-      to check later, and shows the storyteller whether they have seen it. Dealing again sends
-      a new card to everyone, even with the same character (it's how they know), and the old
-      one is struck through.
-- [x] **Choose targets on screen** _(official)_ (3.15.0): the storyteller asks "choose a player" (or two)
-      and the player taps the seats on their device (Monk, Poisoner, Demon…).
-- [x] **Guided night for the storyteller** (3.24.0): at nightfall a panel steps through
-      tonight's night order, only the characters in play with their players (dead ones skipped
-      unless their text is about dying); the current seat glows on the town square. Each step:
-      wake, open the card window for them (empty: the storyteller decides what to send), the
-      answers as they come (and the grimoire, if shown from the seat menu), then sleep and next. A first version
-      also filled the card in from the character's text; dropped because characters like the
-      Lunatic make that guess wrong in bigger scripts. Top right on computers, a bottom sheet
-      on phones; folds, hides for the night, off in Menu > Grimoire.
-- [x] **Show the grimoire** (3.21.0) (Spy, Widow): at night, "Show the grimoire" in any seated
-      player's menu sends only them a snapshot of the grimoire (characters, reminders, bluffs),
-      shown on their town square until they close it or day comes. A book on their seat tells
-      the storyteller it was sent (grey) and closed (gold).
-
-- [x] **Cards that fill themselves** _(official)_ (3.25.0): picking "This is the Demon" puts in the
-      Demon's player, "These are your minions" the Minions, "These characters are not in
-      play" the Demon's bluffs. Only a suggestion the storyteller can change before sending:
-      the Lunatic gets made-up minions. Saves most of the first night's taps.
-- [x] **Quick answers for players** _(official)_ (3.25.0): buttons on the card to answer without typing
-      (Got it, Yes, No, players, characters, a few words), the same on every card, as in the
-      official app. The answer goes to the storyteller's private chat. The official app also
-      lets a script add its own answers and its own storyteller cards (not done).
-- [x] **Edit the grimoire before showing it** _(official)_ (Spy, Widow) (3.25.0): change characters
-      or reminders in the copy sent, without touching the real grimoire.
-- [ ] **Marks on the night order sheet** _(official)_: tap next to a character on the night
-      order to mark it as pending, and take the mark away when it dies or uses its ability.
-      Partly covered by the guided night.
-- [ ] **Open eyes at night** _(official)_ (Wraith): let one player keep their eyes open at
-      night, fully or peeking: they see who is awake and the cards sent, as the character says.
-- [ ] **Storyteller's night summary**: at dawn (and reopenable during the day) one list of
-      what the storyteller sent and got back that night, player by player: the cards, the
-      seats or characters chosen, the quick answers and the grimoire shown. Today it is spread
-      over each player's private chat. It is the storyteller's record of the night, not a
-      summary of who died (that was proposed and declined).
 - [ ] **Send one player their new character** (Snake Charmer, Pit-Hag, Barber, Fang Gu, and
-      the Imp passing the Demon to a Minion in Trouble Brewing): "Send their character" in a
-      seat's menu changes only that player's token, sends them the "You are" card and is kept
-      for reloads. Today "Send characters" deals to everyone again (the whole table learns
-      something changed), and a "You are" card alone leaves their token as it was, and a
-      reload brings back the dealt character.
-- [ ] **Alignment on cards** (Snake Charmer, Fang Gu, Goon): Good or Evil as a choice on the
-      "You are" line, so the card says "You are: Evil" the way it shows a character. Today it
-      can only be written as free text. Goes with the item above.
-- [ ] **Guided night with dead players who act** (Vigormortis, Bone Collector): Minions killed
-      by the Vigormortis keep their ability, and so does the dead player the Bone Collector
-      picks, but the guided night skips them because they are dead. They can be woken by hand.
-      No priority.
-
-Trouble Brewing reviewed (2026-11-09): every other character is covered by info cards,
-choosing players and the vote. The Drunk's token is never dealt (the storyteller seats the
-Townsfolk they think they are, with a Drunk reminder), so no feature for it. A dawn summary of
-who died at night was proposed and declined.
-
-Bad Moon Rising and Sects & Violets reviewed (2026-11-10), travellers included: the only real
-gap is changing one player's character (and alignment) privately, above. Everything else is
-covered: choices of one or two players or a character by cards (the Po's three, or none, with
-the quick answers), numbers and yes/no (the vote history keeps voters and nominators for the
-Flowergirl and Town Crier), visits by day (Savant, Artist) in a private chat or conversation,
-madness and public claims by voice, and the rest is the storyteller's grimoire. Smaller gaps,
-no priority: the guided night skipping dead players who act, the Matron and the Voudon (Day
-and votes, Voice chat).
-
-Not planned: **Minion and demon info** _(official)_ (one button giving the Demon their bluffs
-and minions, and the minions each other). The storyteller prefers to give it by hand with info
-cards, because characters like the Lunatic make an automatic version misleading.
+      the Imp passing the Demon to a Minion): "Send their character" in a seat's menu changes
+      only that player's token, sends them the "You are" card and is kept for reloads. Today
+      "Send characters" deals to everyone again, so the whole table learns something changed.
+- [ ] **Alignment on cards** (Snake Charmer, Fang Gu, Goon): "You are: Evil" as a choice on
+      the card, instead of free text. Goes with the item above.
+- [ ] **Storyteller's night summary**: at dawn (and reopenable during the day) one list of
+      what the storyteller sent and got back that night, player by player. Today it is spread
+      over each player's private chat.
+- [ ] **Open eyes at night** _(official)_ (Wraith): one player keeps their eyes open at night
+      and sees who is awake and the cards sent.
 
 ### Day and votes
 
-- [ ] **Speaking queue**: raise your hand to talk in the plaza; the storyteller sees the queue.
-- [ ] **Quiet nominations**: during the defence only the nominator and the nominee can talk
-      (with a timer); everyone is muted when the vote starts.
-- [x] **Day timer** _(official)_ (3.19.0): a countdown everyone sees ("5 minutes of discussion left"),
-      with a sound when it ends.
+- [ ] **Quiet during the defence, without forcing it**: some way for the nominator and the
+      nominee to be heard during the defence without muting anyone. To think about.
 - [ ] **Ambient sounds**: dusk, dawn, executions.
-- [x] **Pointing vote** _(official)_ (Boomdandy, Fiddler) (3.25.0): everyone points at a player
-      instead of raising a hand, and the storyteller sees who points at whom. Secret until
-      the storyteller reveals it to everyone.
-- [x] **Hidden vote** _(official)_ (Organ Grinder) (3.25.0): only the storyteller sees who voted and
-      the count. Turned on by itself when an Organ Grinder is seated, or by hand.
-- [x] **Vote multiplier from a reminder** _(official)_ (Bureaucrat, Thief, Banshee) (3.25.0): putting the
-      character's reminder on a seat changes that player's vote value by itself. Today the
-      storyteller sets the value by hand (3.11.0).
-- [x] **Give back ghost votes** _(official)_ (Ferryman) (3.25.0): one button returns the spent ghost
-      vote to every dead player.
-- [x] **Ghost votes spent by themselves** (3.27.0): when a vote goes all the way round
-      and is closed, dead players who raised their hand lose their ghost vote. Not in exiles,
-      nor for a Banshee with her ability; a vote reset or closed halfway spends nothing.
-      The ghost vote icon no longer takes clicks: taking it away or giving it back by hand
-      is in the seat menu's "More", and a double tap only kills or revives.
-- [x] **Votes to tie** (3.26.0): when an earlier execution vote today reached the
-      majority, a new vote shows "(3 to tie with Ana, 4 to execute)". Players see it too if
-      they keep the vote history (hidden votes they didn't see don't count for them).
-- [ ] **Voudon vote** (traveller, rare): only the Voudon and the dead vote, and no majority
-      is needed. The storyteller can adjust it by hand, but the count and majority shown would
-      be wrong. No priority.
-- [ ] **Public reminders** _(official)_: some characters' reminders are seen by every player
-      (only the storyteller places them).
-- [ ] **Key to call everyone to the plaza** _(official)_: the "Call to the plaza" button
-      exists; the official app also has a key (R). Our R opens the reference sheet.
-- [x] **End of game and grimoire reveal** _(official)_ (3.20.0): the storyteller ends the game and
-      declares the winning team (Good or Evil); everyone sees the result and the full
-      grimoire (real characters, reminders and demon bluffs), and voice brings everyone back to
-      the plaza to talk about it.
+- [ ] **Public reminders** _(official)_: some characters' reminders are seen by every player.
+- [ ] **Voudon vote** (rare traveller): only the Voudon and the dead vote, with no majority
+      needed. No priority.
 
-### For players
+### Phones and tablets
 
-Ranked with the same criteria as the [next steps](#next-steps).
-
-| #   | Feature                       | Instinctive | Clarity | Value |  Cost  |
-| --- | ----------------------------- | :---------: | :-----: | :---: | :----: |
-| 1   | Notes per player              |    ●●●○○    |  ●●●●○  | ●●●●● | Medium |
-| 2   | Ability in the player menu    |    ●●●●●    |  ●●●●●  | ●●○○○ |  Low   |
-| 3   | Day and night counter         |    ●●●●●    |  ●●●●○  | ●●○○○ |  Low   |
-| 4   | Game diary                    |    ●●●○○    |  ●●●●○  | ●●●○○ | Medium |
-| 5   | Claims on the reference sheet |    ●●○○○    |  ●●●○○  | ●●○○○ | Medium |
-
-- [x] **Alerts** (3.10.0): when the storyteller wakes you up, a notice on screen and a sound
-      unless muted; phones also vibrate (not iPhones: their browser doesn't support it), and the
-      tab title flags it while the game is in the background. Info cards also flag the tab title.
-      No alerts for nominations or votes, on purpose: the countdown is enough, and the "Your vote"
-      panel makes voting clear.
-
-1. [x] **Notes per player** (3.18.0) _(official)_: a "Notes" entry in the player menu with free text
-       ("claims Chef, saw a 1"), and a small icon on the token when it has a note, so they are
-       found again at a glance. Only visible to you and saved on your device. The biggest gap for
-       playing without paper, but it has to be discovered.
-2. [x] **Ability in the player menu** (3.18.0): the bottom panel on touch screens already shows the name
-       and character; add the ability text. Tapping your own token answers "what does my
-       character do?" right where you look, and tapping another token explains the character you
-       think they are. Only for touch screens: computers already show it on hover.
-3. [x] **Day and night counter** (3.19.0): "Day 3" / "Night 2" instead of only day or night, synced from
-       the storyteller. Passive and clear; also gives the diary and the notes a reference.
-4. [x] **Game diary** (3.28.0): everything you learnt, night by night and day by day,
-       newest first: info cards and your answers, the storyteller's messages, deaths, the
-       grimoire shown to you, and each day's nominations with their votes. Kept on the device
-       per game, so it survives a reload. Each day says who is on the block, how many votes
-       tie and how many execute someone else (replaces the vote table button for players).
-       The dead see in the vote panel whether a yes spends their ghost vote (not in exiles,
-       nor with two votes).
-5. [ ] **Claims on the reference sheet**: tap a character on the reference sheet and note who
-       claims it, so a double claim stands out. Hard to find and overlaps with the notes: better
-       as a later extension of them than as a separate feature.
+- [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
+      the bottom instead of floating over the seats.
 
 ### Storyteller setup
 
-- [x] **Characters right after the edition** (3.26.0): picking a script opens the
-      character selection (with five players or more) instead of closing the menu.
 - [ ] **Character selection rules** _(official)_: characters that can't go in the bag (Drunk,
-      Marionette) and characters that can go in more than once (Legion, Riot; with the
-      Atheist or Pope, any character). Check first what the character selector already does.
+      Marionette) and those that can go more than once (Legion, Riot). Check first what the
+      character selector already does.
 
-### Robustness
+### Voice and text chat
 
-- [ ] **Own live session server**: games still sync through upstream's server
-      (`clocktower.live`); if it goes away the app stops working. Move the game sync to our
-      Cloudflare Worker, like voice and chat.
-- [x] **Storyteller reloads without losing anything** (3.16.0): seats, dealt characters, night,
-      who is awake, the vote under way, vote history and card ticks survive a page reload or a
-      lost connection. A game saved more than 12 hours ago counts as a new one.
+- [ ] **Voice and text chat together**: one panel with each place's people and messages,
+      instead of two. To analyse.
+- [ ] **Push-to-talk**: the microphone only sends while a key or a button is held. Optional.
+- [ ] **Block private conversations** (Matron, rare traveller): a storyteller switch. No
+      priority.
+- [ ] **Video** _(official)_: optional camera with thumbnails on the seats, hidden at night.
+      Fits the Cloudflare free tier; heavy on phones' data and battery.
+- [ ] **Storyteller reads every chat**, not only the place they are in. To decide.
 
-### Voice chat
+### Robustness and security
 
-- [x] **One voice panel, people grouped by place** (3.13.0): your own controls on top; below,
-      the places (plaza, private conversations, rooms), each listing who is in it with the
-      speaking indicator. Tap a name to invite them to talk; enter or ask to join from each
-      place; at night the same list wakes and puts to sleep. A side panel that folds on
-      computers, the bottom panel on touch screens. Volume goes in a name's options, and
-      the choice of microphone and speaker in the controls on top.
-- [x] **Dim who isn't with you** (3.25.0): the seats of the people who aren't in your place right now
-      are dimmed on the town square, whether they left for a private conversation or room, or
-      you are in one and they stayed in the plaza. Shows at a glance who can hear you. At
-      night players see everyone dimmed; the storyteller sees whoever they woke.
-- [ ] **Voice and text chat together** (to analyse after the voice panel): text chat also
-      follows the places (a private conversation has its own chat), so one communication
-      panel with each place's people and messages may be clearer than two panels. Decide
-      once the voice panel is in use.
-- [x] **Background noise, like Discord** (3.22.0): RNNoise noise suppression plus a voice
-      gate that sends silence while nobody talks, with automatic sensitivity or a manual
-      threshold on a live meter in the voice panel (saved per device). Errs on the side of
-      letting noise through: a soft voice must never be cut. Firefox may fall back to the gate
-      alone. Untested with real voices and phones.
-- [ ] **Block private conversations** (Matron, rare traveller): a storyteller switch that
-      stops players from starting private conversations or leaving the plaza. Today it has
-      to be asked for out loud. No priority.
-- [ ] **Push-to-talk**: the microphone only sends while a key or an on-screen button is held.
-      Useful with background noise; optional, since it has to be learnt (and holding a button
-      while talking is awkward on a phone).
-- [x] **Volume per person** (3.14.0): a slider for each participant (some people sound too loud or too quiet).
-      iPhones don't let a web page change an audio element's volume: route it through Web Audio.
-- [x] **Choose microphone and speaker** (3.18.0, computers): pick the input/output device (headphones + separate mic).
-- [ ] **Video** _(official)_: optional camera with thumbnails on the seats. Estimated
-      ~15 GB per hour for 11 people at ~300 kbps, well inside the Cloudflare Realtime free
-      tier (1,000 GB/month).
-      The official app hides the cameras at night (only avatars), so nobody sees reactions.
-      Heavy on phones' data and battery.
+- [ ] **Own live session server**: games sync through the original project's server
+      (`clocktower.live`); if it goes away the app stops working. Move it to our Cloudflare
+      Worker, like voice and chat.
+- [ ] **Verify identities**: each client says who it is, so someone tampering with their
+      browser could pose as another player or the storyteller. Parked: we trust the players.
 
-### Text chat
+## Not planned
 
-- [x] **Info cards to several players at once** (3.20.0) (e.g. all the Minions): a "To" row in the
-      card window; each one gets it in their private chat.
-- [ ] **Storyteller reads every chat**, not only the place they are in (to decide).
+- **Minion and demon info in one button** _(official)_: given by hand with info cards, since
+  characters like the Lunatic make an automatic version misleading.
+- **Drunk features**: the Drunk's token is never dealt.
+- "Thinks they are…" for the Lunatic, Drunk and Marionette; whispers only between neighbours;
+  the end-of-game reveal from a reminder; panels you can drag around.
+- A forced speaking queue and forced quiet nominations; marks on the night order sheet; the
+  guided night waking dead players who act; a key to call everyone to the plaza; claims on
+  the reference sheet.
 
-### Security
-
-- [ ] **Verify identities**: today each client says who it is (`?peer=<playerId>` or `host`),
-      so someone tampering with their browser could pose as another player or the storyteller
-      on voice and chat. Fix: a secret the storyteller hands out when creating the session.
-
-### Translation
-
-- [x] Red Herring reminder: official data says "Pista falsa" (token) but "SEÑUELO" (night text).
-      Decided to keep the official translations as they are.
-
-## Notes
-
-- Releases follow the process in [CONTRIBUTING.md](CONTRIBUTING.md#releases).
-- The voice server (`voice-server/`) must be deployed together with app changes that touch
-  its protocol: `cd voice-server && npx wrangler deploy`.
+Scripts reviewed: Trouble Brewing (2026-11-09), Bad Moon Rising and Sects & Violets
+(2026-11-10). Everything else they need is covered by info cards, choices, votes and the
+storyteller's grimoire.
