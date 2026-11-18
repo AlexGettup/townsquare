@@ -79,7 +79,8 @@ export default {
   align-items: center;
   gap: 4px 8px;
   // the menu buttons are on the right: below them on narrow phones
-  max-width: calc(100% - 175px);
+  // (four for the storyteller: announcements, day / night, reference, menu)
+  max-width: calc(100% - 225px);
   padding: 4px 12px;
   background: rgba(0, 0, 0, 0.6);
   border: 2px solid $townsfolk;

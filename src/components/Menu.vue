@@ -166,6 +166,9 @@
             <li v-else @click="undoEndGame">
               {{ $t("menu.undoEndGame") }}
             </li>
+            <li @click="newGame">
+              {{ $t("menu.newGame") }}
+            </li>
           </template>
         </template>
 
@@ -631,6 +634,14 @@ export default {
     undoEndGame() {
       this.$store.commit("session/setGameOver", null);
     },
+    // same players in the same seats, everything else starts over
+    newGame() {
+      if (this.session.isSpectator) return;
+      if (confirm(this.$t("dialogs.newGame"))) {
+        this.$store.dispatch("session/newGame");
+        this.lowerHands();
+      }
+    },
     toggleNight() {
       this.$store.commit("toggleNight");
       if (this.grimoire.isNight) {
@@ -698,6 +709,12 @@ export default {
   text-align: right;
   padding-right: 50px;
   z-index: 75;
+  // phones: the voice button (or the practice badge) is top left; buttons
+  // that don't fit wrap to a second row on the right instead of covering it
+  @media (max-width: 767.98px) {
+    max-width: calc(100vw - 70px);
+    box-sizing: border-box;
+  }
 
   svg {
     filter: drop-shadow(0 0 5px rgba(0, 0, 0, 1));

@@ -238,6 +238,14 @@ class LiveSession {
         if (!this._isSpectator) return;
         this._store.commit("session/setGameOver", params);
         break;
+      case "newGame":
+        // same seats, a new game: forget our role, reminders and diary
+        if (!this._isSpectator) return;
+        this._store.dispatch("players/clearRoles");
+        this._store.commit("session/setGameOver", null);
+        this._store.commit("session/setShownGrimoire", null);
+        this._store.commit("session/newGame");
+        break;
       case "announce":
         if (!this._isSpectator || !params || !params.id) return;
         this._store.commit("session/setAnnouncement", {
@@ -1157,8 +1165,15 @@ class LiveSession {
   /** Tell the whole town the storyteller's announcement. ST only */
   announce() {
     const { announcement } = this._store.state.session;
-    if (this._isSpectator || !announcement) return;
+    // the app's own ("Time's up") happen on every device by themselves
+    if (this._isSpectator || !announcement || announcement.local) return;
     this._send("announce", announcement);
+  }
+
+  /** Tell the players a new game starts in the same seats. ST only */
+  newGame() {
+    if (this._isSpectator) return;
+    this._send("newGame", null);
   }
 
   /** Send the end of the game (winner and grimoire), or that it's over. ST only */
@@ -1436,6 +1451,9 @@ export default (store) => {
         break;
       case "session/setGameOver":
         session.setGameOver();
+        break;
+      case "session/newGame":
+        session.newGame();
         break;
       case "session/setAnnouncement":
         session.announce();

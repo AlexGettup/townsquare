@@ -32,7 +32,6 @@
 
 <script>
 import { mapState } from "vuex";
-import { playChime } from "../voice/sounds";
 
 // how long "Time's up" stays on screen
 const TIME_UP_SHOWN = 15 * 1000;
@@ -89,9 +88,6 @@ export default {
         this.now = Date.now();
         if (timer) this.ticker = setInterval(this.tick, 250);
       },
-    },
-    remaining(seconds, before) {
-      if (seconds === 0 && before > 0 && !this.grimoire.isMuted) playChime();
     },
   },
   beforeDestroy() {

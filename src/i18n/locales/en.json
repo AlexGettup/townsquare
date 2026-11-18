@@ -24,6 +24,7 @@
     "switchToDay": "Switch to Day",
     "endGame": "End the game",
     "undoEndGame": "Back to the game",
+    "newGame": "New game",
     "nightOrder": "Night Order",
     "guidedNight": "Guided night",
     "zoom": "Zoom",
@@ -218,6 +219,7 @@
     "playerPronouns": "Player pronouns",
     "randomizeSeats": "Are you sure you want to randomize seatings?",
     "removeAllPlayers": "Are you sure you want to remove all players?",
+    "newGame": "Start a new game with the same players? Roles, reminders, deaths, votes and nights are cleared.",
     "removeAllRoles": "Are you sure you want to remove all player roles?",
     "removePlayer": "Do you really want to remove {name}?",
     "customNote": "Add a custom reminder note",
@@ -532,6 +534,9 @@
     "presets": {
       "toPlaza": "Everyone to the town square!",
       "nominationsOpen": "Nominations are open",
+      "secondCall": "Second call for nominations",
+      "lastCall": "Last call for nominations",
+      "timeUp": "Time's up",
       "nominationsClosed": "Nominations are closed",
       "fewMinutes": "A few minutes of day left",
       "nightFalls": "Night is about to fall"
