@@ -57,6 +57,16 @@ const getters = {
   selfPeerId: (state, getters, rootState) =>
     rootState.session.isSpectator ? rootState.session.playerId : STORYTELLER,
   isStoryteller: (state, getters) => getters.selfPeerId === STORYTELLER,
+  // what the app knows, for problem reports in the voice server's logs
+  reportContext: (state, getters, rootState) => ({
+    status: state.status,
+    night: rootState.grimoire.isNight,
+    location: state.location,
+    storyteller: getters.isStoryteller,
+    canHear: Object.keys(state.peers).filter((peerId) =>
+      getters.canHear(peerId),
+    ),
+  }),
   locationOf: (state, getters) => (peerId) => {
     if (peerId === getters.selfPeerId) return state.location;
     return state.peers[peerId] ? state.peers[peerId].location : null;
@@ -239,16 +249,26 @@ const actions = {
    * "I can't hear someone": tell the voice server's logs what this device
    * sees, and receive everyone again.
    */
-  async checkAudio({ state, getters, rootState, commit }) {
-    const snapshot = await this.$voice.checkAudio({
-      night: rootState.grimoire.isNight,
-      location: state.location,
-      storyteller: getters.isStoryteller,
-      canHear: Object.keys(state.peers).filter((peerId) =>
-        getters.canHear(peerId),
-      ),
-    });
+  async checkAudio({ getters, commit }) {
+    const snapshot = await this.$voice.checkAudio(getters.reportContext);
     if (snapshot) commit("addNotice", { key: "voice.checkSent" });
+  },
+  /** Leave voice and join again in the same place (from a click). */
+  async reconnect({ state, getters, rootState }) {
+    if (!state.isAvailable || !rootState.session.sessionId) return;
+    await this.$voice.reconnect(getters.reportContext, {
+      channel: rootState.session.sessionId,
+      peerId: getters.selfPeerId,
+      muted: state.muted,
+    });
+  },
+  /** What went wrong, in the player's words, to the voice server's logs. */
+  async sendReport({ getters, rootState, commit }, text) {
+    await this.$voice.sendReport(text, getters.reportContext, {
+      channel: rootState.session.sessionId,
+      peerId: getters.selfPeerId,
+    });
+    commit("addNotice", { key: "voice.reportSent" });
   },
   // both say if it worked, and otherwise leave things as they were
   async setInputDevice({ commit }, deviceId) {

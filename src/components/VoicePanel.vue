@@ -1,16 +1,26 @@
 <template>
   <div class="voice-panel">
-    <span
-      class="toggle"
-      :class="[
-        'status-' + voice.status,
-        { muted: voice.muted, speaking: !!voice.speaking[selfPeerId] },
-      ]"
-      @click="toggle"
-      :title="$t('voice.title')"
-    >
-      <font-awesome-icon :icon="icon" />
-    </span>
+    <div class="buttons">
+      <span
+        class="toggle"
+        :class="[
+          'status-' + voice.status,
+          { muted: voice.muted, speaking: !!voice.speaking[selfPeerId] },
+        ]"
+        @click="toggle"
+        :title="$t('voice.title')"
+      >
+        <font-awesome-icon :icon="icon" />
+      </span>
+      <!-- trouble: receive everyone again, reconnect or report it -->
+      <span
+        class="toggle help"
+        @click="toggleModal('voiceHelp')"
+        :title="$t('voice.help.title')"
+      >
+        <font-awesome-icon icon="exclamation-triangle" />
+      </span>
+    </div>
 
     <!-- touch screens: who talks in private, with the panel closed -->
     <ul class="private-now" v-if="showPrivateNow" @click="isOpen = true">
@@ -69,14 +79,6 @@
           <li class="action" @click="leave">
             {{ $t("voice.leave") }}
             <em><font-awesome-icon icon="sign-out-alt" /></em>
-          </li>
-          <li
-            class="action"
-            :title="$t('voice.cantHearHint')"
-            @click="checkAudio"
-          >
-            {{ $t("voice.cantHear") }}
-            <em><font-awesome-icon icon="redo-alt" /></em>
           </li>
 
           <!-- Night: one list, where the storyteller wakes people up -->
@@ -373,8 +375,8 @@ export default {
     leave() {
       this.$store.dispatch("voice/leave");
     },
-    checkAudio() {
-      this.$store.dispatch("voice/checkAudio");
+    toggleModal(name) {
+      this.$store.commit("toggleModal", name);
     },
     toggleMute() {
       this.$store.dispatch("voice/toggleMute");
@@ -469,8 +471,19 @@ export default {
   text-align: left;
 }
 
+.buttons {
+  display: flex;
+  gap: 6px;
+}
+
 // boxed like the options cog
 .toggle {
+  &.help {
+    color: #ffb347;
+    &:hover {
+      color: red;
+    }
+  }
   display: inline-flex;
   align-items: center;
   justify-content: center;

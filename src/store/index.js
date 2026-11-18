@@ -174,6 +174,7 @@ export default new Vuex.Store({
       voteHistory: false,
       diary: false,
       announce: false,
+      voiceHelp: false,
     },
     edition: editionJSONbyId.get("tb"),
     roles: getRolesByEdition(),

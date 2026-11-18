@@ -93,7 +93,7 @@
     "defaultDevice": "Predeterminado",
     "deviceFailed": "No se pudo usar ese dispositivo",
     "cantHear": "No oigo a alguien",
-    "cantHearHint": "Reconecta el audio de todos los que deberías oír y manda a los logs lo que ve tu dispositivo, para encontrar la causa",
+    "cantHearHint": "Vuelve a conectar el audio de los demás, sin salir del chat",
     "checkSent": "Audio reconectado. Enviado a los logs lo que ve tu dispositivo",
     "microphoneLost": "Se ha desconectado el micrófono: usando el predeterminado",
     "playerMuted": "Micrófono apagado",
@@ -133,6 +133,16 @@
       "NotReadableError": "Otra aplicación está usando el micrófono.",
       "InsecureContext": "El micrófono solo funciona con HTTPS.",
       "Replaced": "Has abierto el chat de voz en otra pestaña."
+    },
+    "reportSent": "Informe enviado. ¡Gracias!",
+    "help": {
+      "title": "Problemas con el chat de voz",
+      "hint": "Si no oyes a alguien, no te oyen o algo falla, prueba esto. Cada opción manda a los logs del servidor lo que ve tu dispositivo (nunca audio), para encontrar la causa.",
+      "reconnect": "Reconectar el chat de voz",
+      "reconnectHint": "Sales y vuelves a entrar, en el mismo sitio",
+      "describe": "¿Qué ha pasado?",
+      "placeholder": "Por ejemplo: hace un rato que no oigo a un jugador",
+      "send": "Enviar informe"
     }
   },
   "chat": {
