@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.30.0
+- Storyteller: "New game" (Characters tab, replaces "Remove all") starts over with the same players in the same seats: roles, reminders, bluffs, deaths, votes, the day count, the timer and the end of the game are cleared, and players clear their role, reminders and diary. The chat stays
+- When the day timer runs out, "Time's up" is announced like the Storyteller's announcements (top of the screen, bell, chat, diary); it replaces the chime at zero, which also played when the timer was stopped
+- Announcements: "Second call for nominations" and "Last call for nominations" replace "nominations closed", "a few minutes left" and "night is about to fall"
+- Phones: the top-left panel (practice, Storyteller) no longer covers the bullhorn button
+
 ### Version 3.29.0
 - Storyteller announcements: a bullhorn button opens the usual announcements (everyone to the town square, nominations open or closed, a few minutes left, night is about to fall) or a free text. Players see it at the top of the screen for 8 seconds with one soft bell, and it stays in the chat and the diary
 - Voice chat keeps going through dropped connections: someone whose connection drops keeps their place for 30 seconds (still heard, same conversation) and nobody notices if they come back in time
