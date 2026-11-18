@@ -4,6 +4,9 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.30.1
+- Voice chat notices when someone's audio stops arriving (both ends thought it was flowing, as when nobody heard anybody until everyone moved to the tavern) and receives them again by itself after 12 seconds. Someone who stays silent (a locked phone) is retried less and less often, up to every 2 minutes. Each case goes to the voice server logs as "silent-track"
+
 ### Version 3.30.0
 - Storyteller: "New game" (Characters tab, replaces "Remove all") starts over with the same players in the same seats: roles, reminders, bluffs, deaths, votes, the day count, the timer and the end of the game are cleared, and players clear their role, reminders and diary. The chat stays
 - When the day timer runs out, "Time's up" is announced like the Storyteller's announcements (top of the screen, bell, chat, diary); it replaces the chime at zero, which also played when the timer was stopped

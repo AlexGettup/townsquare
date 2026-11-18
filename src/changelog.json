@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.30.1",
+    "date": "2026-11-18",
+    "title": {
+      "en": "Steadier voice chat",
+      "es": "Chat de voz más estable"
+    },
+    "en": [
+      "Voice chat: if you stop hearing someone, it reconnects their audio by itself after a few seconds"
+    ],
+    "es": [
+      "Chat de voz: si dejas de oír a alguien, su audio se reconecta solo en unos segundos"
+    ]
+  },
+  {
     "version": "3.30.0",
     "date": "2026-11-18",
     "title": {
