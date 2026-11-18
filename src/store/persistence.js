@@ -7,7 +7,7 @@ const HOSTED_GAME_MAX_AGE = 12 * 60 * 60 * 1000;
  * What survives a page reload of the game the storyteller is hosting, or null
  * when not hosting. It carries its session ID: a new game never inherits it.
  */
-const hostedGameOf = ({ session, grimoire, voice, chat }) =>
+const hostedGameOf = ({ session, grimoire, voice, chat, nightLog }) =>
   session.isSpectator || !session.sessionId
     ? null
     : {
@@ -33,6 +33,7 @@ const hostedGameOf = ({ session, grimoire, voice, chat }) =>
         awake: voice.awake,
         broadcast: voice.broadcast,
         cardsSince: chat.cardsSince,
+        nights: nightLog.nights,
       };
 
 /** The saved game, if it's the session we are coming back to as storyteller. */
@@ -87,6 +88,7 @@ const restoreHostedGame = (store, game) => {
     broadcast: game.broadcast,
   });
   store.commit("chat/setCardsSince", game.cardsSince);
+  store.commit("nightLog/set", game.nights);
   store.commit("session/setGameResumed", true);
 };
 
