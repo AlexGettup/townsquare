@@ -339,6 +339,8 @@
   },
   "vote": {
     "nominated": "¡{nominator} ha nominado a {nominee}!",
+    "exileProposed": "¡{nominator} propone exiliar a {nominee}!",
+    "exileHint": "Exilio: votan todos, también los muertos, sin gastar su voto fantasma",
     "votes": "{count} voto | {count} votos",
     "inFavor": "a favor",
     "secret": "La votación es secreta",
