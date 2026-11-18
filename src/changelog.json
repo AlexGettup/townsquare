@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.30.0",
+    "date": "2026-11-18",
+    "title": {
+      "en": "New game and time's up",
+      "es": "Nueva partida y fin de tiempo"
+    },
+    "en": [
+      "Storyteller: \"New game\" in the Characters tab starts over with the same players in the same seats",
+      "When the day timer runs out, everyone sees \"Time's up\" at the top with the bell",
+      "New quick announcements: second and last call for nominations"
+    ],
+    "es": [
+      "Narrador: «Nueva partida», en la pestaña Personajes, empieza de cero con los mismos jugadores en los mismos asientos",
+      "Cuando se acaba el temporizador del día, todos ven «Se acabó el tiempo» arriba con la campana",
+      "Nuevos anuncios rápidos: segunda y última llamada para nominar"
+    ]
+  },
+  {
     "version": "3.29.0",
     "date": "2026-11-18",
     "title": {
