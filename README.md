@@ -31,8 +31,10 @@ the plans in [ROADMAP.md](ROADMAP.md).
 
 ### For the Storyteller
 
-- **Guided night** through the night order, step by step
+- **Guided night** through the night order, step by step, and a **night summary** of what
+  was sent and answered
 - **Info cards** like the official app, which players answer with one tap
+- **Send one player their new character** and alignment, without the rest noticing
 - **Announcements**, a **day timer** and a day and night counter
 - **Votes** for special characters (secret, pointing, vote values) and automatic ghost votes
 - **Practice game** with made-up players to rehearse alone

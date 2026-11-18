@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.32.0",
+    "date": "2026-11-18",
+    "title": {
+      "en": "New characters mid-game and the night summary",
+      "es": "Personajes nuevos en partida y resumen de la noche"
+    },
+    "en": [
+      "Storyteller: \"Send their character\" (seat menu, under \"More\") gives one player a new character and Good or Evil, without anyone else noticing",
+      "Info cards can say \"You are: Evil\"",
+      "Storyteller: a night summary with what you sent and what came back, player by player",
+      "Guided night: the Toymaker is taken into account"
+    ],
+    "es": [
+      "Narrador: «Enviar su personaje» (menú del asiento, en «Más») da a un jugador un personaje nuevo y su bando, sin que nadie más se entere",
+      "Las tarjetas pueden decir «Tú eres: Malvado»",
+      "Narrador: resumen de la noche con lo que enviaste y lo que te respondieron, jugador a jugador",
+      "Noche guiada: tiene en cuenta al Juguetero"
+    ]
+  },
+  {
     "version": "3.31.0",
     "date": "2026-11-18",
     "title": {
