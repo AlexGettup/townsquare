@@ -61,7 +61,9 @@ variables → Actions → New repository secret):
   to your account.
 - `CLOUDFLARE_ACCOUNT_ID`: on the Workers & Pages overview, right column.
 
-Without them the app still deploys, with a warning that the Worker didn't.
+Without them the Worker isn't deployed (a warning says so), and the app is
+only published if the Worker out there already has the live session; if it
+doesn't, the deploy stops, so players never get an app that can't connect.
 `CF_APP_ID` and `CF_APP_TOKEN` stay in the Worker: a deploy doesn't touch them.
 
 ## Allowed sites

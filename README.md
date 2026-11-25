@@ -13,7 +13,8 @@ This app is a fork. The original Townsquare was created by
 **[Bra1n (Steffen Baumgart)](https://github.com/bra1n/townsquare)**, and **[nicholas-eden and
 contributors](https://github.com/nicholas-eden/townsquare)** kept it up to date with new
 characters, Loric, alternate alignments, custom jinxes and night orders. Everything listed under
-[Original features](#original-features) is their work, and live game sessions still run on the original project's server.
+[Original features](#original-features) is their work. Live game sessions run on this fork's own server, next to voice
+and text chat.
 
 This version, by [Alex (AlexGettup)](https://github.com/AlexGettup), aims to play a whole game
 **without Discord**, as comfortably on a phone or tablet as on a computer. The changes of each
