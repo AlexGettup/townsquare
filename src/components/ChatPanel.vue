@@ -420,6 +420,68 @@ export default {
   }
 }
 
+// upright screens: the strip at the bottom, while its tab is chosen
+// (PortraitDock.vue): its tabs in one row that scrolls sideways, the messages
+// filling the rest
+@media (orientation: portrait) {
+  .has-dock .chat {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--dock-bar) + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    max-width: none;
+    height: var(--dock-body);
+    padding: 6px max(6px, env(safe-area-inset-right, 0px)) 0
+      max(6px, env(safe-area-inset-left, 0px));
+    background: none;
+    border: 0;
+    border-radius: 0;
+    filter: none;
+  }
+  .has-dock:not(.dock-chat) .chat,
+  .has-dock.dock-closed .chat {
+    display: none;
+  }
+  // only the storyteller's "clear", at the end of the tabs' row
+  .has-dock .chat h3 {
+    position: absolute;
+    top: 6px;
+    right: max(8px, env(safe-area-inset-right, 0px));
+    margin: 0;
+    z-index: 1;
+    > :not(.fa-trash-alt) {
+      display: none;
+    }
+  }
+  .has-dock .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 30px 6px 0;
+    font-size: 95%;
+    li {
+      flex-shrink: 0;
+    }
+  }
+  .has-dock .messages,
+  .has-dock .chat:focus-within .messages {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    font-size: 85%;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .has-dock .input {
+    margin: 6px 0;
+    input {
+      font-size: 16px; // smaller zooms the page on iPhones
+      padding: 4px 8px;
+    }
+  }
+}
+
 .notice {
   margin: 4px 8px 0;
   font-size: 80%;

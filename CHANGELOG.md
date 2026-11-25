@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.35.0
+
+- Phones and tablets held upright: the demon bluffs, NPCs and text chat leave the seats and share a strip at the bottom, one at a time, with tabs (Chat, Bluffs, NPCs). Tapping the open tab folds the strip and the town square grows. New chat messages show as a number on the Chat tab. Landscape screens and computers don't change
+- `CLAUDE.md` with the conventions agreed with the owner, for Claude Code sessions and project threads (nothing changes in the app)
+
 ### Version 3.34.0
 
 - Character selection: the counters follow what the chosen characters (and the Fabled and Loric in play) change in the bag, from the official wiki: the Baron's +2 Outsiders, the Godfather's -1 or +1, no Minions with the Kazali or the Lord of Typhon, no Demon with the Summoner, no evil with the Atheist, any count with Legion… A counter that doesn't fit is underlined in red, only as a warning

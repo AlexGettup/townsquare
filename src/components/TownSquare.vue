@@ -361,6 +361,17 @@ export default {
     height: 100vw;
     --circle-size: 100vmin;
   }
+  // above the strip of panels (PortraitDock.vue): the whole width, unless
+  // the screen is too short for it, leaving room for the menu buttons
+  @media (orientation: portrait) {
+    .has-dock & {
+      --circle-size: min(
+        100vw,
+        var(--app-height) - var(--dock-space, 0px) - 50px
+      );
+      height: var(--circle-size);
+    }
+  }
 
   > li {
     position: absolute;
@@ -629,6 +640,59 @@ export default {
         border-width: 0;
       }
     }
+  }
+}
+
+// upright screens: the bluffs and NPCs fill the strip at the bottom, the one
+// whose tab is chosen (PortraitDock.vue)
+@media (orientation: portrait) {
+  .has-dock #townsquare > .bluffs,
+  .has-dock #townsquare > .npcs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: calc(var(--dock-bar) + env(safe-area-inset-bottom, 0px));
+    height: var(--dock-body);
+    z-index: 56;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    filter: none;
+    transform: none;
+    h3 {
+      display: none;
+    }
+    ul {
+      width: 100%;
+      flex-direction: row;
+      li {
+        // as big as the strip allows, three in a row
+        width: min(28vw, var(--dock-body) - 30px);
+        height: min(28vw, var(--dock-body) - 30px);
+        margin: 0 1.5%;
+      }
+    }
+    // the panel's own "close" doesn't apply here: the tab folds the strip
+    &.closed ul li {
+      width: min(28vw, var(--dock-body) - 30px);
+      height: min(28vw, var(--dock-body) - 30px);
+      .night-order {
+        opacity: 1;
+      }
+      .token {
+        border-width: 3px;
+      }
+    }
+  }
+  .has-dock:not(.dock-bluffs) #townsquare > .bluffs,
+  .has-dock:not(.dock-npcs) #townsquare > .npcs,
+  .has-dock.dock-closed #townsquare > .bluffs,
+  .has-dock.dock-closed #townsquare > .npcs {
+    display: none;
   }
 }
 
