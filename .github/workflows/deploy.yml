@@ -82,3 +82,24 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
+
+      # every deploy to main is a release: tag it with package.json's version,
+      # on the commit that was actually published (only once it went out)
+      - name: Tag the release 🏷️
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if ! echo "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::package.json has no valid version ($version)"
+            exit 1
+          fi
+          tag="v$version"
+          # the commit it points to (an annotated tag's "^{}" line comes last)
+          tagged=$(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}" | tail -n 1 | cut -f 1)
+          if [ -z "$tagged" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$tag" -m "Version ${tag#v}"
+            git push origin "$tag"
+          elif [ "$tagged" != "$GITHUB_SHA" ]; then
+            echo "::warning::$tag already exists on another commit ($tagged): was the version bumped? The tag was left as it was"
+          fi

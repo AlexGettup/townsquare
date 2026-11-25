@@ -64,6 +64,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   summary; the Toymaker in the guided night
 - **3.33.0** Own live session server (in our Cloudflare Worker); traveller exiles in the vote
   overlay
+- **3.34.0** Character selection rules (counters, copies, notes per character); the reminder
+  window scrolls on phones; releases tagged by the deploy
 
 ## Planned
 
@@ -78,9 +80,7 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 Chosen by the owner on 2026-11-25:
 
-1. [ ] **Character selection rules** (Storyteller setup): small, part of it exists already
-       (`bag-disabled` characters can't be dealt); missing the ones that can go more than once.
-2. [ ] **Portrait layout** (Phones and tablets).
+1. [ ] **Portrait layout** (Phones and tablets).
 
 ### Night without talking
 
@@ -103,9 +103,9 @@ Chosen by the owner on 2026-11-25:
 
 ### Storyteller setup
 
-- [ ] **Character selection rules** _(official)_: characters that can't go in the bag (Drunk,
-      Marionette) and those that can go more than once (Legion, Riot). Check first what the
-      character selector already does.
+- [ ] **"Adjust" button in the character selector**: swaps Townsfolk and Outsiders at random
+      until the counters fit what the chosen characters call for (Baron, Godfather…). The
+      counters and notes are done (3.34.0).
 
 ### Voice and text chat
 
