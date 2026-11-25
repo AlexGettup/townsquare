@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Practice game on phones: the blue box at the top left (Leave, Random nomination, Automatic) is only as wide as its text, one option per line, instead of stretching towards the menu buttons. Computers don't change
+
 ### Version 3.35.0
 
 - Phones and tablets held upright: the demon bluffs, NPCs and text chat leave the seats and share a strip at the bottom, one at a time, with tabs (Chat, Bluffs, NPCs). Tapping the open tab folds the strip and the town square grows. New chat messages show as a number on the Chat tab. Landscape screens and computers don't change

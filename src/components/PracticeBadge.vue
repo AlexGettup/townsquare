@@ -1,18 +1,23 @@
 <template>
   <div class="practice-badge" v-if="practice.active && players.length">
-    <font-awesome-icon icon="user-graduate" />
-    <span>{{ $t("practice.badge") }}</span>
-    <template v-if="viewing">
-      <span class="viewing">
+    <!-- one line on phones; its parts flow freely on computers -->
+    <span class="head">
+      <font-awesome-icon icon="user-graduate" />
+      <span>{{ $t("practice.badge") }}</span>
+      <span class="viewing" v-if="viewing">
         <font-awesome-icon icon="theater-masks" />
         {{ $t("practice.viewing", { name: viewing.name }) }}
       </span>
-      <span class="nominate" @click="$store.dispatch('practice/leaveView')">
-        {{ $t("practice.backToGrimoire") }}
+      <span class="leave" v-else @click="leave">
+        {{ $t("practice.leave") }}
       </span>
-    </template>
-    <span class="leave" v-else @click="leave">
-      {{ $t("practice.leave") }}
+    </span>
+    <span
+      class="nominate"
+      v-if="viewing"
+      @click="$store.dispatch('practice/leaveView')"
+    >
+      {{ $t("practice.backToGrimoire") }}
     </span>
     <!-- by day: a made-up player nominates another, at random -->
     <span
@@ -86,6 +91,27 @@ export default {
   border: 2px solid $townsfolk;
   border-radius: 16px;
   font-size: 90%;
+
+  .head {
+    display: contents;
+  }
+
+  // phones: one row per line, and the box only as wide as its longest line
+  // (with wrapping it stretched to its whole maximum width)
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    width: max-content;
+    padding: 4px 10px;
+
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+  }
 
   .nominate {
     cursor: pointer;
