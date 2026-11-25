@@ -29,11 +29,11 @@ reads (HTTP 418); its API answers:
 - `voice-server/` (voice, text chat and the live session, one Cloudflare Worker): test with
   `npx wrangler dev` and real WebSocket clients. Wrangler needs Node 22.
 
-## Publishing (cloud sessions)
+## Publishing
 
-A cloud session can push only to its own branch. Releases follow `CONTRIBUTING.md` through pull
-requests: session branch → `develop`, then `develop` → `main`. Merge them yourself only when the
-owner asks to publish, once their checks are green. A push to `main` deploys the Worker, checks
+Work on your own branch and reach `develop` and `main` only through pull requests: your branch →
+`develop`, then `develop` → `main` to publish (`CONTRIBUTING.md` has the release steps). Merge them
+yourself only when the owner asks for it, once their checks are green. A push to `main` deploys the Worker, checks
 it serves `/live/`, publishes the app and tags `vX.Y.Z` by itself; follow the run in GitHub
 Actions and report the result.
 

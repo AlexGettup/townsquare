@@ -6,7 +6,7 @@ release of this fork; older versions belong to the original project.
 
 ### Next version
 
-- `CLAUDE.md` with the conventions agreed with the owner, for Claude Code sessions (nothing changes in the app)
+- `CLAUDE.md` with the conventions agreed with the owner, for Claude Code sessions and project threads (nothing changes in the app)
 
 ### Version 3.34.0
 
