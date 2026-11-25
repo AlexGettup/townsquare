@@ -50,6 +50,8 @@ To release, on a `feature/release-x.y.z` branch off `develop`:
    `npm version x.y.z --no-git-tag-version`
 2. Add a `### Version x.y.z` entry at the top of `CHANGELOG.md`, listing the
    `feat` and `fix` commits since the last tag (`git log vA.B.C..develop --no-merges --oneline`).
+   If there is a `### Next version` section (changes merged before the release, with nothing
+   for players), fold it into that entry.
 3. Add the same version at the top of `src/changelog.json`, in English and Spanish, with a
    short `title` summing up its features and fixes: it is what players see in the menu
    ("What's New"). Leave out notes that only matter to developers.
