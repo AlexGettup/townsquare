@@ -49,6 +49,21 @@ browser ◄──WebRTC───► Cloudflare Realtime SFU      (the audio itse
    VUE_APP_VOICE_URL=https://townsquare-voice.<your-account>.workers.dev
    ```
 
+## Automatic deploys
+
+Every push to `main` deploys this Worker first and then the app
+(`.github/workflows/deploy.yml`), so the app never goes out before the server
+it needs. It only needs two repository secrets (GitHub: Settings → Secrets and
+variables → Actions → New repository secret):
+
+- `CLOUDFLARE_API_TOKEN`: in the Cloudflare dashboard, My Profile → API
+  Tokens → Create Token → the **Edit Cloudflare Workers** template, limited
+  to your account.
+- `CLOUDFLARE_ACCOUNT_ID`: on the Workers & Pages overview, right column.
+
+Without them the app still deploys, with a warning that the Worker didn't.
+`CF_APP_ID` and `CF_APP_TOKEN` stay in the Worker: a deploy doesn't touch them.
+
 ## Allowed sites
 
 Only pages listed in `ALLOWED_ORIGINS` (`wrangler.toml`) can use the server,
