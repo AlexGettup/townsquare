@@ -37,5 +37,6 @@ owner asks to publish, once their checks are green. A push to `main` deploys the
 it serves `/live/`, publishes the app and tags `vX.Y.Z` by itself; follow the run in GitHub
 Actions and report the result.
 
-Every PR to `develop` or `main` must touch `CHANGELOG.md` (a CI check): a change with nothing to
-tell players rides along with the next release instead of getting its own PR.
+Every PR to `develop` or `main` must touch `CHANGELOG.md` (a CI check). A change merged before its
+release (one with nothing for players, say) goes under `### Next version` at the top, which the
+release folds into its entry.
