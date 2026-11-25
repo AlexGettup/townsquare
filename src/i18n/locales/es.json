@@ -468,8 +468,24 @@
       "passOutRandomly": "Repartir {count} personajes al azar",
       "shuffle": "Barajar personajes",
       "clear": "Borrar selección",
-      "illegalWarning": "Aviso: hay personajes seleccionados que no se pueden enviar a los jugadores. No podrás repartir los personajes hasta que los quites.",
-      "setupWarning": "Aviso: hay personajes seleccionados que modifican la preparación de la partida. El reparto aleatorio no los tiene en cuenta."
+      "add": "Añadir {name}",
+      "countOff": "Con estos personajes deberían ser {count}",
+      "notes": {
+        "drunk": "No va en la bolsa: pon un Aldeano en su lugar. La primera noche, marca a uno de los Aldeanos con «Es el Borracho».",
+        "marionette": "No va en la bolsa: pon un Aldeano en su lugar. La primera noche, marca como Marioneta a un jugador bueno vecino del Demonio.",
+        "lilmonsta": "No va en la bolsa: pon un Esbirro más en su lugar y ningún Demonio. La primera noche no hay información de Esbirros ni de Demonio.",
+        "kazali": "Sin Esbirros en la bolsa: sus huecos son Aldeanos o Forasteros. La primera noche, el Kazali elige qué jugadores son qué Esbirros.",
+        "lordoftyphon": "Sin Esbirros en la bolsa: sus huecos son Aldeanos o Forasteros. La primera noche, sus vecinos a cada lado se convierten en Esbirros (uno más de lo normal), en fila con él en medio.",
+        "summoner": "Sin Demonio en la bolsa: pon un Aldeano en su lugar.",
+        "atheist": "Sin Esbirros ni Demonio: sus huecos son Aldeanos o Forasteros.",
+        "legion": "Unos 7 de cada 10 jugadores son Legión, y no hay Esbirros. Usa + para añadir más.",
+        "villageidiot": "Usa + para cambiar hasta 2 Aldeanos por más Tontos del Pueblo. La primera noche, marca a uno de los extra como borracho.",
+        "bountyhunter": "Después de repartir, haz malvado a un Aldeano con «Enviar su personaje».",
+        "huntsman": "La Doncella tiene que estar en juego.",
+        "choirboy": "El Rey tiene que estar en juego.",
+        "xaan": "X es el número de Forasteros al empezar.",
+        "pope": "Usa + para cambiar Aldeanos por copias de Aldeanos o Forasteros en juego."
+      }
     },
     "voteHistory": {
       "clearTitle": "Borrar historial de votos",

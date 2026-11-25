@@ -78,8 +78,7 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 Chosen by the owner on 2026-11-25:
 
-1. [ ] **Character selection rules** (Storyteller setup): small, part of it exists already
-       (`bag-disabled` characters can't be dealt); missing the ones that can go more than once.
+1. [ ] **Character selection rules** (Storyteller setup): built, out in the next version.
 2. [ ] **Portrait layout** (Phones and tablets).
 
 ### Night without talking
@@ -103,9 +102,12 @@ Chosen by the owner on 2026-11-25:
 
 ### Storyteller setup
 
-- [ ] **Character selection rules** _(official)_: characters that can't go in the bag (Drunk,
-      Marionette) and those that can go more than once (Legion, Riot). Check first what the
-      character selector already does.
+- [ ] **Character selection rules** _(official)_: counters that follow what the chosen
+      characters change in the bag (Baron, Kazali, Atheist…, from the wiki's "How to Run"),
+      copies only where allowed (Village Idiot, Legion, Pope), the Huntsman's Damsel and the
+      Choirboy's King, and one note per character. Only warnings. Later: an "Adjust" button
+      that swaps Townsfolk and Outsiders to fit. The Drunk and the Marionette stay out of the
+      bag (as at a real table); Riot needs nothing at setup.
 
 ### Voice and text chat
 
