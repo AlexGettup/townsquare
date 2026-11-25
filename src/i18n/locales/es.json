@@ -292,6 +292,7 @@
   "townSquare": {
     "otherCharacters": "Otros personajes",
     "demonBluffs": "Faroles del Demonio",
+    "demonBluffsShort": "Faroles",
     "npcs": "NPCs"
   },
   "player": {

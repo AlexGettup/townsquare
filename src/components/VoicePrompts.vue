@@ -93,7 +93,8 @@ export default {
 .voice-prompts {
   position: absolute;
   left: 50%;
-  bottom: 10px;
+  // above the strip of panels on upright screens (PortraitDock.vue)
+  bottom: calc(10px + var(--dock-space, 0px));
   transform: translateX(-50%);
   z-index: 80;
   display: flex;

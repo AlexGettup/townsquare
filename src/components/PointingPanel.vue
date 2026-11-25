@@ -128,7 +128,7 @@ export default {
   // upright, the free space is a strip below the circle
   @media (orientation: portrait) {
     top: auto;
-    bottom: 10px;
+    bottom: calc(10px + var(--dock-space, 0px));
     left: 10px;
     right: 10px;
     width: auto;

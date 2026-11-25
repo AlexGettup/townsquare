@@ -292,6 +292,7 @@
   "townSquare": {
     "otherCharacters": "Other Characters",
     "demonBluffs": "Demon Bluffs",
+    "demonBluffsShort": "Bluffs",
     "npcs": "NPCs"
   },
   "player": {

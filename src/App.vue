@@ -51,6 +51,7 @@
     <VoicePrompts />
     <AlertNotices />
     <ChatPanel v-if="players.length" />
+    <PortraitDock />
     <InfoCardModal />
     <ChoosePlayers />
     <GuidedNight />
@@ -89,6 +90,7 @@ import VoiceCorner from "@/components/VoiceCorner";
 import VoicePrompts from "@/components/VoicePrompts";
 import AlertNotices from "@/components/AlertNotices";
 import ChatPanel from "@/components/ChatPanel";
+import PortraitDock from "@/components/PortraitDock";
 import InfoCardModal from "@/components/modals/InfoCardModal";
 import InfoCardComposer from "@/components/modals/InfoCardComposer";
 import GrimoireEditor from "@/components/modals/GrimoireEditor";
@@ -105,6 +107,7 @@ export default {
     VoicePrompts,
     AlertNotices,
     ChatPanel,
+    PortraitDock,
     InfoCardModal,
     InfoCardComposer,
     GrimoireEditor,
@@ -299,13 +302,24 @@ ul {
   // upright phones: the town square and what's in its middle (edition logo,
   // counters, the vote) centred in the room above a bottom sheet (the guided
   // night, see GuidedNight.vue), as far as the space at the top allows
-  @media (orientation: portrait) and (max-width: 767.98px) {
+  // upright screens: and above the strip of panels at the bottom (see
+  // PortraitDock.vue), whichever takes more room
+  @media (orientation: portrait) {
     box-sizing: border-box;
-    padding-bottom: min(
-      var(--bottom-sheet, 0px),
-      max(0px, 100vh - 100vw - 100px)
-    );
+    padding-bottom: var(--dock-space, 0px);
     transition: padding-bottom 200ms;
+  }
+  // with the strip, the circle starts below the menu buttons
+  @media (orientation: portrait) {
+    .has-dock & {
+      padding-top: 48px;
+    }
+  }
+  @media (orientation: portrait) and (max-width: 767.98px) {
+    padding-bottom: max(
+      var(--dock-space, 0px),
+      min(var(--bottom-sheet, 0px), max(0px, 100vh - 100vw - 100px))
+    );
   }
 
   // disable all animations
