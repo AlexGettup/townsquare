@@ -6,9 +6,13 @@
   >
     <h3>{{ $t("modals.roles.title", { count: nonTravellers }) }}</h3>
     <ul class="tokens" v-for="(teamRoles, team) in roleSelection" :key="team">
-      <li class="count" :class="[team]">
+      <li
+        class="count"
+        :class="[team, { off: !isCountRight(team) }]"
+        :title="countTitle(team)"
+      >
         {{ teamRoles.reduce((a, { selected }) => a + selected, 0) }} /
-        {{ game[nonTravellers - 5][team] }}
+        {{ formatCounts(expected[team]) }}
       </li>
       <li
         v-for="role in teamRoles"
@@ -27,13 +31,17 @@
           icon="exclamation-triangle"
           v-if="role.setup || isDisabled(role)"
         />
-        <div class="buttons" v-if="allowMultiple">
+        <div class="buttons" v-if="canRepeat(role)">
           <font-awesome-icon
             icon="minus-circle"
             @click.stop="role.selected--"
           />
           <span>{{ role.selected > 1 ? "x" + role.selected : "" }}</span>
-          <font-awesome-icon icon="plus-circle" @click.stop="role.selected++" />
+          <font-awesome-icon
+            icon="plus-circle"
+            :class="{ spent: role.selected >= maxCopies(role) }"
+            @click.stop="addCopy(role)"
+          />
         </div>
       </li>
     </ul>
@@ -94,15 +102,30 @@
           <font-awesome-icon icon="trash-alt" />
         </div>
       </div>
-      <div class="illegal warning" v-if="isIllegalTokenSelected">
-        <font-awesome-icon icon="exclamation-triangle" />
-        <span>{{ $t("modals.roles.illegalWarning") }}</span>
-      </div>
-      <div class="setup warning" v-if="hasSelectedSetupRoles">
-        <font-awesome-icon icon="exclamation-triangle" />
-        <span>{{ $t("modals.roles.setupWarning") }}</span>
-      </div>
     </div>
+    <!-- what the chosen characters change in the setup, one line each -->
+    <ul class="notes" v-if="notes.length">
+      <li
+        v-for="note in notes"
+        :key="note.id"
+        :class="{ illegal: note.illegal, missing: note.missing }"
+      >
+        <font-awesome-icon icon="exclamation-triangle" />
+        <span>
+          <strong>{{ note.name }}</strong>
+          <template v-if="note.setup">[{{ note.setup }}]</template>
+          {{ note.text }}
+        </span>
+        <span
+          class="add"
+          v-if="note.add"
+          role="button"
+          @click="addRequired(note.add)"
+        >
+          {{ $t("modals.roles.add", { name: note.addName }) }}
+        </span>
+      </li>
+    </ul>
   </Modal>
 </template>
 
@@ -111,6 +134,16 @@ import Modal from "./Modal";
 import gameJSON from "./../../counts.json";
 import Token from "./../Token";
 import { mapGetters, mapMutations, mapState } from "vuex";
+import {
+  RULES,
+  allowsGoodDuplicates,
+  canRepeat,
+  expectedCounts,
+  formatCounts,
+  isBagDisabled,
+  maxCopies,
+  setupText,
+} from "../../setupRules";
 
 const randomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -132,10 +165,70 @@ export default {
         .map((roles) => roles.reduce((a, { selected }) => a + selected, 0))
         .reduce((a, b) => a + b, 0);
     },
-    hasSelectedSetupRoles: function () {
-      return Object.values(this.roleSelection).some((roles) =>
-        roles.some((role) => role.selected && role.setup),
-      );
+    chosenRoles: function () {
+      return Object.values(this.roleSelection)
+        .reduce((all, roles) => [...all, ...roles], [])
+        .filter((role) => role.selected);
+    },
+    // usual counts for the number of players, then what the characters change
+    expected: function () {
+      const base = this.game[Math.max(5, this.nonTravellers) - 5];
+      return expectedCounts(base, [
+        ...this.chosenRoles.map((role) => role.id),
+        ...this.npcs.map((npc) => npc.id),
+      ]);
+    },
+    repeatOptions: function () {
+      return {
+        allowMultiple: this.allowMultiple,
+        goodDuplicates: allowsGoodDuplicates([
+          ...this.chosenRoles,
+          ...this.npcs,
+        ]),
+      };
+    },
+    notes: function () {
+      const sources = [...this.chosenRoles, ...this.npcs];
+      return sources
+        .filter(
+          (role) =>
+            role.setup ||
+            RULES[role.id] ||
+            isBagDisabled(role) ||
+            this.$te(`modals.roles.notes.${role.id}`),
+        )
+        .filter(
+          (role, index, shown) =>
+            shown.findIndex((r) => r.id === role.id) === index,
+        )
+        .map((role) => {
+          const shown = this.localizeRole(role);
+          const rule = RULES[role.id] || {};
+          const required =
+            rule.requires &&
+            !this.chosenRoles.some((r) => r.id === rule.requires)
+              ? this.roles.get(rule.requires)
+              : null;
+          const ability = setupText(shown.ability);
+          return {
+            id: role.id,
+            name: shown.name,
+            // Fabled and Loric are setup rules in themselves
+            setup: ability,
+            text: this.$te(`modals.roles.notes.${role.id}`)
+              ? this.$t(`modals.roles.notes.${role.id}`)
+              : ability
+                ? ""
+                : shown.ability,
+            illegal: isBagDisabled(role),
+            missing: !!(
+              rule.requires &&
+              !this.chosenRoles.some((r) => r.id === rule.requires)
+            ),
+            add: required ? required.id : null,
+            addName: required ? this.localizeRole(required).name : "",
+          };
+        });
     },
     isGardenerOrTorActive: function () {
       return this.npcs.some((npc) => npc.id === "gardener" || npc.id === "tor");
@@ -148,8 +241,42 @@ export default {
     ...mapState(["grimoire", "roles", "npcs", "modals"]),
     ...mapState("players", ["players"]),
     ...mapGetters({ nonTravellers: "players/nonTravellers" }),
+    ...mapGetters(["localizeRole"]),
   },
   methods: {
+    formatCounts,
+    canRepeat(role) {
+      return canRepeat(role, this.repeatOptions);
+    },
+    maxCopies(role) {
+      return maxCopies(role, this.repeatOptions);
+    },
+    addCopy(role) {
+      if (role.selected < this.maxCopies(role)) role.selected++;
+    },
+    isCountRight(team) {
+      const counts = this.expected[team];
+      if (!counts) return true;
+      const chosen = (this.roleSelection[team] || []).reduce(
+        (a, { selected }) => a + selected,
+        0,
+      );
+      return counts.includes(chosen);
+    },
+    countTitle(team) {
+      return this.isCountRight(team)
+        ? ""
+        : this.$t("modals.roles.countOff", {
+            count: formatCounts(this.expected[team]),
+          });
+    },
+    // a character another one needs (the Huntsman's Damsel)
+    addRequired(id) {
+      const role = (
+        this.roleSelection[(this.roles.get(id) || {}).team] || []
+      ).find((r) => r.id === id);
+      if (role && !role.selected) role.selected = 1;
+    },
     selectRandomRoles() {
       this.roleSelection = {};
       this.roles.forEach((role) => {
@@ -387,6 +514,52 @@ ul.tokens {
     &.demon {
       color: $demon;
     }
+    // not what the chosen characters call for (only a warning)
+    &.off {
+      text-decoration: underline wavy red;
+      text-underline-offset: 3px;
+    }
+  }
+  .buttons .spent {
+    opacity: 0.1;
+    pointer-events: none;
+  }
+}
+
+ul.notes {
+  // the modal lays lists out in a row: one note per line here
+  display: block;
+  list-style: none;
+  margin: 10px auto 0;
+  padding: 0;
+  max-width: 720px;
+  font-size: 90%;
+  text-align: left;
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 0;
+    > svg {
+      color: $outsider;
+      flex-shrink: 0;
+    }
+    &.illegal > svg,
+    &.missing > svg {
+      color: gold;
+    }
+    strong {
+      margin-right: 4px;
+    }
+    .add {
+      flex-shrink: 0;
+      margin-left: auto;
+      cursor: pointer;
+      text-decoration: underline;
+      &:hover {
+        color: red;
+      }
+    }
   }
 }
 
@@ -424,38 +597,6 @@ ul.tokens {
           padding: 6px 10px;
           border-radius: 15px;
         }
-      }
-    }
-    .warning {
-      position: absolute;
-      bottom: 20px;
-      z-index: 10;
-      &.setup {
-        color: red;
-        right: 20px;
-      }
-      &.illegal {
-        color: gold;
-        right: 80px;
-      }
-      svg {
-        font-size: 150%;
-        vertical-align: middle;
-      }
-      span {
-        display: none;
-        text-align: center;
-        position: absolute;
-        right: -20px;
-        bottom: 30px;
-        width: 420px;
-        background: rgba(0, 0, 0, 0.75);
-        padding: 5px;
-        border-radius: 10px;
-        border: 2px solid black;
-      }
-      &:hover span {
-        display: block;
       }
     }
   }

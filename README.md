@@ -36,6 +36,7 @@ the plans in [ROADMAP.md](ROADMAP.md).
   was sent and answered
 - **Info cards** like the official app, which players answer with one tap
 - **Send one player their new character** and alignment, without the rest noticing
+- **Character selection** that follows each character's setup rules (Baron, Kazali, Legion…)
 - **Announcements**, a **day timer** and a day and night counter
 - **Votes** for special characters (secret, pointing, vote values) and automatic ghost votes
 - **Practice game** with made-up players to rehearse alone

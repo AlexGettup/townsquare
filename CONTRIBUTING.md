@@ -55,8 +55,9 @@ To release, on a `feature/release-x.y.z` branch off `develop`:
    ("What's New"). Leave out notes that only matter to developers.
 4. Commit as `chore(release): x.y.z`, merge into `develop`, then fast-forward `main`
    to `develop` and push both.
-5. Tag the release on `main` and push the tag:
-   `git tag -a vx.y.z -m "Version x.y.z" && git push origin vx.y.z`
+5. The deploy tags the release by itself (`vx.y.z`, from `package.json`) on the commit it
+   published, once the Worker and the app went out. If that version is tagged on another
+   commit already (the version wasn't bumped), the tag stays and the deploy warns.
 
 ## Development Setup
 

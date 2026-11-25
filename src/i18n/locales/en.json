@@ -468,8 +468,24 @@
       "passOutRandomly": "Pass out {count} characters randomly",
       "shuffle": "Shuffle characters",
       "clear": "Clear selection",
-      "illegalWarning": "Warning: there are characters selected cannot be sent to players! You will not be able to distribute characters until these characters are removed.",
-      "setupWarning": "Warning: there are characters selected that modify the game setup! The randomizer does not account for these characters."
+      "add": "Add {name}",
+      "countOff": "With these characters it should be {count}",
+      "notes": {
+        "drunk": "Not in the bag: put a Townsfolk in its place. On the first night, mark one of the Townsfolk with \"Is the Drunk\".",
+        "marionette": "Not in the bag: put a Townsfolk in its place. On the first night, mark a good player next to the Demon as the Marionette.",
+        "lilmonsta": "Not in the bag: put one more Minion in its place and no Demon. On the first night there is no Minion or Demon info.",
+        "kazali": "No Minions in the bag: Townsfolk or Outsiders take their places. On the first night, the Kazali chooses which players are which Minions.",
+        "lordoftyphon": "No Minions in the bag: Townsfolk or Outsiders take their places. On the first night, the neighbours on each side become Minions (one more than usual), in a line with the Lord of Typhon in the middle.",
+        "summoner": "No Demon in the bag: put a Townsfolk in its place.",
+        "atheist": "No Minions or Demon: Townsfolk or Outsiders take their places.",
+        "legion": "About 7 in 10 players are Legion, and there are no Minions. Use + to add more.",
+        "villageidiot": "Use + to swap up to 2 Townsfolk for more Village Idiots. On the first night, mark one of the extras as drunk.",
+        "bountyhunter": "After dealing, make a Townsfolk evil with \"Send their character\".",
+        "huntsman": "The Damsel has to be in play.",
+        "choirboy": "The King has to be in play.",
+        "xaan": "X is the number of Outsiders at the start.",
+        "pope": "Use + to swap Townsfolk for copies of in-play Townsfolk or Outsiders."
+      }
     },
     "voteHistory": {
       "clearTitle": "Clear vote history",

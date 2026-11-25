@@ -1,5 +1,9 @@
 <template>
-  <Modal v-if="isDisplayed" @close="toggleModal('reminder')">
+  <Modal
+    class="reminder-modal"
+    v-if="isDisplayed"
+    @close="toggleModal('reminder')"
+  >
     <h3>{{ $t("modals.reminder.title") }}</h3>
     <ul class="reminders">
       <li
@@ -288,5 +292,23 @@ input.reminder-search {
   &:not(:focus) {
     border-bottom-color: #777;
   }
+}
+</style>
+
+<style lang="scss">
+// many reminders (a big game, on a phone) don't fit: the list scrolls by
+// itself, with the title and the search still in view
+.reminder-modal .modal > .slot {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.reminder-modal ul.reminders {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  // room for a reminder growing on hover at the edges
+  padding: 8px 0;
 }
 </style>
