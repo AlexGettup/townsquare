@@ -8,7 +8,7 @@ release of this fork; older versions belong to the original project.
 
 - Games sync through our own server (the Cloudflare Worker that already runs voice and text chat) instead of the original project's server (`clocktower.live`), so the app keeps working if that one goes away. Nothing changes for players. Everyone in a game needs this version: reload the page if a game doesn't connect
 - `VUE_APP_LIVE_SERVER` in `.env` picks the server games sync through (`own` or `original`) without losing voice and text chat
-- Deploys: every push to `main` deploys the voice server first and then the app, and the app isn't published if the voice server it needs isn't there (needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets, see `voice-server/README.md`)
+- Deploys: every push to `main` deploys the voice server first (on Node 22, which `wrangler` needs) and then the app, and the app isn't published if the voice server it needs isn't there (needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets, see `voice-server/README.md`)
 - Vote overlay: a traveller's exile says "X proposes to exile Y" and that everyone votes without spending ghost votes, instead of looking like a nomination
 
 ### Version 3.32.0
