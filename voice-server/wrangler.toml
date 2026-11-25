@@ -15,7 +15,16 @@ ALLOWED_ORIGINS = "https://alexgettup.github.io"
 name = "ROOMS"
 class_name = "VoiceRoom"
 
+# the live session (game sync), see src/live.js
+[[durable_objects.bindings]]
+name = "LIVE"
+class_name = "LiveRoom"
+
 # SQLite-backed Durable Objects are the ones available on the free plan
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["VoiceRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["LiveRoom"]

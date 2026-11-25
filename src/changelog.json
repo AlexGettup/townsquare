@@ -1,5 +1,21 @@
 [
   {
+    "version": "3.33.0",
+    "date": "2026-11-25",
+    "title": {
+      "en": "Our own game server",
+      "es": "Servidor de partidas propio"
+    },
+    "en": [
+      "Games now run on our own server, so the app doesn't depend on the original project any more. If a game doesn't connect, reload the page: everyone needs this version",
+      "Votes: a traveller's exile is shown as an exile, and everyone votes without spending ghost votes"
+    ],
+    "es": [
+      "Las partidas van ahora por nuestro propio servidor, así que la app ya no depende del proyecto original. Si una partida no conecta, recarga la página: todos necesitáis esta versión",
+      "Votaciones: el exilio de un viajero se muestra como exilio, y todos votan sin gastar el voto fantasma"
+    ]
+  },
+  {
     "version": "3.32.0",
     "date": "2026-11-18",
     "title": {

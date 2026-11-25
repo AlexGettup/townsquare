@@ -4,6 +4,13 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.33.0
+
+- Games sync through our own server (the Cloudflare Worker that already runs voice and text chat) instead of the original project's server (`clocktower.live`), so the app keeps working if that one goes away. Nothing changes for players. Everyone in a game needs this version: reload the page if a game doesn't connect
+- `VUE_APP_LIVE_SERVER` in `.env` picks the server games sync through (`own` or `original`) without losing voice and text chat
+- Deploys: every push to `main` deploys the voice server first and then the app, and the app isn't published if the voice server it needs isn't there (needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets, see `voice-server/README.md`)
+- Vote overlay: a traveller's exile says "X proposes to exile Y" and that everyone votes without spending ghost votes, instead of looking like a nomination
+
 ### Version 3.32.0
 
 - Storyteller: "Send their character" (seat menu, under "More") gives one player a new character and Good or Evil (Snake Charmer, Pit-Hag, Barber, Fang Gu, Goon…). Their token changes here and on their device, they get a "You are" card with the alignment, what they noted on other seats stays, and it survives reloads. Nobody else gets anything

@@ -1,3 +1,9 @@
+> **Not used by this fork any more.** The live session runs in the Cloudflare
+> Worker in [`voice-server/`](../voice-server/README.md) (`src/live.js`). This
+> folder is the original project's server, kept for reference; the app only
+> uses it (`clocktower.live`) with `VUE_APP_LIVE_SERVER=original` in `.env`,
+> or when `VUE_APP_VOICE_URL` is empty.
+
 ## Live session server
 This is the home of the NodeJS live session backend.
 It allows a Storyteller and their player to communicate through
