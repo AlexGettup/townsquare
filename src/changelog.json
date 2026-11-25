@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.35.0",
+    "date": "2026-11-25",
+    "title": {
+      "en": "Upright phones",
+      "es": "Móvil en vertical"
+    },
+    "en": [
+      "Phones and tablets held upright: the demon bluffs, NPCs and chat move to a strip at the bottom with tabs, so they don't cover any seat. Tap the open tab to fold it and make the town square bigger. New chat messages show as a number on the Chat tab"
+    ],
+    "es": [
+      "Móviles y tablets en vertical: los faroles del Demonio, los NPCs y el chat pasan a un panel abajo con pestañas, así no tapan ningún asiento. Toca la pestaña abierta para plegarlo y agrandar la plaza. Los mensajes nuevos del chat salen como un número en la pestaña Chat"
+    ]
+  },
+  {
     "version": "3.34.0",
     "date": "2026-11-25",
     "title": {

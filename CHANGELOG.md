@@ -4,7 +4,7 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
-### Next version
+### Version 3.35.0
 
 - Phones and tablets held upright: the demon bluffs, NPCs and text chat leave the seats and share a strip at the bottom, one at a time, with tabs (Chat, Bluffs, NPCs). Tapping the open tab folds the strip and the town square grows. New chat messages show as a number on the Chat tab. Landscape screens and computers don't change
 - `CLAUDE.md` with the conventions agreed with the owner, for Claude Code sessions and project threads (nothing changes in the app)
