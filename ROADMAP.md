@@ -62,6 +62,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   whoever the voice server allows
 - **3.32.0** Send one player their new character and alignment; Storyteller's night
   summary; the Toymaker in the guided night
+- **3.33.0** Own live session server (in our Cloudflare Worker); traveller exiles in the vote
+  overlay
 
 ## Planned
 
@@ -74,7 +76,11 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 ### Next steps
 
-Nothing chosen yet: the owner picks from the ideas below.
+Chosen by the owner on 2026-11-25:
+
+1. [ ] **Character selection rules** (Storyteller setup): small, part of it exists already
+       (`bag-disabled` characters can't be dealt); missing the ones that can go more than once.
+2. [ ] **Portrait layout** (Phones and tablets).
 
 ### Night without talking
 
@@ -114,9 +120,6 @@ Nothing chosen yet: the owner picks from the ideas below.
 
 ### Robustness and security
 
-- [ ] **Own live session server**: games sync through the original project's server
-      (`clocktower.live`); if it goes away the app stops working. Move it to our Cloudflare
-      Worker, like voice and chat.
 - [ ] **Verify identities**: each client says who it is, so someone tampering with their
       browser could pose as another player or the storyteller. Parked: we trust the players.
 
