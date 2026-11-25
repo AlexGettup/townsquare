@@ -3,9 +3,11 @@ import i18n from "../i18n";
 class LiveSession {
   constructor(store) {
     // our own live session server lives in the voice server's Worker
-    // (voice-server/src/live.js); without one, the original project's server
+    // (voice-server/src/live.js); VUE_APP_LIVE_SERVER=original (or no voice
+    // server) syncs games through the original project's server instead
     const serverUrl = (process.env.VUE_APP_VOICE_URL || "").replace(/\/$/, "");
-    this._isOwnServer = !!serverUrl;
+    this._isOwnServer =
+      !!serverUrl && process.env.VUE_APP_LIVE_SERVER !== "original";
     this._wss = this._isOwnServer
       ? serverUrl.replace(/^http/, "ws") + "/live/"
       : "wss://clocktower.live:8001/";
