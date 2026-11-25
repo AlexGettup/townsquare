@@ -2,8 +2,17 @@ import i18n from "../i18n";
 
 class LiveSession {
   constructor(store) {
-    this._wss = "wss://clocktower.live:8001/";
-    // this._wss = "ws://localhost:8081/"; // uncomment if using local server with NODE_ENV=development
+    // our own live session server lives in the voice server's Worker
+    // (voice-server/src/live.js); without one, the original project's server
+    const serverUrl = (process.env.VUE_APP_VOICE_URL || "").replace(/\/$/, "");
+    this._isOwnServer = !!serverUrl;
+    this._wss = this._isOwnServer
+      ? serverUrl.replace(/^http/, "ws") + "/live/"
+      : "wss://clocktower.live:8001/";
+    // our own server doesn't measure latency: each client measures its own
+    // (half the round trip of ["rtt"]) and the ping carries it
+    this._latency = 0;
+    this._rttStart = 0;
     this._socket = null;
     this._isSpectator = true;
     this._gamestate = [];
@@ -145,11 +154,17 @@ class LiveSession {
    */
   _ping() {
     this._handlePing();
+    if (this._isOwnServer && this._socket && this._socket.readyState === 1) {
+      // answered by the server itself (exactly this text), see _handleMessage
+      this._rttStart = new Date().getTime();
+      this._socket.send('["rtt"]');
+    }
     this._send("ping", [
       this._isSpectator
         ? this._store.state.session.playerId
         : Object.keys(this._players).length,
-      "latency",
+      // the original server replaces "latency" with both ends' latency
+      this._isOwnServer ? this._latency : "latency",
     ]);
     clearTimeout(this._pingTimer);
     this._pingTimer = setTimeout(this._ping.bind(this), this._pingInterval);
@@ -194,6 +209,14 @@ class LiveSession {
         break;
       case "claim":
         this._updateSeat(params);
+        break;
+      case "rtt":
+        if (this._rttStart) {
+          this._latency = Math.round(
+            (new Date().getTime() - this._rttStart) / 2,
+          );
+          this._rttStart = 0;
+        }
         break;
       case "ping":
         this._handlePing(params);
@@ -923,6 +946,10 @@ class LiveSession {
    */
   _handlePing([playerIdOrCount = 0, latency] = []) {
     const now = new Date().getTime();
+    if (this._isOwnServer && latency !== undefined) {
+      // the sender's latency plus ours, as the original server worked it out
+      latency = (parseInt(latency, 10) || 0) + this._latency;
+    }
     if (!this._isSpectator) {
       // remove players that haven't sent a ping in twice the timespan
       for (let player in this._players) {

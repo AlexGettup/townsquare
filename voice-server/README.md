@@ -1,6 +1,8 @@
 # Townsquare voice server
 
-Backend for the in-app voice chat. It runs for free on Cloudflare:
+Backend for the in-app voice chat, the text chat and the live session (the
+game's sync between the storyteller and the players). It runs for free on
+Cloudflare:
 
 - **Cloudflare Realtime SFU** carries the audio: every player uploads their
   microphone once and downloads the people they may hear.
@@ -11,7 +13,16 @@ Backend for the in-app voice chat. It runs for free on Cloudflare:
   the room refuses pulls the hearing rules do not allow, and force-closes the
   tracks someone may no longer hear (a private conversation, the night…).
 
+- **The live session** (`src/live.js`, one `LiveRoom` Durable Object per game
+  session) relays the game between the storyteller and the players, as the
+  original project's server (`clocktower.live`) did: player pings go to the
+  storyteller, `direct` messages only to their player, everything else to the
+  whole session. It checks player secrets and allows one storyteller per
+  session (taking over one silent for more than 65 seconds). Clients measure
+  their own latency with `["rtt"]`, which the room answers without waking up.
+
 ```
+browser ──WebSocket──► Worker /live/<session>/<player> (the game itself)
 browser ──WebSocket──► Worker /rooms/<session>/ws    (who is in voice)
 browser ──WebSocket──► Worker /rooms/<session>/chat  (text chat)
 browser ──HTTPS─────► Worker /rooms/<session>/sfu/... ──► Cloudflare Realtime API

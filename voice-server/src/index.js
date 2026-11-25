@@ -10,8 +10,13 @@
  *   the app secret never reaches the browser. It goes through the room, which
  *   only lets each client receive the microphones it is allowed to hear.
  *
+ * - /live/<channel>/<playerId>  WebSocket for the live session itself (the
+ *   game's sync between storyteller and players), see live.js.
+ *
  * Secrets (set with `wrangler secret put`): CF_APP_ID, CF_APP_TOKEN.
  */
+
+export { LiveRoom } from "./live.js";
 
 // SFU_API_URL (optional var) points to a fake SFU in tests
 const SFU_API = "https://rtc.live.cloudflare.com/v1/apps";
@@ -113,6 +118,18 @@ export default {
     }
     if (request.method === "OPTIONS") {
       return withCors(new Response(null, { status: 204 }), origin);
+    }
+
+    const live = url.pathname.match(/^\/live\/([^/]+)\/[^/]+$/);
+    if (live) {
+      if (request.headers.get("Upgrade") !== "websocket") {
+        return new Response("Expected a WebSocket", { status: 426 });
+      }
+      const channel = decodeURIComponent(live[1]).toLowerCase();
+      if (!channel || channel.length > 100) {
+        return new Response("Bad session", { status: 400 });
+      }
+      return env.LIVE.get(env.LIVE.idFromName(channel)).fetch(request);
     }
 
     const room = url.pathname.match(
