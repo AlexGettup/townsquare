@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.34.0",
+    "date": "2026-11-25",
+    "title": {
+      "en": "Character selection rules",
+      "es": "Reglas para elegir personajes"
+    },
+    "en": [
+      "Storyteller: when choosing characters, the counters follow what each one changes (Baron, Godfather, Kazali, Atheist…) and a note per character says what to do",
+      "Storyteller: the Village Idiot, Legion and, with the Pope, good characters can go more than once; the Huntsman and the Choirboy offer to add the Damsel and the King",
+      "Phones: the reminder window scrolls, so you reach the last ones in big games"
+    ],
+    "es": [
+      "Narrador: al elegir personajes, los contadores siguen lo que cambia cada uno (Barón, Padrino, Kazali, Ateo…) y una nota por personaje dice qué hacer",
+      "Narrador: el Tonto del Pueblo, la Legión y, con el Papa, los personajes buenos pueden ir más de una vez; el Cazador y el Monaguillo ofrecen añadir a la Doncella y al Rey",
+      "Móviles: la ventana de recordatorios se desplaza, así llegas a los últimos en partidas grandes"
+    ]
+  },
+  {
     "version": "3.33.0",
     "date": "2026-11-25",
     "title": {

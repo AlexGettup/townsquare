@@ -4,6 +4,15 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.34.0
+
+- Character selection: the counters follow what the chosen characters (and the Fabled and Loric in play) change in the bag, from the official wiki: the Baron's +2 Outsiders, the Godfather's -1 or +1, no Minions with the Kazali or the Lord of Typhon, no Demon with the Summoner, no evil with the Atheist, any count with Legion… A counter that doesn't fit is underlined in red, only as a warning
+- Character selection: copies only where the rules allow them, without the "allow duplicates" box: the Village Idiot (up to 3), Legion, and good characters with the Pope or the Atheist
+- Character selection: the Huntsman and the Choirboy offer to add the Damsel and the King
+- Character selection: one note per character under the buttons, with its setup text and what to do, instead of one generic warning. The Drunk and the Marionette still stay out of the bag, and their notes say what to put instead
+- Phones: the reminder window scrolls, so the last reminders and the search can be reached in big games
+- Deploys tag each release by themselves (`vx.y.z`) on the commit they published
+
 ### Version 3.33.0
 
 - Games sync through our own server (the Cloudflare Worker that already runs voice and text chat) instead of the original project's server (`clocktower.live`), so the app keeps working if that one goes away. Nothing changes for players. Everyone in a game needs this version: reload the page if a game doesn't connect
