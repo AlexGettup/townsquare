@@ -56,6 +56,21 @@ jobs:
           node-version: 20
           cache: npm
 
+      # the app syncs games through the Worker's /live/ (VUE_APP_LIVE_SERVER
+      # in .env): don't publish it while the Worker out there lacks it
+      - name: Check the live session server ☁️
+        run: |
+          set -a; . ./.env; set +a
+          if [ -n "$VUE_APP_VOICE_URL" ] && [ "$VUE_APP_LIVE_SERVER" != "original" ]; then
+            status=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "Origin: https://${GITHUB_REPOSITORY_OWNER,,}.github.io" \
+              "$VUE_APP_VOICE_URL/live/check/host")
+            if [ "$status" != "426" ]; then
+              echo "::error::The voice server has no live session (HTTP $status): deploy it (voice-server/README.md) or set VUE_APP_LIVE_SERVER=original"
+              exit 1
+            fi
+          fi
+
       - name: Install and Build 🔧
         run: |
           npm ci
