@@ -66,6 +66,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   overlay
 - **3.34.0** Character selection rules (counters, copies, notes per character); the reminder
   window scrolls on phones; releases tagged by the deploy
+- **3.35.0** Portrait layout: on upright phones and tablets the bluffs, NPCs and chat share a
+  strip with tabs at the bottom instead of floating over the seats
 
 ## Planned
 
@@ -78,9 +80,7 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 ### Next steps
 
-Chosen by the owner on 2026-11-25:
-
-1. [ ] **Portrait layout** (Phones and tablets).
+None chosen yet: the owner picks the next one (the portrait layout shipped in 3.35.0).
 
 ### Night without talking
 
@@ -95,11 +95,6 @@ Chosen by the owner on 2026-11-25:
 - [ ] **Public reminders** _(official)_: some characters' reminders are seen by every player.
 - [ ] **Voudon vote** (rare traveller): only the Voudon and the dead vote, with no majority
       needed. No priority.
-
-### Phones and tablets
-
-- [ ] **Portrait layout**: bigger town square, and the panels (bluffs, NPCs, chat) as tabs at
-      the bottom instead of floating over the seats.
 
 ### Storyteller setup
 
