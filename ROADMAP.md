@@ -68,6 +68,9 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   window scrolls on phones; releases tagged by the deploy
 - **3.35.0** Portrait layout: on upright phones and tablets the bluffs, NPCs and chat share a
   strip with tabs at the bottom instead of floating over the seats
+- **3.36.0** Practice game simulator: made-up players choose as their character would, claim,
+  nominate and vote by day; Trouble Brewing rules (Butler, Saint, Mayor, Spy); narrower practice
+  box on phones
 
 ## Planned
 
@@ -80,7 +83,7 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 ### Next steps
 
-None chosen yet: the owner picks the next one (the portrait layout shipped in 3.35.0).
+None chosen yet: the owner picks the next one (the practice game simulator shipped in 3.36.0).
 
 ### Night without talking
 

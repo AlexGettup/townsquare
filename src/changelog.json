@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.36.0",
+    "date": "2026-11-26",
+    "title": {
+      "en": "Practice game that plays itself",
+      "es": "Partida de práctica que se juega sola"
+    },
+    "en": [
+      "Practice game: the made-up players choose at night as their character would, knowing only what a real player would know. \"At random\" is now \"Let Ana decide\"",
+      "Practice game: \"Automatic\" is on from the start. By day the made-up players say what they are and what they learned, nominate saying why, and vote from what they think",
+      "Practice game, Trouble Brewing: the Butler, the Saint, the Mayor and the Spy play by their rules",
+      "Phones: the blue practice box at the top left is only as wide as its text"
+    ],
+    "es": [
+      "Partida de práctica: los jugadores inventados eligen de noche como lo haría su personaje, sabiendo solo lo que sabría un jugador real. \"Al azar\" ahora es \"Que decida Ana\"",
+      "Partida de práctica: \"Automáticos\" viene activado. De día los jugadores inventados dicen qué son y qué averiguaron, nominan diciendo por qué y votan según lo que piensan",
+      "Partida de práctica, Trouble Brewing: el Mayordomo, el Santo, el Alcalde y el Espía juegan según sus reglas",
+      "Móviles: el recuadro azul de práctica de arriba a la izquierda solo es tan ancho como su texto"
+    ]
+  },
+  {
     "version": "3.35.0",
     "date": "2026-11-25",
     "title": {
