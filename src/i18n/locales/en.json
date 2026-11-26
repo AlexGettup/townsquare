@@ -532,7 +532,7 @@
     "viewAs": "View as {name}",
     "viewing": "Viewing as {name}",
     "backToGrimoire": "Back to the grimoire",
-    "autoHint": "The made-up players answer cards, choices and the grimoire by themselves, at random. Their answers reach your private chat.",
+    "autoHint": "The made-up players answer cards, choices and the grimoire by themselves, as their character would. Their answers reach your private chat.",
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",
     "sees": "What {name} sees",
@@ -546,8 +546,8 @@
     "seeAll": "Close all as seen",
     "nominate": "Random nomination",
     "nominateHint": "A made-up player nominates another, both at random",
-    "random": "At random",
-    "allRandom": "All at random"
+    "random": "Let {name} decide",
+    "allRandom": "Let them all decide"
   },
   "pointing": {
     "title": "Pointing vote",

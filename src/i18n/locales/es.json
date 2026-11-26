@@ -532,7 +532,7 @@
     "viewAs": "Ver como {name}",
     "viewing": "Viendo como {name}",
     "backToGrimoire": "Volver al grimorio",
-    "autoHint": "Los jugadores inventados contestan solos y al azar a las tarjetas, las elecciones y el grimorio. Sus respuestas te llegan al chat privado.",
+    "autoHint": "Los jugadores inventados contestan solos, como lo haría su personaje, a las tarjetas, las elecciones y el grimorio. Sus respuestas te llegan al chat privado.",
     "leave": "Salir",
     "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",
     "sees": "Lo que ve {name}",
@@ -546,8 +546,8 @@
     "seeAll": "Cerrar todo como visto",
     "nominate": "Nominación al azar",
     "nominateHint": "Un jugador inventado nomina a otro, los dos al azar",
-    "random": "Al azar",
-    "allRandom": "Todos al azar"
+    "random": "Que decida {name}",
+    "allRandom": "Que decidan todos"
   },
   "pointing": {
     "title": "Votación señalando",
