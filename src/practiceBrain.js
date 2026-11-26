@@ -101,6 +101,8 @@ export const knowledgeOf = (player, cards, roleById) => {
     teammates: isEvil
       ? [...demons, ...minions].filter((name) => name !== player.name)
       : [],
+    // the Demon, as far as an evil player knows (not themselves)
+    demons: isEvil ? [...demons].filter((name) => name !== player.name) : [],
     bluffs: [...notInPlay],
     choices,
   };

@@ -561,6 +561,11 @@
         "sameClaim": "Nomino a {name}: dice ser {role}, y {role} soy yo.",
         "hunch": "Nomino a {name}: no me fío."
       },
+      "escape": {
+        "saint": "¡Soy {role}! Si me ejecutáis, perdemos. Nomino a {name}.",
+        "demon": "¡Que no soy yo! Nomino a {name}: no me fío.",
+        "final": "¡No me ejecutéis! Si muero quedamos 2 y gana el mal. Nomino a {name}."
+      },
       "number": "Me salió un {n}"
     }
   },

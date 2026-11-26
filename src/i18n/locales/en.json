@@ -561,6 +561,11 @@
         "sameClaim": "I nominate {name}: they say they're the {role}, and I'm the {role}.",
         "hunch": "I nominate {name}: I don't trust them."
       },
+      "escape": {
+        "saint": "I'm the {role}! Execute me and we lose. I nominate {name}.",
+        "demon": "It isn't me! I nominate {name}: I don't trust them.",
+        "final": "Don't execute me! If I die, 2 are left and evil wins. I nominate {name}."
+      },
       "number": "I got a {n}"
     }
   },
