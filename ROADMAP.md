@@ -75,6 +75,7 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   players about to die try to get off the block; counters that allow for the Drunk
 - **3.38.0** Guided night uses the whole height of its tab on upright screens; practice guided
   night keeps only Send info and Next; Bad Moon Rising characters play by their rules in practice
+- **3.39.0** Sects & Violets characters play by their rules in practice games
 
 ## Planned
 
