@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Storyteller on phones and tablets held upright: the guided night uses the whole height of its "Night" tab. The character's text is no longer cut after three lines (it takes the room left and scrolls when longer), and the buttons are a little bigger. Landscape screens and computers don't change
+
 ### Version 3.37.0
 
 - Character selection, with the Drunk on the script: the Townsfolk and Outsider counters also accept one Outsider fewer and one Townsfolk more (one of the Townsfolk will secretly be the Drunk), and say so on hover. The Drunk's token still never goes in the bag. A counter showing a range ("5–6") now fits on two lines inside its circle

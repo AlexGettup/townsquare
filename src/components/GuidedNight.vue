@@ -511,11 +511,24 @@ export default {
     border-radius: 0;
     box-shadow: none;
     font-size: 15px;
+    // the whole height of the strip: the character's text takes what the
+    // rest leaves (scrolling when longer), the buttons right below it
+    display: flex;
+    flex-direction: column;
+    > * {
+      flex-shrink: 0;
+    }
     h4 {
       margin-top: 2px;
     }
     .reminder {
-      max-height: 3.4em;
+      flex: 1 1 auto;
+      min-height: 2.6em;
+      max-height: none;
+      margin-bottom: 4px;
+    }
+    .actions .button {
+      font-size: 100%;
     }
   }
 
