@@ -8,7 +8,7 @@
 
 import { STORYTELLER } from "./voice";
 import { dmTab } from "./chat";
-import { rollPersonality } from "../../practicePersonality";
+import { rollConviction, rollPersonality } from "../../practicePersonality";
 
 // made-up players get IDs like these, so cards and the grimoire can go to them
 export const PRACTICE_ID = "practice-";
@@ -106,6 +106,9 @@ const state = () => ({
   // player ID -> personality key (src/practicePersonality.js), rolled at
   // random when the practice starts
   personalities: {},
+  // player ID -> conviction, 1 to 10 (how much the others believe them),
+  // rolled at random with the personality
+  convictions: {},
   // the storyteller sees each one's personality under their name
   showPersonalities: false,
 });
@@ -141,6 +144,12 @@ const mutations = {
   },
   setPersonality(state, { id, personality }) {
     state.personalities = { ...state.personalities, [id]: personality };
+  },
+  setConvictions(state, convictions) {
+    state.convictions = { ...convictions };
+  },
+  setConviction(state, { id, conviction }) {
+    state.convictions = { ...state.convictions, [id]: conviction };
   },
   setShowPersonalities(state, show) {
     state.showPersonalities = show;
@@ -189,10 +198,13 @@ const actions = {
     });
     // each one plays with a personality of their own, at random
     const personalities = {};
+    const convictions = {};
     rootState.players.players.forEach(({ id }) => {
       personalities[id] = rollPersonality();
+      convictions[id] = rollConviction();
     });
     commit("setPersonalities", personalities);
+    commit("setConvictions", convictions);
     commit("setActive", true);
     // the made-up players play by themselves unless switched off
     commit("setAuto", true);

@@ -28,7 +28,9 @@ export default (store) => {
       const { isOpen, tab } = store.state.chat;
       const fromOthers = message.from !== selfPeerId();
       const unread = fromOthers && (!isOpen || tab !== tabOf(message));
-      store.commit("chat/addMessage", { message, unread });
+      // a practice game keeps its cards: the made-up players remember by them
+      const keepCards = store.state.practice.active;
+      store.commit("chat/addMessage", { message, unread, keepCards });
       // an info card from the storyteller pops up on screen
       if (fromOthers && message.card) {
         store.commit("chat/showCard", message);

@@ -27,7 +27,12 @@ import {
   votesFor,
   wantsSwap,
 } from "../practiceDay";
-import { rollPersonality, traitsOf } from "../practicePersonality";
+import {
+  convictionFactor,
+  rollConviction,
+  rollPersonality,
+  traitsOf,
+} from "../practicePersonality";
 import { dmTab } from "./modules/chat";
 import { grimoireSeats } from "./modules/practice";
 import { STORYTELLER } from "./modules/voice";
@@ -78,9 +83,15 @@ export default (store) => {
   // what each one said they learned at night, true or made up: [{ speaker,
   // roleId, lines }] (lines as practiceDay's infoOf gives them)
   let statements = [];
+  // who said "I suspect X" in the town square: [{ speaker, name }]
+  let accusations = [];
   // deaths and comebacks as they happened: [{ name, at, isDead }], to know
   // who was alive when a card came (the Empath's neighbours that night)
   let deaths = [];
+  // when each night fell and each nomination began: a night's info is
+  // about the seats as they were up to the next one of these (deaths in
+  // the night, marked then or at dawn, count; the day's executions don't)
+  let cutoffs = [];
   // player ID -> the grimoire they were shown (the Spy): { players: [{
   // name, roleId, alignment }], bluffs: [role IDs] }
   let seen = {};
@@ -116,7 +127,9 @@ export default (store) => {
     minds = {};
     claims = {};
     statements = [];
+    accusations = [];
     deaths = [];
+    cutoffs = [];
     seen = {};
     call = null;
   };
@@ -157,14 +170,18 @@ export default (store) => {
       )
       .map(({ card, choice, at }) => ({ card, choice, at }));
 
-  /** The seats as they were at that moment (who was alive). */
+  /**
+   * The seats as they were for info that came at that moment (who was
+   * alive): up to the next nightfall or nomination after it.
+   */
   const seatsAt = (at) => {
     const seats = store.state.players.players;
-    if (!at || !deaths.length) return seats;
+    const until = at && cutoffs.find((time) => time > at);
+    if (!until || !deaths.length) return seats;
     return seats.map((seat) => {
       const changes = deaths.filter(({ name }) => name === seat.name);
       if (!changes.length) return seat;
-      const before = changes.filter((change) => change.at <= at).pop();
+      const before = changes.filter((change) => change.at <= until).pop();
       const isDead = before ? before.isDead : !changes[0].isDead;
       return { name: seat.name, isDead };
     });
@@ -181,6 +198,35 @@ export default (store) => {
       });
     }
     return traitsOf(id);
+  };
+
+  /** How convincing they are (1 to 10), rolled now if not yet. */
+  const convictionFor = (playerId) => {
+    let conviction = store.state.practice.convictions[playerId];
+    if (!conviction) {
+      conviction = rollConviction();
+      store.commit("practice/setConviction", { id: playerId, conviction });
+    }
+    return conviction;
+  };
+
+  /**
+   * The nominations of the last day before that moment, as the vote
+   * history has them: [{ nominator, voters }] (the Flowergirl, the Town
+   * Crier).
+   */
+  const dayVotes = (at) => {
+    const before = store.state.session.voteHistory.filter(
+      ({ timestamp }) => !at || new Date(timestamp).getTime() < at,
+    );
+    if (!before.length) return [];
+    const last = before[before.length - 1].day;
+    return before
+      .filter(({ day }) => day === last)
+      .map(({ nominator, votes }) => ({
+        nominator,
+        voters: votes.map((name) => name.replace(/^−/, "")),
+      }));
   };
 
   /**
@@ -239,6 +285,12 @@ export default (store) => {
   /** Everyone as the made-up players see themselves, with what they think. */
   const town = (until = null) => {
     const seats = grimoireSeats(store.state.players.players);
+    // how convincing each one is, by name
+    const factors = {};
+    seats.forEach(({ id, name }) => {
+      factors[name] = convictionFactor(convictionFor(id));
+    });
+    const convictionOf = (name) => factors[name] || 1;
     const people = seats.map((seat) => {
       const cards = cardsOf(seat.id, until);
       const me = withGrimoire(knowledgeOf(seat, cards, roleById), seat.id);
@@ -258,6 +310,9 @@ export default (store) => {
         traits,
         seatsAt,
         day: day(),
+        accusations,
+        convictionOf,
+        dayVotes,
       });
       // the storyteller's answer to the Artist's question
       if (mind.artist && mind.artist.name in scores) {
@@ -274,6 +329,9 @@ export default (store) => {
       statements,
       seatsAt,
       day: day(),
+      accusations,
+      convictionOf,
+      dayVotes,
     });
     return { seats, people, opinion };
   };
@@ -549,6 +607,7 @@ export default (store) => {
       );
       if (doubted && (isEvil || scores[doubted] > 0.8)) {
         parts.push(i18n.t("practice.say.suspect", { name: doubted }));
+        accusations.push({ speaker: seat.name, name: doubted });
       } else if (first) {
         parts.push(i18n.t("practice.say.nothingYet"));
       }
@@ -758,6 +817,7 @@ export default (store) => {
         }
         break;
       case "toggleNight":
+        if (state.grimoire.isNight) cutoffs.push(Date.now());
         cancelAll();
         call = null;
         if (!state.grimoire.isNight && isAuto() && state.grimoire.nightCount)
@@ -772,12 +832,21 @@ export default (store) => {
       // a vote is over: the next one may nominate
       // (whoever is about to die may try to get off the block)
       case "session/nomination":
+        if (state.session.nomination) cutoffs.push(Date.now());
         if (!state.session.nomination && isAuto()) {
           nominateSoon();
         }
         break;
-      // someone died by day (executed): a Moonchild chooses at once
       case "players/update":
+        // who was alive when: the Empath's neighbours on each night
+        if (payload && payload.property === "isDead" && payload.player) {
+          deaths.push({
+            name: payload.player.name,
+            at: Date.now(),
+            isDead: !!payload.value,
+          });
+        }
+        // someone died by day (executed): a Moonchild chooses at once
         if (
           payload &&
           payload.property === "isDead" &&
