@@ -470,6 +470,7 @@
       "shuffle": "Shuffle characters",
       "clear": "Clear selection",
       "add": "Add {name}",
+      "countDrunk": "With the Drunk on the script, one of the Townsfolk may be the Drunk: one Outsider fewer and one Townsfolk more is fine too",
       "countOff": "With these characters it should be {count}",
       "notes": {
         "drunk": "Not in the bag: put a Townsfolk in its place. On the first night, mark one of the Townsfolk with \"Is the Drunk\".",
@@ -505,6 +506,7 @@
     }
   },
   "guidedNight": {
+    "tab": "Night",
     "title": "Guided night",
     "night": "Night {night}",
     "stepOf": "step {step} of {total}",
@@ -559,6 +561,11 @@
         "info": "I nominate {name}: my info points there.",
         "sameClaim": "I nominate {name}: they say they're the {role}, and I'm the {role}.",
         "hunch": "I nominate {name}: I don't trust them."
+      },
+      "escape": {
+        "saint": "I'm the {role}! Execute me and we lose. I nominate {name}.",
+        "demon": "It isn't me! I nominate {name}: I don't trust them.",
+        "final": "Don't execute me! If I die, 2 are left and evil wins. I nominate {name}."
       },
       "number": "I got a {n}"
     }

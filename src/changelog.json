@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.37.0",
+    "date": "2026-11-26",
+    "title": {
+      "en": "Night tab on phones",
+      "es": "Pestaña Noche en el móvil"
+    },
+    "en": [
+      "Storyteller on upright phones and tablets: the guided night is a \"Night\" tab in the strip at the bottom, next to Chat and Bluffs, instead of a panel covering it. It opens by itself at night",
+      "Practice game: a made-up player about to die whose death loses the game for their team (the Demon, the Saint, or a good player with 3 alive) nominates someone else to get off the block",
+      "Practice game: with 4 alive the good only nominate or vote when very sure",
+      "Storyteller: with the Drunk on the script, the character counters also accept one Outsider fewer and one Townsfolk more"
+    ],
+    "es": [
+      "Narrador en móviles y tablets en vertical: la noche guiada es una pestaña \"Noche\" en el panel de abajo, junto a Chat y Faroles, en vez de un panel que lo tapa. Se abre sola al caer la noche",
+      "Partida de práctica: un jugador inventado a punto de morir cuya muerte hace perder a su equipo (el Demonio, el Santo o un bueno con 3 vivos) nomina a otro para librarse",
+      "Partida de práctica: con 4 vivos los buenos solo nominan o votan cuando están muy seguros",
+      "Narrador: con el Borracho en el guion, los contadores de personajes también aceptan un Forastero menos y un Aldeano más"
+    ]
+  },
+  {
     "version": "3.36.0",
     "date": "2026-11-26",
     "title": {

@@ -23,7 +23,8 @@ const STORAGE_KEY = "portraitDock";
 const PORTRAIT = "(orientation: portrait)";
 
 /**
- * Upright screens: the demon bluffs, NPCs and text chat panels stop floating
+ * Upright screens: the guided night (storyteller), demon bluffs, NPCs and
+ * text chat panels stop floating
  * over the seats and share a strip at the bottom, one at a time, picked with
  * these tabs. Tapping the open tab folds the strip and the town square grows.
  * The panels keep their own components: the classes this sets on <html>
@@ -49,6 +50,10 @@ export default {
     tabs: function () {
       if (!this.players.length) return [];
       const tabs = [];
+      // storyteller: the guided night, first while it's on
+      if (this.isGuidedNightShown) {
+        tabs.push({ id: "night", label: this.$t("guidedNight.tab") });
+      }
       if (
         (this.voice.isAvailable && this.session.sessionId) ||
         this.practice.active
@@ -95,7 +100,15 @@ export default {
     revealedGrimoire: function () {
       return this.$store.getters["session/revealedGrimoire"];
     },
-    ...mapState(["chat", "voice", "session", "grimoire", "practice", "npcs"]),
+    ...mapState([
+      "chat",
+      "voice",
+      "session",
+      "grimoire",
+      "practice",
+      "npcs",
+      "isGuidedNightShown",
+    ]),
     ...mapState("players", ["players"]),
     ...mapGetters("chat", ["totalUnread"]),
   },
@@ -112,6 +125,18 @@ export default {
     },
     isChatShown() {
       this.syncChat();
+    },
+    // night falls with the guided night on: its tab opens, and at day the
+    // strip goes back to the tab it showed before
+    isGuidedNightShown(isShown) {
+      if (isShown) {
+        if (this.chosen !== "night") this.beforeNight = this.chosen;
+        this.chosen = "night";
+        this.isOpen = true;
+      } else if (this.chosen === "night") {
+        this.chosen = this.beforeNight || "chat";
+      }
+      this.save();
     },
     isPortrait(isPortrait) {
       // back to landscape: the chat panel as it was before turning
@@ -159,6 +184,9 @@ export default {
         this.chosen = tab;
         this.isOpen = true;
       }
+      this.save();
+    },
+    save() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
@@ -205,6 +233,11 @@ export default {
   // circle and the menu buttons, between 150 and 300 pixels
   --dock-bar: 42px;
   --dock-body: clamp(150px, var(--app-height) - 100vw - 90px, 300px);
+}
+// the guided night needs its buttons in view: a bit more room, the circle
+// shrinks a little
+html.dock-night {
+  --dock-body: clamp(210px, var(--app-height) - 100vw - 90px, 300px);
 }
 
 .portrait-dock {

@@ -188,6 +188,9 @@ export default new Vuex.Store({
     bluffs: [{}, {}, {}],
     // storyteller: the players of the guided night's current step
     guidedPlayers: [],
+    // storyteller: the guided night panel is showing (a tab of its own on
+    // upright screens, PortraitDock.vue)
+    isGuidedNightShown: false,
     otherTravellers: getTravellersNotInEdition(),
     otherNpcs: getNpcs(),
     jinxes,
@@ -302,6 +305,9 @@ export default new Vuex.Store({
     toggleGuidedNight: toggle("isGuidedNight"),
     setGuidedPlayers(state, ids) {
       state.guidedPlayers = ids;
+    },
+    setGuidedNightShown(state, isShown) {
+      state.isGuidedNightShown = isShown;
     },
     setNightCount({ grimoire }, count) {
       grimoire.nightCount = count;

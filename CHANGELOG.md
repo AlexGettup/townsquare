@@ -4,6 +4,13 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.37.0
+
+- Character selection, with the Drunk on the script: the Townsfolk and Outsider counters also accept one Outsider fewer and one Townsfolk more (one of the Townsfolk will secretly be the Drunk), and say so on hover. The Drunk's token still never goes in the bag. A counter showing a range ("5–6") now fits on two lines inside its circle
+- Practice game by day, with "Automatic" on: a made-up player about to die whose death loses the game for their team (the Demon, the Saint, or a good player with 3 alive) nominates at once, if they haven't yet today, whoever the town doubts most, to tie or beat their vote. The Saint says what they are ("I'm the Saint! Execute me and we lose"), a good player with 3 alive that 2 would be left; the Demon only says it isn't them. They raise their hand in every later vote, and so do the evil who know they're the Demon and the good who believe the one about to die (a claimed Saint, anyone with 3 alive)
+- Practice game: with 4 alive the good hold back and only nominate or vote when very sure, as with a claimed Mayor at 3 (a wrong execution leaves 3, the Demon kills and the evil win)
+- Storyteller on phones and tablets held upright: the guided night is one more tab ("Night") in the strip at the bottom, next to Chat and Bluffs, instead of a panel covering it. It opens by itself when night falls, and at day the strip goes back to the tab it showed before. Its tab is a little taller so the buttons stay in view. Landscape screens and computers don't change
+
 ### Version 3.36.0
 
 - Practice game, Trouble Brewing: the made-up Butler only raises their hand if their master does; the good leave a claimed Saint alone (the evil push for them); with 3 alive and a claimed Mayor the good only nominate or vote when very sure; a Spy shown the grimoire knows the whole evil team and bluffs a character that isn't in play
