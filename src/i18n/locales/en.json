@@ -567,7 +567,12 @@
         "demon": "It isn't me! I nominate {name}: I don't trust them.",
         "final": "Don't execute me! If I die, 2 are left and evil wins. I nominate {name}."
       },
-      "number": "I got a {n}"
+      "number": "I got a {n}",
+      "nobody": "No-one tonight.",
+      "guess": "{name} is the {role}.",
+      "more": "And also: {names}.",
+      "gossip": "I'm the {role}, and this is my statement: {name} is the Demon.",
+      "moonchild": "I'm the {role}: I choose {name}."
     }
   },
   "pointing": {
