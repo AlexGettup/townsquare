@@ -1,9 +1,10 @@
 import i18n from "../i18n";
-import { CHOICES, describePart, partsOf } from "../cards";
+import { CHOICES, alignmentOf, describePart, partsOf } from "../cards";
 import { knowledgeOf } from "../practiceBrain";
 import {
   NOMINATE_AT,
   claimFor,
+  isMayorStandoff,
   nominationOf,
   rollHunches,
   slayerShot,
@@ -49,6 +50,9 @@ export default (store) => {
   let minds = {};
   // name -> role ID claimed in the town square
   let claims = {};
+  // player ID -> the grimoire they were shown (the Spy): { players: [{
+  // name, roleId, alignment }], bluffs: [role IDs] }
+  let seen = {};
   // the storyteller's open call for nominations (an announcement key)
   let call = null;
   const timers = new Set();
@@ -80,6 +84,7 @@ export default (store) => {
     cancelAll();
     minds = {};
     claims = {};
+    seen = {};
     call = null;
   };
 
@@ -105,12 +110,50 @@ export default (store) => {
       )
       .map(({ card, choice }) => ({ card, choice }));
 
+  /**
+   * An evil player who was shown the grimoire (the Spy) knows the whole
+   * evil team, and can bluff a character that isn't in play.
+   */
+  const withGrimoire = (me, playerId) => {
+    const grimoire = seen[playerId];
+    if (!grimoire || me.alignment !== "evil") return me;
+    const inPlay = grimoire.players.map(({ roleId }) => roleId);
+    const notInPlay = scriptRoles()
+      .filter(({ team, id }) => team === "townsfolk" && !inPlay.includes(id))
+      .map(({ id }) => id);
+    return {
+      ...me,
+      teammates: grimoire.players
+        .filter(
+          ({ alignment, name }) => alignment === "evil" && name !== me.name,
+        )
+        .map(({ name }) => name),
+      bluffs: [...new Set([...me.bluffs, ...grimoire.bluffs, ...notInPlay])],
+    };
+  };
+
+  /** What a made-up player saw when shown the grimoire. */
+  const remember = (playerId, grimoire) => {
+    const { players } = store.state.players;
+    seen[playerId] = {
+      players: grimoire.players.map(({ roleId, alignmentIndex }, index) => {
+        const role = roleById(roleId) || {};
+        return {
+          name: players[index] ? players[index].name : "",
+          roleId,
+          alignment: alignmentOf(role.team, alignmentIndex),
+        };
+      }),
+      bluffs: (grimoire.bluffs || []).filter(Boolean),
+    };
+  };
+
   /** Everyone as the made-up players see themselves, with what they think. */
   const town = () => {
     const seats = grimoireSeats(store.state.players.players);
     const people = seats.map((seat) => {
       const cards = cardsOf(seat.id);
-      const me = knowledgeOf(seat, cards, roleById);
+      const me = withGrimoire(knowledgeOf(seat, cards, roleById), seat.id);
       const mind = minds[seat.id] || (minds[seat.id] = { told: 0 });
       if (mind.day !== day()) {
         mind.day = day();
@@ -275,6 +318,10 @@ export default (store) => {
           opinion,
           claims,
           hasBlock,
+          mayor: isMayorStandoff(
+            people.map(({ seat }) => seat),
+            claims,
+          ),
         }),
       }))
       .filter(({ nomination }) => nomination)
@@ -321,7 +368,12 @@ export default (store) => {
     const nominator = players[nomination[0]];
     const isExile = !!nominee && nominee.role.team === "traveller";
     const { people, opinion } = town();
-    players.forEach((player, index) => {
+    const mayor = isMayorStandoff(
+      people.map(({ seat }) => seat),
+      claims,
+    );
+    const counts = {};
+    const decide = (player, index) => {
       const canVote = !player.isVoteless || isExile;
       // the vote costs them their ghost vote (not in an exile, nor for a
       // Banshee with her ability)
@@ -336,19 +388,54 @@ export default (store) => {
           nominator: nominator && nominator.name,
           dead: spendsGhostVote,
           opinion,
+          mayor,
         });
+        // the Butler only votes if their master does
+        const master = butlerMaster(person.me);
+        if (yes && master !== null) {
+          const seat = players.findIndex(({ name }) => name === master);
+          yes = seat >= 0 && counts[seat] > 0;
+        }
       }
-      const count = yes ? (player.hasTwoVotes ? 2 : 1) : 0;
-      if (store.state.session.votes[index] !== count) {
-        store.commit("session/voteSync", [index, count]);
+      counts[index] = yes ? (player.hasTwoVotes ? 2 : 1) : 0;
+    };
+    const isButler = (player) => {
+      const person = people.find(({ seat }) => seat.id === player.id);
+      return !!person && butlerMaster(person.me) !== null;
+    };
+    players.forEach((player, index) => {
+      if (!isButler(player)) decide(player, index);
+    });
+    players.forEach((player, index) => {
+      if (isButler(player)) decide(player, index);
+    });
+    players.forEach((player, index) => {
+      if (store.state.session.votes[index] !== counts[index]) {
+        store.commit("session/voteSync", [index, counts[index]]);
       }
     });
+  };
+
+  /** A Butler's master (the last player they chose), or null if none yet. */
+  const butlerMaster = (me) => {
+    if (me.role.id !== "butler") return null;
+    const chosen = me.choices.filter(({ phrase }) => phrase === "choosePlayer");
+    return chosen.length ? chosen[chosen.length - 1].choice[0] : null;
   };
 
   store.subscribe(({ type, payload }, state) => {
     if (type === "practice/setActive" && !payload) forget();
     if (!isActive()) return;
     switch (type) {
+      // the grimoire shown to a made-up player (the Spy)
+      case "session/setGrimoireView":
+        if (payload && payload.status === "sent" && payload.playerId) {
+          remember(
+            payload.playerId,
+            payload.grimoire || store.getters["session/grimoireSnapshot"],
+          );
+        }
+        break;
       case "toggleNight":
         cancelAll();
         call = null;

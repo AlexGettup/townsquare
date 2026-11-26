@@ -36,6 +36,20 @@ const EVIL_YES = 0.55;
 const GHOST_SURE = 2;
 // the Slayer shoots once they are this sure, or at random from day 3
 const SLAYER_SURE = 2;
+// with 3 alive and a Mayor, the good only execute when this sure
+const MAYOR_SURE = 2.5;
+
+/**
+ * Three players alive, one of them claimed the Mayor: no execution wins
+ * for the good (if the Mayor is real), so they hold back.
+ * players: [{ name, isDead }]; claims: name -> role ID.
+ */
+export const isMayorStandoff = (players, claims) => {
+  const alive = players.filter(({ isDead }) => !isDead);
+  return (
+    alive.length === 3 && alive.some(({ name }) => claims[name] === "mayor")
+  );
+};
 
 const add = (scores, name, amount) => {
   if (name in scores) scores[name] += amount;
@@ -115,6 +129,12 @@ export const suspicionsOf = (
       add(scores, name, 3);
     }
   });
+  // the Saint: executing them loses the game, so the good leave them be
+  Object.entries(claims).forEach(([name, roleId]) => {
+    if (name !== me.name && roleId === "saint" && me.alignment === "good") {
+      add(scores, name, -1.2);
+    }
+  });
   // evil: their teammates are never suspects
   me.teammates.forEach((name) => {
     if (name in scores) scores[name] = -5;
@@ -169,11 +189,13 @@ export const townOpinion = (allScores) => {
 export const nominationOf = (
   me,
   scores,
-  { nominees, opinion, claims, hasBlock, random = Math.random },
+  { nominees, opinion, claims, hasBlock, mayor, random = Math.random },
 ) => {
   const options = nominees.filter((name) => name !== me.name);
   if (!options.length) return null;
   const extra = hasBlock ? BLOCK_EXTRA : 0;
+  // the good: only someone they are very sure of, with the Mayor's win near
+  const mayorExtra = mayor && me.alignment !== "evil" ? MAYOR_SURE - 1 : 0;
   if (me.alignment === "evil") {
     const doubted = options.filter((name) => me.teammates.includes(name));
     const mostDoubted = doubted.sort(
@@ -192,7 +214,11 @@ export const nominationOf = (
     const ranked = good
       .map((name) => ({
         name,
-        score: (opinion[name] || 0) * 0.7 + (scores[name] || 0) * 0.5,
+        score:
+          (opinion[name] || 0) * 0.7 +
+          (scores[name] || 0) * 0.5 +
+          // a claimed Saint executed wins the game for them
+          (claims[name] === "saint" ? 1 : 0),
       }))
       .sort((a, b) => b.score - a.score);
     return {
@@ -214,7 +240,7 @@ export const nominationOf = (
       : (scores[name] || 0) > 1.5
         ? "info"
         : "hunch";
-  return { target: name, score: score - extra, reason };
+  return { target: name, score: score - extra - mayorExtra, reason };
 };
 
 /**
@@ -225,9 +251,9 @@ export const nominationOf = (
 export const votesFor = (
   me,
   scores,
-  { nominee, nominator, dead, opinion, random = Math.random },
+  { nominee, nominator, dead, opinion, mayor, random = Math.random },
 ) => {
-  if (nominator === me.name) return true;
+  if (nominator === me.name && !mayor) return true;
   if (nominee === me.name) return false;
   const score = (scores[nominee] || 0) + (opinion[nominee] || 0) * 0.3;
   if (me.alignment === "evil") {
@@ -238,6 +264,7 @@ export const votesFor = (
       EVIL_YES + Math.min(Math.max(opinion[nominee] || 0, 0), 1) * 0.3
     );
   }
+  if (mayor) return score >= MAYOR_SURE;
   if (dead) return score >= GHOST_SURE;
   return score + random() * 0.5 >= 1.1;
 };
