@@ -532,7 +532,7 @@
     "viewAs": "Ver como {name}",
     "viewing": "Viendo como {name}",
     "backToGrimoire": "Volver al grimorio",
-    "autoHint": "Los jugadores inventados contestan solos, como lo haría su personaje, a las tarjetas, las elecciones y el grimorio. Sus respuestas te llegan al chat privado.",
+    "autoHint": "Los jugadores inventados juegan solos: contestan a tus tarjetas, dicen qué son al amanecer, nominan cuando abres las nominaciones y votan.",
     "leave": "Salir",
     "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",
     "sees": "Lo que ve {name}",

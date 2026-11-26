@@ -532,7 +532,7 @@
     "viewAs": "View as {name}",
     "viewing": "Viewing as {name}",
     "backToGrimoire": "Back to the grimoire",
-    "autoHint": "The made-up players answer cards, choices and the grimoire by themselves, as their character would. Their answers reach your private chat.",
+    "autoHint": "The made-up players play by themselves: they answer your cards, say what they are at dawn, nominate when you open nominations, and vote.",
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",
     "sees": "What {name} sees",
