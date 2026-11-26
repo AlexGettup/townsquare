@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.40.0",
+    "date": "2026-11-26",
+    "title": {
+      "en": "Practice players with personalities",
+      "es": "Jugadores de práctica con personalidad"
+    },
+    "en": [
+      "Practice game: each made-up player gets a personality at random (Normal, Trusting, Liar, Strategist, Novice, Veteran, Hothead, Quiet) that changes how much they believe others, how they lie, how soon they nominate and how they vote. A new \"Personalities\" switch in the blue box shows them under each name",
+      "Practice game: the made-up players listen to what others say in the town square and believe it more or less. The evil make up info for their bluff, two players claiming the same character raise suspicion, and some good players keep their character to themselves on the first day",
+      "Practice game: the Empath's numbers count only for the neighbours they had that night"
+    ],
+    "es": [
+      "Partida de práctica: cada jugador inventado saca una personalidad al azar (Normal, Confiado, Mentiroso, Estratega, Novato, Veterano, Impulsivo, Callado) que cambia cuánto creen a los demás, cómo mienten, cuándo nominan y cómo votan. Un nuevo interruptor \"Personalidades\" en el recuadro azul la muestra bajo cada nombre",
+      "Partida de práctica: los jugadores inventados escuchan lo que dicen los demás en la plaza y lo creen más o menos. Los malvados se inventan información para su farol, dos jugadores que dicen ser el mismo personaje levantan sospechas y algunos buenos se guardan su personaje el primer día",
+      "Partida de práctica: los números del Empático solo cuentan para los vecinos que tenía esa noche"
+    ]
+  },
+  {
     "version": "3.39.0",
     "date": "2026-11-26",
     "title": {
