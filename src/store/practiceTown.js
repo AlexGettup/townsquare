@@ -6,8 +6,10 @@ import {
   claimFor,
   condemnedOf,
   escapeOf,
+  gossipStatement,
   isCarefulDay,
   isMayorStandoff,
+  moonchildChoice,
   nominationOf,
   rollHunches,
   slayerShot,
@@ -42,6 +44,10 @@ const between = ([min, max]) => min + Math.random() * (max - min);
  *   second and last call) the most convinced one nominates, then the next
  *   after each vote, while someone is sure enough.
  * - When the clock hand starts, each one votes from what they think.
+ * - The Gossip may make a public statement, and the Moonchild chooses
+ *   someone when they learn they died.
+ * - At night, store.$practiceTown.viewOf() tells the cards window what a
+ *   made-up player thinks, so they choose by it (src/practiceBrain.js).
  *
  * What each one thinks lives here, for this page load.
  */
@@ -50,7 +56,7 @@ export default (store) => {
     store.state.practice.active && !store.state.session.gameOver;
   const isAuto = () => isActive() && store.state.practice.auto;
 
-  // player ID -> { day, hunches, claim, told, shot }
+  // player ID -> { day, hunches, claim, told, shot, gossiped, moonchild }
   let minds = {};
   // name -> role ID claimed in the town square
   let claims = {};
@@ -106,13 +112,20 @@ export default (store) => {
   const aliveCount = () =>
     store.state.players.players.filter(({ isDead }) => !isDead).length;
 
-  const cardsOf = (playerId) =>
+  // until: { playerId, messageId }, only that player's cards sent before
+  // that one (the card they are answering now)
+  const cardsOf = (playerId, until = null) =>
     store.state.chat.messages
       .filter(
         (message) =>
           message.channel === "dm:" + playerId &&
           message.from === STORYTELLER &&
-          message.card,
+          message.card &&
+          !(
+            until &&
+            until.playerId === playerId &&
+            message.id >= until.messageId
+          ),
       )
       .map(({ card, choice }) => ({ card, choice }));
 
@@ -161,10 +174,10 @@ export default (store) => {
   };
 
   /** Everyone as the made-up players see themselves, with what they think. */
-  const town = () => {
+  const town = (until = null) => {
     const seats = grimoireSeats(store.state.players.players);
     const people = seats.map((seat) => {
-      const cards = cardsOf(seat.id);
+      const cards = cardsOf(seat.id, until);
       const me = withGrimoire(knowledgeOf(seat, cards, roleById), seat.id);
       const mind = minds[seat.id] || (minds[seat.id] = { told: 0 });
       if (mind.day !== day()) {
@@ -187,6 +200,24 @@ export default (store) => {
     );
     return { seats, people, opinion };
   };
+
+  /**
+   * What a made-up player knows and thinks, for the card they are answering
+   * (messageId): { me, scores, opinion, claims }, or null.
+   */
+  const viewOf = (playerId, messageId) => {
+    if (!isActive()) return null;
+    const { people, opinion } = town({ playerId, messageId });
+    const person = people.find(({ seat }) => seat.id === playerId);
+    if (!person) return null;
+    return {
+      me: person.me,
+      scores: person.scores,
+      opinion,
+      claims: { ...claims },
+    };
+  };
+  store.$practiceTown = { viewOf };
 
   const say = (playerId, key, values = {}) => {
     if (typeof store.$chat.sayAs !== "function") return;
@@ -257,9 +288,44 @@ export default (store) => {
           mind.claim = me.role.id;
           say(seat.id, "slayer", { role: roleName(me.role.id), name: target });
         });
+        // the Gossip's statement, once a day
+        people.forEach(({ seat, me, mind, scores }) => {
+          if (seat.isDead || mind.gossiped === day()) return;
+          const alive = people
+            .filter(({ seat }) => !seat.isDead)
+            .map(({ seat }) => seat.name);
+          const target = gossipStatement(me, scores, { alive, day: day() });
+          if (!target) return;
+          mind.gossiped = day();
+          claims[seat.name] = me.role.id;
+          mind.claim = me.role.id;
+          say(seat.id, "gossip", { role: roleName(me.role.id), name: target });
+        });
       },
       wait + between(TALK_GAP),
     );
+    // a Moonchild killed at night learns it now
+    later(moonchildren, between(TALK_GAP));
+  };
+
+  /** Dead Moonchildren who haven't chosen yet choose someone, in public. */
+  const moonchildren = () => {
+    if (!isAuto() || store.state.grimoire.isNight) return;
+    const { people, opinion } = town();
+    const alive = people
+      .filter(({ seat }) => !seat.isDead)
+      .map(({ seat }) => seat.name);
+    people.forEach(({ seat, me, mind, scores }) => {
+      // brought back (Shabaloth, Professor): they choose again next time
+      if (!seat.isDead) mind.moonchild = false;
+      if (!seat.isDead || mind.moonchild) return;
+      const target = moonchildChoice(me, scores, { alive, opinion });
+      if (!target) return;
+      mind.moonchild = true;
+      claims[seat.name] = me.role.id;
+      mind.claim = me.role.id;
+      say(seat.id, "moonchild", { role: roleName(me.role.id), name: target });
+    });
   };
 
   const speak = (playerId) => {
@@ -514,6 +580,18 @@ export default (store) => {
       case "session/nomination":
         if (!state.session.nomination && isAuto()) {
           nominateSoon();
+        }
+        break;
+      // someone died by day (executed): a Moonchild chooses at once
+      case "players/update":
+        if (
+          payload &&
+          payload.property === "isDead" &&
+          payload.value &&
+          isAuto() &&
+          !state.grimoire.isNight
+        ) {
+          later(moonchildren, between(TALK_GAP));
         }
         break;
       case "session/lockVote":

@@ -567,7 +567,12 @@
         "demon": "¡Que no soy yo! Nomino a {name}: no me fío.",
         "final": "¡No me ejecutéis! Si muero quedamos 2 y gana el mal. Nomino a {name}."
       },
-      "number": "Me salió un {n}"
+      "number": "Me salió un {n}",
+      "nobody": "Esta noche, a nadie.",
+      "guess": "{name} es {role}.",
+      "more": "Y también: {names}.",
+      "gossip": "Soy {role} y esta es mi declaración: {name} es el Demonio.",
+      "moonchild": "Soy {role}: elijo a {name}."
     }
   },
   "pointing": {
