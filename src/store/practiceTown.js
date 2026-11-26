@@ -18,6 +18,7 @@ import {
   klutzChoice,
   madnessIn,
   moonchildChoice,
+  mostDoubted,
   nominationOf,
   publicOpinion,
   rollHunches,
@@ -27,6 +28,7 @@ import {
   wantsSwap,
 } from "../practiceDay";
 import { rollPersonality, traitsOf } from "../practicePersonality";
+import { dmTab } from "./modules/chat";
 import { grimoireSeats } from "./modules/practice";
 import { STORYTELLER } from "./modules/voice";
 import { valueFromReminders } from "./voteValue";
@@ -144,7 +146,7 @@ export default (store) => {
     store.state.chat.messages
       .filter(
         (message) =>
-          message.channel === "dm:" + playerId &&
+          message.channel === dmTab(playerId) &&
           message.from === STORYTELLER &&
           message.card &&
           !(
@@ -225,6 +227,15 @@ export default (store) => {
     };
   };
 
+  // the names of the alive ones among town()'s people
+  const aliveNames = (people) =>
+    people.filter(({ seat }) => !seat.isDead).map(({ seat }) => seat.name);
+  // they say in public what they are (claims[name] = role ID)
+  const claimAs = (seat, mind, roleId) => {
+    claims[seat.name] = roleId;
+    mind.claim = roleId;
+  };
+
   /** Everyone as the made-up players see themselves, with what they think. */
   const town = (until = null) => {
     const seats = grimoireSeats(store.state.players.players);
@@ -286,9 +297,15 @@ export default (store) => {
   };
   store.$practiceTown = { viewOf };
 
+  // a made-up player speaks in the town square, or writes to the
+  // storyteller in private
   const say = (playerId, key, values = {}) => {
     if (typeof store.$chat.sayAs !== "function") return;
     store.$chat.sayAs(playerId, i18n.t(`practice.say.${key}`, values));
+  };
+  const write = (playerId, key, values = {}) => {
+    if (typeof store.$chat.writeAs !== "function") return;
+    store.$chat.writeAs(playerId, i18n.t(`practice.say.${key}`, values));
   };
 
   /** One line of night info written out, as a player would say it. */
@@ -354,27 +371,21 @@ export default (store) => {
         const { people } = town();
         people.forEach(({ seat, me, mind, scores }) => {
           if (mind.shot || seat.isDead) return;
-          const alive = people
-            .filter(({ seat }) => !seat.isDead)
-            .map(({ seat }) => seat.name);
+          const alive = aliveNames(people);
           const target = slayerShot(me, scores, { alive, day: day() });
           if (!target) return;
           mind.shot = true;
-          claims[seat.name] = me.role.id;
-          mind.claim = me.role.id;
+          claimAs(seat, mind, me.role.id);
           say(seat.id, "slayer", { role: roleName(me.role.id), name: target });
         });
         // the Gossip's statement, once a day
         people.forEach(({ seat, me, mind, scores }) => {
           if (seat.isDead || mind.gossiped === day()) return;
-          const alive = people
-            .filter(({ seat }) => !seat.isDead)
-            .map(({ seat }) => seat.name);
+          const alive = aliveNames(people);
           const target = gossipStatement(me, scores, { alive, day: day() });
           if (!target) return;
           mind.gossiped = day();
-          claims[seat.name] = me.role.id;
-          mind.claim = me.role.id;
+          claimAs(seat, mind, me.role.id);
           say(seat.id, "gossip", { role: roleName(me.role.id), name: target });
         });
         sectsAndViolets(people);
@@ -391,13 +402,7 @@ export default (store) => {
    * question (once). Only good players with the real character.
    */
   const sectsAndViolets = (people) => {
-    const alive = people
-      .filter(({ seat }) => !seat.isDead)
-      .map(({ seat }) => seat.name);
-    const write = (playerId, key, values) => {
-      if (typeof store.$chat.writeAs !== "function") return;
-      store.$chat.writeAs(playerId, i18n.t(`practice.say.${key}`, values));
-    };
+    const alive = aliveNames(people);
     people.forEach(({ seat, me, mind, scores, cards }) => {
       if (seat.isDead || me.alignment !== "good") return;
       const role = roleName(me.role.id);
@@ -409,8 +414,7 @@ export default (store) => {
           scriptRoles: scriptRoles(),
         });
         if (!guesses) return;
-        claims[seat.name] = me.role.id;
-        mind.claim = me.role.id;
+        claimAs(seat, mind, me.role.id);
         say(seat.id, "juggler", {
           role,
           guesses: guesses
@@ -440,9 +444,7 @@ export default (store) => {
   const moonchildren = () => {
     if (!isAuto() || store.state.grimoire.isNight) return;
     const { people, opinion } = town();
-    const alive = people
-      .filter(({ seat }) => !seat.isDead)
-      .map(({ seat }) => seat.name);
+    const alive = aliveNames(people);
     people.forEach(({ seat, me, mind, scores }) => {
       // brought back (Shabaloth, Professor): they choose again next time
       if (!seat.isDead) mind.moonchild = mind.klutz = false;
@@ -451,16 +453,14 @@ export default (store) => {
       const klutz = !mind.klutz && klutzChoice(me, scores, { alive });
       if (klutz) {
         mind.klutz = true;
-        claims[seat.name] = me.role.id;
-        mind.claim = me.role.id;
+        claimAs(seat, mind, me.role.id);
         say(seat.id, "klutz", { role: roleName(me.role.id), name: klutz });
       }
       if (mind.moonchild) return;
       const target = moonchildChoice(me, scores, { alive, opinion });
       if (!target) return;
       mind.moonchild = true;
-      claims[seat.name] = me.role.id;
-      mind.claim = me.role.id;
+      claimAs(seat, mind, me.role.id);
       say(seat.id, "moonchild", { role: roleName(me.role.id), name: target });
     });
   };
@@ -476,8 +476,7 @@ export default (store) => {
     // nothing else, or might be executed
     if (mind.mad && mind.mad.day === day()) {
       if (mind.claim === mind.mad.roleId) return;
-      mind.claim = mind.mad.roleId;
-      claims[seat.name] = mind.claim;
+      claimAs(seat, mind, mind.mad.roleId);
       say(seat.id, "claim", { role: roleName(mind.claim) });
       return;
     }
@@ -540,16 +539,14 @@ export default (store) => {
       );
     // nothing new: who they doubt most, if anyone (the evil, a good player)
     if (!news) {
-      const doubted = Object.keys(scores)
-        .filter(
-          (name) => !people.find(({ seat }) => seat.name === name).seat.isDead,
-        )
-        .filter((name) => !isEvil || !me.teammates.includes(name))
-        .sort(
-          (a, b) =>
-            (isEvil ? opinion[b] || 0 : scores[b]) -
-            (isEvil ? opinion[a] || 0 : scores[a]),
-        )[0];
+      const alive = aliveNames(people);
+      const doubted = mostDoubted(
+        Object.keys(scores).filter(
+          (name) =>
+            alive.includes(name) && (!isEvil || !me.teammates.includes(name)),
+        ),
+        isEvil ? opinion : scores,
+      );
       if (doubted && (isEvil || scores[doubted] > 0.8)) {
         parts.push(i18n.t("practice.say.suspect", { name: doubted }));
       } else if (first) {
@@ -598,10 +595,7 @@ export default (store) => {
     });
     if (!escape) return false;
     // the Saint says what they are: the good should want them off too
-    if (escape.reason === "saint") {
-      claims[condemned] = "saint";
-      person.mind.claim = "saint";
-    }
+    if (escape.reason === "saint") claimAs(person.seat, person.mind, "saint");
     nominate(person.seat.id, escape.target, `escape.${escape.reason}`, {
       role: roleName(person.me.role.id),
     });
