@@ -140,6 +140,18 @@ module.exports = (store) => {
   // a practice game goes on after a reload (its chat doesn't)
   if (localStorage.practice === "1") store.commit("practice/setActive", true);
   if (localStorage.practiceAuto === "1") store.commit("practice/setAuto", true);
+  if (localStorage.practicePersonalities) {
+    try {
+      store.commit(
+        "practice/setPersonalities",
+        JSON.parse(localStorage.practicePersonalities),
+      );
+    } catch (e) {
+      localStorage.removeItem("practicePersonalities");
+    }
+  }
+  if (localStorage.practiceShowPersonalities === "1")
+    store.commit("practice/setShowPersonalities", true);
   if (localStorage.voiceProcessing !== undefined) {
     store.commit(
       "voice/setProcessing",
@@ -261,10 +273,22 @@ module.exports = (store) => {
         if (payload) localStorage.setItem("practice", "1");
         else localStorage.removeItem("practice");
         if (!payload) localStorage.removeItem("practiceAuto");
+        if (!payload) localStorage.removeItem("practicePersonalities");
         break;
       case "practice/setAuto":
         if (payload) localStorage.setItem("practiceAuto", "1");
         else localStorage.removeItem("practiceAuto");
+        break;
+      case "practice/setPersonalities":
+      case "practice/setPersonality":
+        localStorage.setItem(
+          "practicePersonalities",
+          JSON.stringify(state.practice.personalities),
+        );
+        break;
+      case "practice/setShowPersonalities":
+        if (payload) localStorage.setItem("practiceShowPersonalities", "1");
+        else localStorage.removeItem("practiceShowPersonalities");
         break;
       case "voice/setProcessing":
         localStorage.setItem(

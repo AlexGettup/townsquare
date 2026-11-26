@@ -248,7 +248,12 @@ export default {
         scriptRoles: this.scriptRoles,
         nightCount: this.$store.state.grimoire.nightCount || 1,
         ...(view
-          ? { scores: view.scores, opinion: view.opinion, claims: view.claims }
+          ? {
+              scores: view.scores,
+              opinion: view.opinion,
+              claims: view.claims,
+              traits: view.traits,
+            }
           : {}),
       });
       if (!answer) return null;

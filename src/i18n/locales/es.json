@@ -535,6 +535,18 @@
     "viewing": "Viendo como {name}",
     "backToGrimoire": "Volver al grimorio",
     "autoHint": "Los jugadores inventados juegan solos: contestan a tus tarjetas, dicen qué son al amanecer, nominan cuando abres las nominaciones y votan.",
+    "showPersonalities": "Personalidades",
+    "personalitiesHint": "Muestra la personalidad de cada jugador inventado bajo su nombre. Cada uno sacó una al azar al empezar la práctica: cambia cuánto creen a los demás, cómo mienten y cómo votan",
+    "personalities": {
+      "normal": "Normal",
+      "trusting": "Confiado",
+      "liar": "Mentiroso",
+      "strategist": "Estratega",
+      "novice": "Novato",
+      "veteran": "Veterano",
+      "hothead": "Impulsivo",
+      "quiet": "Callado"
+    },
     "leave": "Salir",
     "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",
     "sees": "Lo que ve {name}",
@@ -556,11 +568,13 @@
       "lastNight": "Anoche: {info}.",
       "suspect": "Sospecho de {name}.",
       "nothingYet": "Todavía no sé nada más.",
+      "hiding": "Prefiero no decir todavía qué soy.",
       "slayer": "Soy {role}: disparo a {name}.",
       "nominate": {
         "info": "Nomino a {name}: mi información apunta ahí.",
         "sameClaim": "Nomino a {name}: dice ser {role}, y {role} soy yo.",
-        "hunch": "Nomino a {name}: no me fío."
+        "hunch": "Nomino a {name}: no me fío.",
+        "virgin": "Nomino a {name}: dice ser la Virgen, vamos a comprobarlo."
       },
       "escape": {
         "saint": "¡Soy {role}! Si me ejecutáis, perdemos. Nomino a {name}.",
