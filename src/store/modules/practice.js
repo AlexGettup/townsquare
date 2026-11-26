@@ -173,6 +173,8 @@ const actions = {
       );
     });
     commit("setActive", true);
+    // the made-up players play by themselves unless switched off
+    commit("setAuto", true);
   },
   /** A made-up player nominates another, both picked at random. */
   randomNomination({ getters, dispatch, rootState }) {
