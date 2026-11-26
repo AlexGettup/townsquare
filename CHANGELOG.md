@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Practice game by day, with "Automatic" on: a made-up player about to die whose death loses the game for their team (the Demon, the Saint) nominates at once, if they haven't yet today, whoever the town doubts most, to tie or beat their vote. The Saint says what they are ("I'm the Saint! Execute me and we lose"); the Demon only says it isn't them. They raise their hand in every later vote, and so do the evil who know they're the Demon and the good who believe the Saint
+
 ### Version 3.36.0
 
 - Practice game, Trouble Brewing: the made-up Butler only raises their hand if their master does; the good leave a claimed Saint alone (the evil push for them); with 3 alive and a claimed Mayor the good only nominate or vote when very sure; a Spy shown the grimoire knows the whole evil team and bluffs a character that isn't in play

@@ -244,17 +244,75 @@ export const nominationOf = (
 };
 
 /**
+ * Why their own execution would lose the game for their team: "demon" or
+ * "saint", or null. They know it from their character (their token or the
+ * last "You are" card).
+ */
+export const deathLoses = (me) => {
+  if (me.alignment === "evil" && me.role.team === "demon") return "demon";
+  if (me.alignment === "good" && me.role.id === "saint") return "saint";
+  return null;
+};
+
+/**
+ * The one about to die today, if any: the name alone at the top of
+ * votesToBeat (a tie means nobody is about to die).
+ */
+export const condemnedOf = (block) =>
+  block && block.nominees.length === 1 ? block.nominees[0] : null;
+
+/**
+ * Someone about to die whose death loses the game for them tries to get
+ * off the block: they nominate whoever the town doubts most (the one most
+ * likely to tie or beat their vote), not a teammate they know of. Returns
+ * { target, reason } (reason from deathLoses) or null.
+ *
+ * condemned: condemnedOf(); nominees: names that can be nominated now;
+ * opinion: townOpinion().
+ */
+export const escapeOf = (me, scores, { condemned, nominees, opinion }) => {
+  if (condemned !== me.name) return null;
+  const reason = deathLoses(me);
+  if (!reason) return null;
+  const options = nominees.filter(
+    (name) => name !== me.name && !me.teammates.includes(name),
+  );
+  if (!options.length) return null;
+  const target = options
+    .map((name) => ({
+      name,
+      score: (opinion[name] || 0) + (scores[name] || 0) * 0.3,
+    }))
+    .sort((a, b) => b.score - a.score)[0].name;
+  return { target, reason };
+};
+
+/**
+ * Do they want whoever is about to die swapped for anyone else? The
+ * condemned themselves (if their death loses), the evil if it's the Demon
+ * they know of, the good if it's a claimed Saint they believe.
+ */
+export const wantsSwap = (me, scores, { condemned, claims }) => {
+  if (!condemned) return false;
+  if (condemned === me.name) return !!deathLoses(me);
+  if (me.alignment === "evil") return me.demons.includes(condemned);
+  return claims[condemned] === "saint" && (scores[condemned] || 0) < 1;
+};
+
+/**
  * Do they raise their hand? nominee and nominator are names; dead: they
- * would spend their ghost vote; block: { count } of who is about to die, or
- * null; opinion: townOpinion().
+ * would spend their ghost vote; opinion: townOpinion(); swap: they want
+ * whoever is about to die off the block (wantsSwap).
  */
 export const votesFor = (
   me,
   scores,
-  { nominee, nominator, dead, opinion, mayor, random = Math.random },
+  { nominee, nominator, dead, opinion, mayor, swap, random = Math.random },
 ) => {
   if (nominator === me.name && !mayor) return true;
   if (nominee === me.name) return false;
+  // anyone but the one about to die (see wantsSwap)
+  if (swap) return true;
   const score = (scores[nominee] || 0) + (opinion[nominee] || 0) * 0.3;
   if (me.alignment === "evil") {
     if (me.teammates.includes(nominee)) return random() < SACRIFICE;

@@ -4,6 +4,8 @@ import { knowledgeOf } from "../practiceBrain";
 import {
   NOMINATE_AT,
   claimFor,
+  condemnedOf,
+  escapeOf,
   isMayorStandoff,
   nominationOf,
   rollHunches,
@@ -11,6 +13,7 @@ import {
   suspicionsOf,
   townOpinion,
   votesFor,
+  wantsSwap,
 } from "../practiceDay";
 import { grimoireSeats } from "./modules/practice";
 import { STORYTELLER } from "./modules/voice";
@@ -126,6 +129,12 @@ export default (store) => {
       teammates: grimoire.players
         .filter(
           ({ alignment, name }) => alignment === "evil" && name !== me.name,
+        )
+        .map(({ name }) => name),
+      demons: grimoire.players
+        .filter(
+          ({ roleId, name }) =>
+            name !== me.name && (roleById(roleId) || {}).team === "demon",
         )
         .map(({ name }) => name),
       bluffs: [...new Set([...me.bluffs, ...grimoire.bluffs, ...notInPlay])],
@@ -296,15 +305,63 @@ export default (store) => {
     }
   };
 
+  /** Nominate now: say why, then the nomination itself a moment later. */
+  const nominate = (playerId, target, key, values) => {
+    say(playerId, key, { name: target, ...values });
+    aboutToNominate = true;
+    nominating = setTimeout(() => {
+      nominating = null;
+      aboutToNominate = false;
+      if (!isAuto() || store.state.session.nomination) return;
+      const seats = store.state.players.players;
+      const from = seats.findIndex(({ id }) => id === playerId);
+      const to = seats.findIndex(({ name }) => name === target);
+      if (from < 0 || to < 0 || seats[to].wasNominated) return;
+      if (seats[from].hasNominated) return;
+      store.dispatch("session/nominate", [from, to]);
+    }, 1500);
+  };
+
+  /**
+   * Whoever is about to die, if their death loses the game for their team
+   * and they haven't nominated today, nominates to get off the block.
+   */
+  const tryEscape = ({ people, opinion }, nominees) => {
+    const condemned = condemnedOf(store.getters["session/votesToBeat"]);
+    if (!condemned) return false;
+    const person = people.find(({ seat }) => seat.name === condemned);
+    const player =
+      person &&
+      store.state.players.players.find(({ id }) => id === person.seat.id);
+    if (!player || player.isDead || player.hasNominated) return false;
+    const escape = escapeOf(person.me, person.scores, {
+      condemned,
+      nominees,
+      opinion,
+    });
+    if (!escape) return false;
+    // the Saint says what they are: the good should want them off too
+    if (escape.reason === "saint") {
+      claims[condemned] = "saint";
+      person.mind.claim = "saint";
+    }
+    nominate(person.seat.id, escape.target, `escape.${escape.reason}`, {
+      role: roleName(person.me.role.id),
+    });
+    return true;
+  };
+
   /** The most convinced player nominates, if they are sure enough. */
   const tryNominate = () => {
     nominating = null;
     const { session, grimoire, players } = store.state;
-    if (!isAuto() || !call || grimoire.isNight || session.nomination) return;
-    const { people, opinion } = town();
+    if (!isAuto() || grimoire.isNight || session.nomination) return;
+    const mood = town();
+    const { people, opinion } = mood;
     const nominees = players.players
       .filter((player) => !player.wasNominated && !player.isDead)
       .map(({ name }) => name);
+    if (tryEscape(mood, nominees) || !call) return;
     const hasBlock = !!store.getters["session/votesToBeat"];
     const wanted = people
       .filter(({ seat }) => {
@@ -342,21 +399,9 @@ export default (store) => {
     const { person, nomination } = wanted;
     const reason =
       nomination.reason === "sacrifice" ? "hunch" : nomination.reason;
-    say(person.seat.id, `nominate.${reason}`, {
-      name: nomination.target,
+    nominate(person.seat.id, nomination.target, `nominate.${reason}`, {
       role: roleName(person.me.role.id),
     });
-    aboutToNominate = true;
-    nominating = setTimeout(() => {
-      nominating = null;
-      aboutToNominate = false;
-      if (!isAuto() || store.state.session.nomination) return;
-      const seats = store.state.players.players;
-      const from = seats.findIndex(({ id }) => id === person.seat.id);
-      const to = seats.findIndex(({ name }) => name === nomination.target);
-      if (from < 0 || to < 0 || seats[to].wasNominated) return;
-      store.dispatch("session/nominate", [from, to]);
-    }, 1500);
   };
 
   /** The clock hand starts: everyone raises a hand or not. */
@@ -372,6 +417,7 @@ export default (store) => {
       people.map(({ seat }) => seat),
       claims,
     );
+    const condemned = condemnedOf(store.getters["session/votesToBeat"]);
     const counts = {};
     const decide = (player, index) => {
       const canVote = !player.isVoteless || isExile;
@@ -389,6 +435,7 @@ export default (store) => {
           dead: spendsGhostVote,
           opinion,
           mayor,
+          swap: wantsSwap(person.me, person.scores, { condemned, claims }),
         });
         // the Butler only votes if their master does
         const master = butlerMaster(person.me);
@@ -449,8 +496,9 @@ export default (store) => {
         }
         break;
       // a vote is over: the next one may nominate
+      // (whoever is about to die may try to get off the block)
       case "session/nomination":
-        if (!state.session.nomination && call) {
+        if (!state.session.nomination && isAuto()) {
           nominateSoon();
         }
         break;
