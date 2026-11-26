@@ -68,6 +68,9 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   window scrolls on phones; releases tagged by the deploy
 - **3.35.0** Portrait layout: on upright phones and tablets the bluffs, NPCs and chat share a
   strip with tabs at the bottom instead of floating over the seats
+- **3.36.0** Practice game simulator: made-up players choose as their character would, claim,
+  nominate and vote by day; Trouble Brewing rules (Butler, Saint, Mayor, Spy); narrower practice
+  box on phones
 
 ## Planned
 
@@ -80,7 +83,7 @@ _(official)_ when botc.app has something similar. Details of what is done are in
 
 ### Next steps
 
-None chosen yet: the owner picks the next one (the portrait layout shipped in 3.35.0).
+None chosen yet: the owner picks the next one (the practice game simulator shipped in 3.36.0).
 
 ### Night without talking
 
@@ -123,6 +126,9 @@ None chosen yet: the owner picks the next one (the portrait layout shipped in 3.
 - **Minion and demon info in one button** _(official)_: given by hand with info cards, since
   characters like the Lunatic make an automatic version misleading.
 - **Drunk features**: the Drunk's token is never dealt.
+- **Practice game as an exam**: no review of the storyteller's night, no "mistakes" pointed
+  out, no graded scenarios. The practice game is a simulator of a game seen from the
+  storyteller's seat: the made-up players play and the storyteller reacts.
 - "Thinks they are…" for the Lunatic, Drunk and Marionette; whispers only between neighbours;
   the end-of-game reveal from a reminder; panels you can drag around.
 - A forced speaking queue and forced quiet nominations; marks on the night order sheet; the

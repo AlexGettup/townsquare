@@ -4,6 +4,16 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.36.0
+
+- Practice game, Trouble Brewing: the made-up Butler only raises their hand if their master does; the good leave a claimed Saint alone (the evil push for them); with 3 alive and a claimed Mayor the good only nominate or vote when very sure; a Spy shown the grimoire knows the whole evil team and bluffs a character that isn't in play
+- `ROADMAP.md`: the practice game is a simulator, not an exam (under "Not planned")
+- Practice game by day, with "Automatic" on: at dawn some made-up players say in the town square what they are and what they learned at night ("I'm the Fortune Teller. What I know: Ana, Carlos: Yes"); the evil ones claim one of the characters "not in play" they were given, or else make one up. When the storyteller announces that nominations are open (and on the second and last call) the most convinced one nominates, saying why, then the next one after each vote, while someone is sure enough: fewer once someone is about to die. They nominate and vote from what they learned at night and what others claimed (someone claiming their own character), with a morning hunch; the evil protect the teammates they know of, push on good players the town already doubts, and now and then vote or nominate a teammate to look good. The Slayer shoots in the chat when sure (or at random from day 3) and the storyteller resolves it. What they think is forgotten when the page reloads
+- Practice game: votes follow what each made-up player thinks instead of a coin toss, also without "Automatic"
+- Practice game: the made-up players choose as their character would, knowing only what a real player would know: their own character and alignment (or the last "You are" card), and their evil teammates only once a card showed them. The Poisoner and the Demon go for someone not on their side as far as they know (a Minion who hasn't met the Demon may poison them), the Monk and the Butler never choose themselves, the Butler mostly keeps their master, the Imp sometimes kills themselves to pass the Demon on, the Philosopher names a good character, once-per-game abilities get used more as the nights go by. Other scripts follow the ability's text ("not yourself", "a dead player", "different to last night"). It applies to automatic players and to "Let Ana decide" (formerly "At random"), and "All at random" is now "Let them all decide"
+- Practice game: "Automatic" is on from the start; switch it off to answer for the made-up players yourself
+- Practice game on phones: the blue box at the top left (Leave, Random nomination, Automatic) is only as wide as its text, one option per line, instead of stretching towards the menu buttons. Computers don't change
+
 ### Version 3.35.0
 
 - Phones and tablets held upright: the demon bluffs, NPCs and text chat leave the seats and share a strip at the bottom, one at a time, with tabs (Chat, Bluffs, NPCs). Tapping the open tab folds the strip and the town square grows. New chat messages show as a number on the Chat tab. Landscape screens and computers don't change

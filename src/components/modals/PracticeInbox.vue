@@ -38,7 +38,7 @@
           </div>
           <div class="button" @click="answerAtRandom(item)">
             <font-awesome-icon icon="dice" />
-            {{ $t("practice.random") }}
+            {{ $t("practice.random", { name: player.name }) }}
           </div>
           <div class="button" @click="done">{{ $t("cards.later") }}</div>
         </div>
@@ -62,7 +62,7 @@
             @click="answerAtRandom(item)"
           >
             <font-awesome-icon icon="dice" />
-            {{ $t("practice.random") }}
+            {{ $t("practice.random", { name: player.name }) }}
           </div>
         </div>
       </template>
@@ -95,25 +95,19 @@
 import { mapGetters, mapState } from "vuex";
 import Modal from "./Modal";
 import InfoCard from "../InfoCard";
-import { partsOf } from "../../cards";
-import { pickAtRandom } from "../../store/modules/practice";
+import { grimoireSeats } from "../../store/modules/practice";
+import { STORYTELLER } from "../../store/modules/voice";
+import { SEATS_TO_CHOOSE, decide, knowledgeOf } from "../../practiceBrain";
 
 // automatic players take between this and twice this to answer (ms)
 const AUTO_DELAY = 1200;
 
-// cards answered by tapping seats: how many to pick
-const SEATS_TO_CHOOSE = {
-  choosePlayer: 1,
-  chooseTwoPlayers: 2,
-  // the pointing vote (Boomdandy)
-  pointAtPlayer: 1,
-};
-
 /**
  * Practice game: what a made-up player received (an info card, the grimoire),
  * one at a time. The storyteller acts for them: closing it is the player
- * seeing it, and they can pick seats or write back. "At random" answers a
- * choice for them: seats, a character, or yes or no to using their ability.
+ * seeing it, and they can pick seats or write back. "At random" lets them
+ * decide as their character would (src/practiceBrain.js): seats, a
+ * character, or yes or no to using their ability.
  */
 export default {
   components: { Modal, InfoCard },
@@ -151,10 +145,10 @@ export default {
       return this.players.map(({ name }) => name);
     },
     // characters a player could name: the script's, without travellers
-    scriptRoleNames() {
-      return [...this.$store.state.roles.values()]
-        .filter(({ team }) => team !== "traveller" && team !== "fabled")
-        .map((role) => this.$store.getters.localizeRole(role).name);
+    scriptRoles() {
+      return [...this.$store.state.roles.values()].filter(
+        ({ team }) => team !== "traveller" && team !== "fabled",
+      );
     },
   },
   watch: {
@@ -220,35 +214,46 @@ export default {
       );
     },
     /**
-     * What a made-up player answers at random to this card, or null when it
-     * asks nothing: { seats: [names] } or { text }.
+     * What a made-up player answers to this card, as their character would
+     * (see src/practiceBrain.js), or null when it asks nothing:
+     * { seats: [names] } or { text }.
      */
     randomAnswerOf(message) {
       if (!message || !message.card) return null;
-      const seats = SEATS_TO_CHOOSE[message.card.phrase];
-      if (seats) {
-        const names = [...this.names];
-        const picked = [];
-        while (picked.length < seats && names.length) {
-          picked.push(names.splice(Math.random() * names.length, 1)[0]);
-        }
-        return picked.length === seats ? { seats: picked } : null;
-      }
-      const phrases = [
-        message.card.phrase,
-        ...partsOf(message.card).map(({ phrase }) => phrase),
-      ];
-      if (phrases.includes("chooseCharacter") && this.scriptRoleNames.length) {
-        return { text: pickAtRandom(this.scriptRoleNames) };
-      }
-      if (phrases.includes("useAbility")) {
+      const playerId = message.channel.slice("dm:".length);
+      const seats = grimoireSeats(this.players);
+      const seat = seats.find(({ id }) => id === playerId);
+      if (!seat) return null;
+      const roleById = (id) =>
+        this.$store.state.roles.get(id) ||
+        this.$store.getters.rolesJSONbyId.get(id) ||
+        null;
+      // the cards the storyteller sent them, up to this one
+      const cards = this.$store.state.chat.messages
+        .filter(
+          (other) =>
+            other.channel === message.channel &&
+            other.from === STORYTELLER &&
+            other.card &&
+            other.id < message.id,
+        )
+        .map(({ card, choice }) => ({ card, choice }));
+      const me = knowledgeOf(seat, cards, roleById);
+      const answer = decide(me, message.card, {
+        players: seats,
+        scriptRoles: this.scriptRoles,
+        nightCount: this.$store.state.grimoire.nightCount || 1,
+      });
+      if (!answer) return null;
+      if (answer.seats) return answer;
+      if (answer.roleId) {
         return {
-          text: this.$t(Math.random() < 0.5 ? "cards.yes" : "cards.no"),
+          text: this.$store.getters.localizeRole(roleById(answer.roleId)).name,
         };
       }
-      return null;
+      return { text: this.$t(`cards.${answer.answer}`) };
     },
-    // answer for them at random (if the card asks something), then close it
+    // let them decide (if the card asks something), then close it
     answerAtRandom(item) {
       const message = this.messageOf(item);
       const answer = this.randomAnswerOf(message);

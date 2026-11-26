@@ -25,6 +25,25 @@ let nextItem = 1;
 const VIEW_KEY = "practiceView";
 let savedView = null;
 
+/**
+ * The seats as the storyteller's grimoire has them, also while it is put
+ * away to view the game as a player: { id, name, role, alignmentIndex,
+ * isDead }.
+ */
+export const grimoireSeats = (players) =>
+  players.map(({ id, name, role, alignmentIndex, isDead }) => {
+    const saved = savedView && savedView.players.find((s) => s.id === id);
+    return saved
+      ? {
+          id,
+          name,
+          isDead,
+          role: saved.role,
+          alignmentIndex: saved.alignmentIndex,
+        }
+      : { id, name, isDead, role, alignmentIndex };
+  });
+
 const roleById = (rootState, rootGetters, id) =>
   (id &&
     (rootState.roles.get(id) ||
@@ -154,6 +173,8 @@ const actions = {
       );
     });
     commit("setActive", true);
+    // the made-up players play by themselves unless switched off
+    commit("setAuto", true);
   },
   /** A made-up player nominates another, both picked at random. */
   randomNomination({ getters, dispatch, rootState }) {
