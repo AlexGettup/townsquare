@@ -428,11 +428,16 @@ const heardBy = (me, statements, base, context) => {
       heard[name] = (heard[name] || 0) + amount * belief;
     });
   });
-  // "I suspect X": each one's latest, as much as they believe the speaker
+  // "I suspect X" with no reason given: each one's latest, and only from a
+  // very convincing speaker. It moves the trusting and the novices a
+  // little, the careful ones (strategists, veterans) hardly or not at all
+  const gullible =
+    clamp((traits.trust - 0.4) / 0.55, 0, 1) * (1 - 0.5 * traits.logic);
   const latest = {};
   accusations.forEach(({ speaker, name }) => (latest[speaker] = name));
   Object.entries(latest).forEach(([speaker, name]) => {
     if (speaker === me.name || !(speaker in base)) return;
+    if (convictionOf(speaker) < CONVINCING) return;
     if (name === me.name) {
       // a good player accused: the accuser is wrong, or lies
       if (me.alignment === "good") {
@@ -440,13 +445,18 @@ const heardBy = (me, statements, base, context) => {
       }
       return;
     }
-    heard[name] = (heard[name] || 0) + ACCUSATION * beliefIn(speaker);
+    heard[name] =
+      (heard[name] || 0) +
+      ACCUSATION * clamp(1 - base[speaker] / 2, 0, 1.2) * gullible;
   });
   return heard;
 };
 
-// how much one "I suspect X" from someone they fully believe counts
-const ACCUSATION = 0.35;
+// how much one "I suspect X" counts, at most (a very gullible listener)
+const ACCUSATION = 0.15;
+// only a speaker this convincing (convictionFactor of 8 or more) sways
+// anyone with a bare "I suspect X"
+const CONVINCING = 1.25;
 
 /**
  * All the lines of one player's info read together: name -> amount. The
