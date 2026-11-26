@@ -6,6 +6,7 @@ release of this fork; older versions belong to the original project.
 
 ### Next version
 
+- Practice game: the "Personalities" button's hint also explains the conviction
 - `docs/practice-wiki-audit.md`: audit of the practice game's made-up players against the official wiki (Trouble Brewing, Bad Moon Rising, Sects & Violets), in Spanish, updated to 3.40.0 (nothing changes in the app)
 - Practice game: the made-up players now use more of what the cards tell them. "Good" or "Evil" on a line ("Carl: Evil") makes them doubt or trust that player; the Chef's number, the Clockmaker's, the Oracle's and the Flowergirl's and Town Crier's yes or no (about who voted and nominated the day before) move their doubts a little; a believed Mathematician saying some abilities went wrong makes everyone's info count a little less. Numbers are hints, never proof
 - Practice game: each made-up player also gets a conviction at random when the practice starts, next to their personality: how much the others believe what they say (claims and info). A bare "I suspect X" now counts a little, only from a very convincing player and mostly on the Trusting and the Novices, like a strong voice at a real table. Whoever listens still weighs it with their own personality. With "Personalities" on, it shows under the name (for example "Veteran" and "Very convincing" on two lines)
