@@ -572,7 +572,12 @@
       "guess": "{name} is the {role}.",
       "more": "And also: {names}.",
       "gossip": "I'm the {role}, and this is my statement: {name} is the Demon.",
-      "moonchild": "I'm the {role}: I choose {name}."
+      "moonchild": "I'm the {role}: I choose {name}.",
+      "pair": "{name}: {role}.",
+      "juggler": "I'm the {role}. My guesses: {guesses}",
+      "savant": "I'm the {role}: what are my 2 things today?",
+      "artist": "I'm the {role}. My question: is {name} the Demon?",
+      "klutz": "I'm the {role}: I choose {name}. If they're evil, we lose."
     }
   },
   "pointing": {

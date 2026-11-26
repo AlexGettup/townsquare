@@ -24,10 +24,19 @@
  * they doubt most, those who protect choose whoever they trust most, and
  * the evil kill whoever the town trusts.
  *
+ * Sects & Violets: the Snake Charmer and the Dreamer also go for whoever
+ * they doubt most, the Seamstress checks one they trust against one they
+ * doubt. The No Dashii leaves their poisoned neighbours alive, the
+ * Vigormortis now and then kills one of their Minions, the Fang Gu jumps to
+ * a claimed Outsider when the town doubts them. The Cerenovus and the
+ * Pit-Hag choose a player and a character together (one on the card, the
+ * other in the chat).
+ *
  * Kept apart from Vue and the store so it can be tried on its own.
  */
 
 import { CHOICES, alignmentOf, partsOf } from "./cards";
+import { neighboursOf } from "./practiceDay";
 
 // cards answered by tapping seats: how many to pick
 export const SEATS_TO_CHOOSE = {
@@ -43,7 +52,7 @@ const PROTECTS_EVIL = ["devilsadvocate"];
 const PROTECTS = ["monk", "innkeeper", "tealady"];
 // good characters who choose whoever they doubt most (the Sailor makes them
 // drunk, the Exorcist stops the Demon, the Chambermaid sees if they woke)
-const HUNTS = ["exorcist", "sailor", "chambermaid"];
+const HUNTS = ["exorcist", "sailor", "chambermaid", "snakecharmer", "dreamer"];
 // whoever they chose before, they keep choosing most nights
 const KEEPS_CHOICE = { butler: 0.75, sailor: 0.3 };
 // a Demon that may choose themselves to pass the Demon on (Imp)
@@ -54,6 +63,17 @@ const NAMES_GOOD = ["philosopher", "cerenovus", "pixie", "huntsman"];
 const NAMES_EVIL = ["courtier"];
 // the Po, some nights, chooses no-one to choose 3 players the next
 const PO_CHARGE = 0.2;
+// evil characters that choose a player and a character at once
+const PAIRS = ["cerenovus", "pithag"];
+// the Vigormortis kills one of their Minions (who keeps their ability)
+const VIGOR_MINION = 0.1;
+// the Fang Gu jumps to a claimed Outsider: more when the town doubts them
+const FANGGU_JUMP = 0.15;
+const FANGGU_JUMP_DOUBTED = 0.5;
+// the Pit-Hag makes a Demon (deaths that night are arbitrary), from night 3
+const PITHAG_DEMON = 0.1;
+// never dealt nor made in this fork
+const NEVER = ["drunk", "marionette"];
 // how much luck counts when they rank players by what they think of them
 // (more for the evil's kills, so the Demon doesn't always pick the same)
 const JITTER = 0.6;
@@ -89,8 +109,12 @@ export const knowledgeOf = (player, cards, roleById) => {
   let skipped = false;
   cards.forEach(({ card, choice }) => {
     if (!card) return;
+    // made mad by the Cerenovus: the character shown isn't theirs
+    const madness = partsOf(card).some(({ roles }) =>
+      roles.includes("cerenovus"),
+    );
     partsOf(card).forEach((part) => {
-      if (part.phrase === "youAre") {
+      if (part.phrase === "youAre" && !madness) {
         const told = part.roles.length && roleById(part.roles[0]);
         if (told && told.id) {
           role = told;
@@ -181,6 +205,60 @@ const firstOf = (list, count) => {
 };
 
 /**
+ * Choices of a few characters that don't follow the general rules: names,
+ * or null to choose like the rest.
+ * - The Seamstress: the one they trust most and the one they doubt most.
+ * - The No Dashii: not their alive neighbours (they are poisoned).
+ * - The Vigormortis: now and then a Minion they know of.
+ * - The Fang Gu: a claimed Outsider, to jump to them.
+ */
+const specialSeats = (
+  me,
+  count,
+  { alive, players, nightCount, scores, opinion, claims, roleOf, random },
+) => {
+  const role = me.role || {};
+  const others = alive.filter((name) => name !== me.name);
+  const isEvil = me.alignment === "evil";
+  if (role.id === "seamstress" && !isEvil && count === 2 && scores) {
+    const trusted = ranked(others, scores, random, true)[0];
+    const doubted = ranked(
+      others.filter((name) => name !== trusted),
+      scores,
+      random,
+    )[0];
+    return trusted && doubted ? [trusted, doubted] : null;
+  }
+  if (!isEvil || count !== 1 || nightCount < 2) return null;
+  const minions = me.teammates.filter(
+    (name) => others.includes(name) && !me.demons.includes(name),
+  );
+  const good = others.filter((name) => !me.teammates.includes(name));
+  if (role.id === "vigormortis" && minions.length) {
+    if (random() < VIGOR_MINION) return [ranked(minions, null, random)[0]];
+  }
+  if (role.id === "fanggu") {
+    const outsiders = good.filter(
+      (name) =>
+        claims[name] && (roleOf(claims[name]) || {}).team === "outsider",
+    );
+    const doubted = opinion && (opinion[me.name] || 0) >= 1;
+    const chance = doubted ? FANGGU_JUMP_DOUBTED : FANGGU_JUMP;
+    if (outsiders.length && random() < chance) {
+      return [ranked(outsiders, null, random)[0]];
+    }
+  }
+  if (role.id === "nodashii") {
+    const poisoned = neighboursOf(me.name, players);
+    const away = good.filter((name) => !poisoned.includes(name));
+    if (away.length) {
+      return [ranked(away, opinion, random, true, EVIL_JITTER)[0]];
+    }
+  }
+  return null;
+};
+
+/**
  * The seats a made-up player taps: { seats: [names] }, or null when they
  * can't choose that many.
  *
@@ -248,6 +326,19 @@ export const chooseSeats = (
     return !!claimed && (!scores || (scores[name] || 0) < 1);
   };
   const roleOf = (id) => scriptRoles.find((script) => script.id === id) || null;
+
+  // Sects & Violets Demons and the Seamstress
+  const special = specialSeats(me, count, {
+    alive,
+    players,
+    nightCount,
+    scores,
+    opinion,
+    claims,
+    roleOf,
+    random,
+  });
+  if (special) return { seats: special };
 
   let groups;
   if (rules.deadOnly) {
@@ -327,11 +418,14 @@ const nameOf = ({ name }) => name;
 export const chooseCharacter = (
   me,
   scriptRoles,
-  { random = Math.random } = {},
+  { claims = {}, nightCount = 1, random = Math.random } = {},
 ) => {
   const role = me.role || {};
   const notMine = scriptRoles.filter(({ id }) => id !== role.id);
   const good = notMine.filter(({ team }) => team === "townsfolk");
+  if (PAIRS.includes(role.id) && me.alignment === "evil") {
+    return pairRole(me, null, { scriptRoles, claims, nightCount, random });
+  }
   // the Courtier: most likely the Demon, else a Minion
   if (NAMES_EVIL.includes(role.id) && me.alignment !== "evil") {
     const team = random() < 0.6 ? "demon" : "minion";
@@ -344,6 +438,69 @@ export const chooseCharacter = (
       : notMine;
   if (!list.length) return null;
   return list[Math.floor(random() * list.length)].id;
+};
+
+const pickOne = (list, random) =>
+  list.length ? list[Math.floor(random() * list.length)] : null;
+
+/**
+ * The character the Cerenovus or the Pit-Hag pairs with their player
+ * (target, a name or null): a role ID or null.
+ * - The Cerenovus: mostly a character another player claimed, so the mad
+ *   one claims it too and the town doubts them both; else any Townsfolk.
+ * - The Pit-Hag: an Outsider nobody claimed (it may not be in play), and
+ *   from night 3 now and then a Demon, for arbitrary deaths.
+ */
+export const pairRole = (
+  me,
+  target,
+  { scriptRoles = [], claims = {}, nightCount = 1, random = Math.random } = {},
+) => {
+  const role = me.role || {};
+  const usable = scriptRoles.filter(
+    ({ id }) => id !== role.id && !NEVER.includes(id),
+  );
+  const townsfolk = usable.filter(({ team }) => team === "townsfolk");
+  const taken = Object.values(claims);
+  if (role.id === "cerenovus") {
+    const claimed = Object.entries(claims)
+      .filter(
+        ([name, id]) =>
+          name !== target &&
+          name !== me.name &&
+          !me.teammates.includes(name) &&
+          townsfolk.some((other) => other.id === id),
+      )
+      .map(([, id]) => id);
+    if (claimed.length && random() < 0.6) return pickOne(claimed, random);
+    const picked = pickOne(townsfolk, random);
+    return picked ? picked.id : null;
+  }
+  if (role.id === "pithag") {
+    const demons = usable.filter(({ team }) => team === "demon");
+    if (nightCount >= 3 && demons.length && random() < PITHAG_DEMON) {
+      return pickOne(demons, random).id;
+    }
+    const free = (team) =>
+      usable.filter(
+        (other) => other.team === team && !taken.includes(other.id),
+      );
+    const picked =
+      pickOne(free("outsider"), random) || pickOne(free("townsfolk"), random);
+    return picked ? picked.id : null;
+  }
+  return null;
+};
+
+/**
+ * The Cerenovus and the Pit-Hag: a player and a character at once.
+ * Returns { seats: [name], role } or null.
+ */
+export const pairOf = (me, context) => {
+  const chosen = chooseSeats(me, context.players, 1, context);
+  if (!chosen) return null;
+  const role = pairRole(me, chosen.seats[0], context);
+  return role ? { seats: chosen.seats, role } : null;
 };
 
 /**
@@ -444,9 +601,10 @@ export const poChoice = (me, context) => {
 
 /**
  * What a made-up player answers to a card, or null when it asks nothing:
- * { seats: [names] } (with the Gambler's `guess`, a role ID, or the Po's
- * `more`, two more names), { nobody: true } (the Po chooses no-one),
- * { roleId } or { answer: "yes" | "no" }.
+ * { seats: [names] } (with the Gambler's `guess`, a role ID, the Po's
+ * `more`, two more names, or the Cerenovus' and Pit-Hag's `role`),
+ * { nobody: true } (the Po chooses no-one), { roleId } (with the
+ * Cerenovus' and Pit-Hag's `target`, a name) or { answer: "yes" | "no" }.
  */
 export const decide = (me, card, context) => {
   if (!card) return null;
@@ -461,8 +619,18 @@ export const decide = (me, card, context) => {
     const po = poChoice(me, context);
     if (po) return po;
   }
+  const pairs = PAIRS.includes(role.id) && me.alignment === "evil";
+  if (seats === 1 && pairs) {
+    const pair = pairOf(me, context);
+    if (pair) return pair;
+  }
   if (seats) return chooseSeats(me, context.players, seats, context);
   const phrases = [card.phrase, ...partsOf(card).map(({ phrase }) => phrase)];
+  if (phrases.includes("chooseCharacter") && pairs) {
+    // the character on the card, the player in the chat
+    const pair = pairOf(me, context);
+    if (pair) return { roleId: pair.role, target: pair.seats[0] };
+  }
   if (phrases.includes("chooseCharacter")) {
     const roleId = chooseCharacter(me, context.scriptRoles, context);
     return roleId ? { roleId } : null;
