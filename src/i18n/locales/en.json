@@ -547,6 +547,11 @@
       "hothead": "Hothead",
       "quiet": "Quiet"
     },
+    "convictions": {
+      "low": "Barely convincing",
+      "some": "Fairly convincing",
+      "high": "Very convincing"
+    },
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",
     "sees": "What {name} sees",

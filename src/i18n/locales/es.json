@@ -547,6 +547,11 @@
       "hothead": "Impulsivo",
       "quiet": "Callado"
     },
+    "convictions": {
+      "low": "Convence poco",
+      "some": "Convence algo",
+      "high": "Convence mucho"
+    },
     "leave": "Salir",
     "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",
     "sees": "Lo que ve {name}",

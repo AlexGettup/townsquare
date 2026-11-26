@@ -192,3 +192,20 @@ export const rollPersonality = (random = Math.random) => {
 
 /** The traits of a personality key (normal if unknown). */
 export const traitsOf = (id) => PERSONALITIES[id] || PERSONALITIES.normal;
+
+/**
+ * Conviction: how much the others believe what a made-up player says (their
+ * claims, their info, their "I suspect X"), from 1 to 10, rolled at random
+ * when the practice starts next to the personality. Whoever listens still
+ * weighs it with their own trust.
+ */
+export const rollConviction = (random = Math.random) =>
+  1 + Math.floor(random() * 10);
+
+/** What a conviction multiplies belief by: 0.55 to 1.45, 1 on average. */
+export const convictionFactor = (conviction) =>
+  conviction ? 0.45 + conviction / 10 : 1;
+
+/** How it is shown: "low" (1-3), "some" (4-7) or "high" (8-10). */
+export const convictionLevel = (conviction) =>
+  conviction >= 8 ? "high" : conviction >= 4 ? "some" : "low";
