@@ -38,7 +38,7 @@
           </div>
           <div class="button" @click="answerAtRandom(item)">
             <font-awesome-icon icon="dice" />
-            {{ $t("practice.random") }}
+            {{ $t("practice.random", { name: player.name }) }}
           </div>
           <div class="button" @click="done">{{ $t("cards.later") }}</div>
         </div>
@@ -62,7 +62,7 @@
             @click="answerAtRandom(item)"
           >
             <font-awesome-icon icon="dice" />
-            {{ $t("practice.random") }}
+            {{ $t("practice.random", { name: player.name }) }}
           </div>
         </div>
       </template>
