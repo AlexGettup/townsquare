@@ -1,12 +1,16 @@
 <template>
   <div
     class="guided-night"
-    :class="{ collapsed: isCollapsed }"
+    :class="{ collapsed: isCollapsed && !isDocked, docked: isDocked }"
     v-if="isShown"
     @click.stop
   >
     <!-- folded: one line, tap to unfold -->
-    <div v-if="isCollapsed" class="pill" @click="isCollapsed = false">
+    <div
+      v-if="isCollapsed && !isDocked"
+      class="pill"
+      @click="isCollapsed = false"
+    >
       <font-awesome-icon icon="moon" />
       {{ $t("guidedNight.title") }} ·
       {{
@@ -39,7 +43,12 @@
         <span class="nav" :class="{ off: isDone }" @click="skip">
           <font-awesome-icon icon="chevron-right" />
         </span>
-        <span class="tool" :title="$t('guidedNight.fold')" @click="fold">
+        <span
+          class="tool"
+          v-if="!isDocked"
+          :title="$t('guidedNight.fold')"
+          @click="fold"
+        >
           <font-awesome-icon icon="chevron-down" />
         </span>
         <span class="tool" :title="$t('guidedNight.hide')" @click="hide">
@@ -148,6 +157,9 @@ export default {
       since: Date.now(),
       isCollapsed: false,
       hiddenNight: null,
+      // upright screens: a tab in the strip at the bottom (PortraitDock.vue),
+      // which folds it instead of the panel's own button
+      isDocked: false,
     };
   },
   computed: {
@@ -283,6 +295,15 @@ export default {
     },
   },
   watch: {
+    isShown: {
+      immediate: true,
+      handler(isShown) {
+        this.$store.commit("setGuidedNightShown", isShown);
+      },
+    },
+    isDocked() {
+      this.$nextTick(() => this.reportHeight());
+    },
     // their seats light up on the town square
     guidedPlayers: {
       immediate: true,
@@ -321,6 +342,18 @@ export default {
   },
   // the town square makes room for the panel on phones (App.vue, #app)
   mounted() {
+    this.portrait = window.matchMedia
+      ? window.matchMedia("(orientation: portrait)")
+      : null;
+    this.onTurn = () => {
+      this.isDocked = !!this.portrait && this.portrait.matches;
+    };
+    if (this.portrait) {
+      this.portrait.addEventListener
+        ? this.portrait.addEventListener("change", this.onTurn)
+        : this.portrait.addListener(this.onTurn);
+    }
+    this.onTurn();
     this.sheetObserver = new ResizeObserver(() => this.reportHeight());
     this.watchSheet();
   },
@@ -328,6 +361,12 @@ export default {
     this.watchSheet();
   },
   beforeDestroy() {
+    if (this.portrait) {
+      this.portrait.removeEventListener
+        ? this.portrait.removeEventListener("change", this.onTurn)
+        : this.portrait.removeListener(this.onTurn);
+    }
+    this.$store.commit("setGuidedNightShown", false);
     this.sheetObserver.disconnect();
     document.documentElement.style.setProperty("--bottom-sheet", "0px");
   },
@@ -342,7 +381,8 @@ export default {
       this.reportHeight();
     },
     reportHeight() {
-      const height = this.sheet ? this.sheet.offsetHeight : 0;
+      // in the strip, the strip makes the room (PortraitDock.vue)
+      const height = this.sheet && !this.isDocked ? this.sheet.offsetHeight : 0;
       document.documentElement.style.setProperty(
         "--bottom-sheet",
         height + "px",
@@ -453,6 +493,32 @@ export default {
     width: 330px;
   }
 
+  // upright screens: the strip's panel while its tab is chosen
+  &.docked {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: calc(var(--dock-bar) + env(safe-area-inset-bottom, 0px));
+    transform: none;
+    z-index: 56;
+    width: auto;
+    height: var(--dock-body);
+    overflow-y: auto;
+    padding: 4px max(14px, env(safe-area-inset-right, 0px)) 8px
+      max(14px, env(safe-area-inset-left, 0px));
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 15px;
+    h4 {
+      margin-top: 2px;
+    }
+    .reminder {
+      max-height: 3.4em;
+    }
+  }
+
   &.collapsed {
     width: auto;
     padding: 6px 14px;
@@ -494,6 +560,12 @@ export default {
       cursor: default;
     }
   }
+}
+
+// the strip shows one panel at a time
+.has-dock:not(.dock-night) .guided-night.docked,
+.has-dock.dock-closed .guided-night.docked {
+  display: none;
 }
 
 h4 {

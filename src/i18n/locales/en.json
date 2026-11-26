@@ -505,6 +505,7 @@
     }
   },
   "guidedNight": {
+    "tab": "Night",
     "title": "Guided night",
     "night": "Night {night}",
     "stepOf": "step {step} of {total}",
