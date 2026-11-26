@@ -114,6 +114,12 @@ export default class PracticeChat {
     this._post(playerId, "dm:" + playerId, text.trim());
   }
 
+  /** A made-up player speaks in the town square. */
+  sayAs(playerId, text) {
+    if (!text.trim()) return;
+    this._post(playerId, PLAZA, text.trim());
+  }
+
   _find(id) {
     return this.messages.find((message) => message.id === id);
   }

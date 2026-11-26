@@ -532,7 +532,7 @@
     "viewAs": "View as {name}",
     "viewing": "Viewing as {name}",
     "backToGrimoire": "Back to the grimoire",
-    "autoHint": "The made-up players answer cards, choices and the grimoire by themselves, as their character would. Their answers reach your private chat.",
+    "autoHint": "The made-up players play by themselves: they answer your cards, say what they are at dawn, nominate when you open nominations, and vote.",
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",
     "sees": "What {name} sees",
@@ -547,7 +547,21 @@
     "nominate": "Random nomination",
     "nominateHint": "A made-up player nominates another, both at random",
     "random": "Let {name} decide",
-    "allRandom": "Let them all decide"
+    "allRandom": "Let them all decide",
+    "say": {
+      "claim": "I'm the {role}.",
+      "learned": "What I know: {info}.",
+      "lastNight": "Last night: {info}.",
+      "suspect": "I suspect {name}.",
+      "nothingYet": "I don't know anything else yet.",
+      "slayer": "I'm the {role}: I shoot {name}.",
+      "nominate": {
+        "info": "I nominate {name}: my info points there.",
+        "sameClaim": "I nominate {name}: they say they're the {role}, and I'm the {role}.",
+        "hunch": "I nominate {name}: I don't trust them."
+      },
+      "number": "I got a {n}"
+    }
   },
   "pointing": {
     "title": "Pointing vote",

@@ -532,7 +532,7 @@
     "viewAs": "Ver como {name}",
     "viewing": "Viendo como {name}",
     "backToGrimoire": "Volver al grimorio",
-    "autoHint": "Los jugadores inventados contestan solos, como lo haría su personaje, a las tarjetas, las elecciones y el grimorio. Sus respuestas te llegan al chat privado.",
+    "autoHint": "Los jugadores inventados juegan solos: contestan a tus tarjetas, dicen qué son al amanecer, nominan cuando abres las nominaciones y votan.",
     "leave": "Salir",
     "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",
     "sees": "Lo que ve {name}",
@@ -547,7 +547,21 @@
     "nominate": "Nominación al azar",
     "nominateHint": "Un jugador inventado nomina a otro, los dos al azar",
     "random": "Que decida {name}",
-    "allRandom": "Que decidan todos"
+    "allRandom": "Que decidan todos",
+    "say": {
+      "claim": "Soy {role}.",
+      "learned": "Lo que sé: {info}.",
+      "lastNight": "Anoche: {info}.",
+      "suspect": "Sospecho de {name}.",
+      "nothingYet": "Todavía no sé nada más.",
+      "slayer": "Soy {role}: disparo a {name}.",
+      "nominate": {
+        "info": "Nomino a {name}: mi información apunta ahí.",
+        "sameClaim": "Nomino a {name}: dice ser {role}, y {role} soy yo.",
+        "hunch": "Nomino a {name}: no me fío."
+      },
+      "number": "Me salió un {n}"
+    }
   },
   "pointing": {
     "title": "Votación señalando",

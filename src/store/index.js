@@ -5,6 +5,7 @@ import socket from "./socket";
 import voicePlugin from "./voice";
 import chatPlugin from "./chat";
 import practicePlugin from "./practice";
+import practiceTownPlugin from "./practiceTown";
 import notesPlugin from "./notes";
 import diaryPlugin from "./diary";
 import announcementsPlugin from "./announcements";
@@ -510,6 +511,7 @@ export default new Vuex.Store({
     voicePlugin,
     chatPlugin,
     practicePlugin,
+    practiceTownPlugin,
     wakeLockPlugin,
     alertsPlugin,
     notesPlugin,
