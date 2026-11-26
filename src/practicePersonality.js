@@ -23,6 +23,9 @@
  * - talk: how likely they speak at dawn (times the usual chance).
  * - virgin: how likely they nominate a claimed Virgin to test her.
  * - quiet: how much they doubt someone who never said what they are.
+ * - doubts: as good, how much they think their own info may be wrong
+ *   (poisoned or made drunk) when the script has characters that do it, or
+ *   it clashes with what others told.
  *
  * Kept apart from Vue and the store so it can be tried on its own.
  */
@@ -42,6 +45,7 @@ export const PERSONALITIES = {
     slips: 0.05,
     talk: 1,
     virgin: 0.2,
+    doubts: 0.45,
     quiet: 0.1,
   },
   // believes almost anything, follows the group, slow to doubt
@@ -59,6 +63,7 @@ export const PERSONALITIES = {
     slips: 0.1,
     talk: 1,
     virgin: 0,
+    doubts: 0.15,
     quiet: 0,
   },
   // as evil, always makes up info, and bold; as good, often hides at first
@@ -76,6 +81,7 @@ export const PERSONALITIES = {
     slips: 0.02,
     talk: 1.1,
     virgin: 0.1,
+    doubts: 0.45,
     quiet: 0.1,
   },
   // reasons with everything, hard info over hunches, careful with votes
@@ -93,6 +99,7 @@ export const PERSONALITIES = {
     slips: 0,
     talk: 1,
     virgin: 0.5,
+    doubts: 0.85,
     quiet: 0.2,
   },
   // reads info badly, goes by gut and by the group, lies clumsily
@@ -110,6 +117,7 @@ export const PERSONALITIES = {
     slips: 0.4,
     talk: 0.8,
     virgin: 0,
+    doubts: 0.05,
     quiet: 0,
   },
   // doubts a single source, tests the Virgin, watches the quiet ones
@@ -127,6 +135,7 @@ export const PERSONALITIES = {
     slips: 0,
     talk: 1,
     virgin: 0.7,
+    doubts: 1,
     quiet: 0.45,
   },
   // nominates early and raises their hand a lot
@@ -144,6 +153,7 @@ export const PERSONALITIES = {
     slips: 0.1,
     talk: 1.2,
     virgin: 0.1,
+    doubts: 0.25,
     quiet: 0.1,
   },
   // speaks little and late
@@ -161,6 +171,7 @@ export const PERSONALITIES = {
     slips: 0.05,
     talk: 0.5,
     virgin: 0.1,
+    doubts: 0.5,
     quiet: 0,
   },
 };
