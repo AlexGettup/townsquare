@@ -123,6 +123,9 @@ None chosen yet: the owner picks the next one (the portrait layout shipped in 3.
 - **Minion and demon info in one button** _(official)_: given by hand with info cards, since
   characters like the Lunatic make an automatic version misleading.
 - **Drunk features**: the Drunk's token is never dealt.
+- **Practice game as an exam**: no review of the storyteller's night, no "mistakes" pointed
+  out, no graded scenarios. The practice game is a simulator of a game seen from the
+  storyteller's seat: the made-up players play and the storyteller reacts.
 - "Thinks they are…" for the Lunatic, Drunk and Marionette; whispers only between neighbours;
   the end-of-game reveal from a reminder; panels you can drag around.
 - A forced speaking queue and forced quiet nominations; marks on the night order sheet; the
