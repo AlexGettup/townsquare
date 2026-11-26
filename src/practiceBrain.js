@@ -418,13 +418,13 @@ const nameOf = ({ name }) => name;
 export const chooseCharacter = (
   me,
   scriptRoles,
-  { claims = {}, nightCount = 1, random = Math.random } = {},
+  { claims = {}, random = Math.random } = {},
 ) => {
   const role = me.role || {};
   const notMine = scriptRoles.filter(({ id }) => id !== role.id);
   const good = notMine.filter(({ team }) => team === "townsfolk");
   if (PAIRS.includes(role.id) && me.alignment === "evil") {
-    return pairRole(me, null, { scriptRoles, claims, nightCount, random });
+    return pairRole(me, null, { scriptRoles, claims, random });
   }
   // the Courtier: most likely the Demon, else a Minion
   if (NAMES_EVIL.includes(role.id) && me.alignment !== "evil") {
@@ -448,13 +448,12 @@ const pickOne = (list, random) =>
  * (target, a name or null): a role ID or null.
  * - The Cerenovus: mostly a character another player claimed, so the mad
  *   one claims it too and the town doubts them both; else any Townsfolk.
- * - The Pit-Hag: an Outsider nobody claimed (it may not be in play), and
- *   from night 3 now and then a Demon, for arbitrary deaths.
+ * - The Pit-Hag: an Outsider nobody claimed (it may not be in play).
  */
 export const pairRole = (
   me,
   target,
-  { scriptRoles = [], claims = {}, nightCount = 1, random = Math.random } = {},
+  { scriptRoles = [], claims = {}, random = Math.random } = {},
 ) => {
   const role = me.role || {};
   const usable = scriptRoles.filter(
@@ -477,10 +476,6 @@ export const pairRole = (
     return picked ? picked.id : null;
   }
   if (role.id === "pithag") {
-    const demons = usable.filter(({ team }) => team === "demon");
-    if (nightCount >= 3 && demons.length && random() < PITHAG_DEMON) {
-      return pickOne(demons, random).id;
-    }
     const free = (team) =>
       usable.filter(
         (other) => other.team === team && !taken.includes(other.id),
@@ -493,10 +488,36 @@ export const pairRole = (
 };
 
 /**
- * The Cerenovus and the Pit-Hag: a player and a character at once.
+ * The Cerenovus and the Pit-Hag: a player and a character at once. From
+ * night 3 the Pit-Hag now and then makes a Minion they know a Demon.
  * Returns { seats: [name], role } or null.
  */
 export const pairOf = (me, context) => {
+  const {
+    players,
+    scriptRoles = [],
+    nightCount = 1,
+    random = Math.random,
+  } = context;
+  // the Pit-Hag makes one of their Minions a Demon (alignment doesn't
+  // change: a good player made a Demon would stay good)
+  if ((me.role || {}).id === "pithag" && nightCount >= 3) {
+    const minions = players
+      .filter(
+        ({ name, isDead }) =>
+          !isDead && me.teammates.includes(name) && !me.demons.includes(name),
+      )
+      .map(nameOf);
+    const demons = scriptRoles.filter(
+      ({ team, id }) => team === "demon" && !NEVER.includes(id),
+    );
+    if (minions.length && demons.length && random() < PITHAG_DEMON) {
+      return {
+        seats: [pickOne(minions, random)],
+        role: pickOne(demons, random).id,
+      };
+    }
+  }
   const chosen = chooseSeats(me, context.players, 1, context);
   if (!chosen) return null;
   const role = pairRole(me, chosen.seats[0], context);

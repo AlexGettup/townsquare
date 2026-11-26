@@ -153,8 +153,10 @@ export const suspicionsOf = (
           (team) => team === "minion" || team === "demon",
         );
         // one good player shown alone (the Grandmother's grandchild) is
-        // trusted for sure; one of two (the Washerwoman's) only a little
-        const good = part.players.length === 1 ? -2 : -0.5;
+        // trusted for sure; one of two (the Washerwoman's) only a little.
+        // An evil player shown a good one (the Evil Twin's twin) pushes them
+        const alone = me.alignment === "evil" ? 2 : -2;
+        const good = part.players.length === 1 ? alone : -0.5;
         part.players.forEach((name) =>
           add(scores, name, evil ? 2.5 / part.players.length + 0.5 : good),
         );
