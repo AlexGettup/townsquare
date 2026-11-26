@@ -78,6 +78,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.39.0** Sects & Violets characters play by their rules in practice games
 - **3.40.0** Practice players with personalities who listen to and weigh what others say in
   the town square; evil bluffs with made-up info
+- **3.41.0** Practice players read more card info and each has a conviction; Empath counts
+  that night's neighbours; first-night cards kept in long chats
 
 ## Planned
 

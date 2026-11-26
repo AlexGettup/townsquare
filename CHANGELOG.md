@@ -4,7 +4,7 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
-### Next version
+### Version 3.41.0
 
 - Practice game: the "Personalities" button's hint also explains the conviction
 - `docs/practice-wiki-audit.md`: audit of the practice game's made-up players against the official wiki (Trouble Brewing, Bad Moon Rising, Sects & Violets), in Spanish, updated to 3.40.0 (nothing changes in the app)
