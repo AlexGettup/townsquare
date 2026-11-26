@@ -216,7 +216,8 @@ export default {
     /**
      * What a made-up player answers to this card, as their character would
      * (see src/practiceBrain.js), or null when it asks nothing:
-     * { seats: [names] } or { text }.
+     * { seats: [names], text } (text: what they add in the private chat,
+     * like the Gambler's guess) or { text }.
      */
     randomAnswerOf(message) {
       if (!message || !message.card) return null;
@@ -238,13 +239,42 @@ export default {
             other.id < message.id,
         )
         .map(({ card, choice }) => ({ card, choice }));
-      const me = knowledgeOf(seat, cards, roleById);
+      // what they think of the others, with "Automatic" on (store/practiceTown.js)
+      const town = this.$store.$practiceTown;
+      const view = town ? town.viewOf(playerId, message.id) : null;
+      const me = view ? view.me : knowledgeOf(seat, cards, roleById);
       const answer = decide(me, message.card, {
         players: seats,
         scriptRoles: this.scriptRoles,
         nightCount: this.$store.state.grimoire.nightCount || 1,
+        ...(view
+          ? { scores: view.scores, opinion: view.opinion, claims: view.claims }
+          : {}),
       });
       if (!answer) return null;
+      // the Po chooses no-one tonight
+      if (answer.nobody) return { text: this.$t("practice.say.nobody") };
+      if (answer.seats && answer.guess) {
+        const name = this.$store.getters.localizeRole(
+          roleById(answer.guess),
+        ).name;
+        return {
+          seats: answer.seats,
+          text: this.$t("practice.say.guess", {
+            name: answer.seats[0],
+            role: name,
+          }),
+        };
+      }
+      // the Po's 3 players: the card takes one, the other two in the chat
+      if (answer.seats && answer.more && answer.more.length) {
+        return {
+          seats: answer.seats,
+          text: this.$t("practice.say.more", {
+            names: answer.more.join(", "),
+          }),
+        };
+      }
       if (answer.seats) return answer;
       if (answer.roleId) {
         return {
@@ -260,6 +290,7 @@ export default {
       if (answer && answer.seats) {
         this.$store.$chat.seenBy(message.id);
         this.$store.$chat.answerAs(message.id, answer.seats);
+        if (answer.text) this.$store.$chat.writeAs(item.playerId, answer.text);
         this.$store.commit("practice/close", item.id);
         return;
       }

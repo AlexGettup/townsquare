@@ -108,8 +108,11 @@ export const suspicionsOf = (
         const evil = teams.some(
           (team) => team === "minion" || team === "demon",
         );
+        // one good player shown alone (the Grandmother's grandchild) is
+        // trusted for sure; one of two (the Washerwoman's) only a little
+        const good = part.players.length === 1 ? -2 : -0.5;
         part.players.forEach((name) =>
-          add(scores, name, evil ? 2.5 / part.players.length + 0.5 : -0.5),
+          add(scores, name, evil ? 2.5 / part.players.length + 0.5 : good),
         );
       }
       // a yes or no about the players they chose (Fortune Teller)
@@ -390,4 +393,46 @@ export const slayerShot = (
   if ((scores[best] || 0) >= SLAYER_SURE) return best;
   if (day >= 3 && random() < 0.35) return best;
   return null;
+};
+
+/**
+ * The Gossip's public statement today: whom they say is the Demon (a name)
+ * or null. Each day at most once (the caller remembers it); when they doubt
+ * someone enough, or now and then from day 2 to see what happens. The
+ * storyteller decides if it was true.
+ */
+export const gossipStatement = (
+  me,
+  scores,
+  { alive, day, random = Math.random },
+) => {
+  if (me.role.id !== "gossip" || me.alignment !== "good") return null;
+  const options = alive.filter((name) => name !== me.name);
+  if (!options.length) return null;
+  const best = [...options].sort(
+    (a, b) => (scores[b] || 0) - (scores[a] || 0),
+  )[0];
+  if ((scores[best] || 0) >= 1.2 && random() < 0.7) return best;
+  if (day >= 2 && random() < 0.3) return best;
+  return null;
+};
+
+/**
+ * The Moonchild learns they died: the alive player they choose in public
+ * (a name) or null. Good: whoever they doubt most (if it's a good player,
+ * that one dies tonight). Evil: whoever the town trusts most, not a
+ * teammate they know of.
+ */
+export const moonchildChoice = (me, scores, { alive, opinion = {} }) => {
+  if (me.role.id !== "moonchild") return null;
+  const options = alive.filter((name) => name !== me.name);
+  if (me.alignment === "evil") {
+    const good = options.filter((name) => !me.teammates.includes(name));
+    return (
+      [...good].sort((a, b) => (opinion[a] || 0) - (opinion[b] || 0))[0] || null
+    );
+  }
+  return (
+    [...options].sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0] || null
+  );
 };
