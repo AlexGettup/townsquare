@@ -4,7 +4,7 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
-### Next version
+### Version 3.38.0
 
 - Storyteller on phones and tablets held upright: the guided night uses the whole height of its "Night" tab. The character's text is no longer cut after three lines (it takes the room left and scrolls when longer), and the buttons are a little bigger. Landscape screens and computers don't change
 - Practice game, Bad Moon Rising: the made-up players choose at night by what they think of the others. The Exorcist, Sailor and Chambermaid go for whoever they doubt most; the Innkeeper (and the Monk, the Tea Lady) protect whoever they trust most; the evil kill whoever the town trusts, and the Devil's Advocate protects the teammate the town doubts most. The Gambler bets on someone they believe and writes the guess in the chat (the character that player claimed), or on the Demon when quite sure. The Po now and then chooses no-one, and the next night chooses 3 (one on the card, the other two in the chat). The Professor brings back a dead player they believe was a Townsfolk, and the Courtier names a Demon or a Minion of the script. By day the Gossip sometimes makes a public statement ("X is the Demon"), the Moonchild chooses someone in public when they learn they died, and a player shown alone as good (the Grandmother's grandchild) is trusted

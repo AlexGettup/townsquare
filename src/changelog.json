@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.38.0",
+    "date": "2026-11-26",
+    "title": {
+      "en": "Taller Night tab, Bad Moon Rising practice",
+      "es": "Pestaña Noche más alta, práctica con Bad Moon Rising"
+    },
+    "en": [
+      "Storyteller on upright phones and tablets: the guided night uses the whole height of its \"Night\" tab. The character's text is no longer cut after three lines, and the buttons are a little bigger",
+      "Practice game, guided night: only \"Send info\" and \"Next\" are left, in one row",
+      "Practice game, Bad Moon Rising: the made-up players choose by what they think of the others (the Gambler, the Po, the Professor, the Courtier, the Devil's Advocate…). By day the Gossip sometimes makes a public statement and the Moonchild chooses someone when they die"
+    ],
+    "es": [
+      "Narrador en móviles y tablets en vertical: la noche guiada ocupa toda la altura de su pestaña \"Noche\". El texto del personaje ya no se corta tras tres líneas y los botones son un poco más grandes",
+      "Partida de práctica, noche guiada: solo quedan \"Enviar información\" y \"Siguiente\", en una fila",
+      "Partida de práctica, Bad Moon Rising: los jugadores inventados eligen según lo que piensan de los demás (el Tahúr, el Po, el Profesor, el Cortesano, el Abogado del Diablo…). De día el Chismoso a veces hace una declaración pública y la Niña de la luna elige a alguien al morir"
+    ]
+  },
+  {
     "version": "3.37.0",
     "date": "2026-11-26",
     "title": {
