@@ -79,6 +79,10 @@ export default (store) => {
   // deaths and comebacks as they happened: [{ name, at, isDead }], to know
   // who was alive when a card came (the Empath's neighbours that night)
   let deaths = [];
+  // when each night fell and each nomination began: a night's info is
+  // about the seats as they were up to the next one of these (deaths in
+  // the night, marked then or at dawn, count; the day's executions don't)
+  let cutoffs = [];
   // player ID -> the grimoire they were shown (the Spy): { players: [{
   // name, roleId, alignment }], bluffs: [role IDs] }
   let seen = {};
@@ -115,6 +119,7 @@ export default (store) => {
     claims = {};
     statements = [];
     deaths = [];
+    cutoffs = [];
     seen = {};
     call = null;
   };
@@ -155,14 +160,18 @@ export default (store) => {
       )
       .map(({ card, choice, at }) => ({ card, choice, at }));
 
-  /** The seats as they were at that moment (who was alive). */
+  /**
+   * The seats as they were for info that came at that moment (who was
+   * alive): up to the next nightfall or nomination after it.
+   */
   const seatsAt = (at) => {
     const seats = store.state.players.players;
-    if (!at || !deaths.length) return seats;
+    const until = at && cutoffs.find((time) => time > at);
+    if (!until || !deaths.length) return seats;
     return seats.map((seat) => {
       const changes = deaths.filter(({ name }) => name === seat.name);
       if (!changes.length) return seat;
-      const before = changes.filter((change) => change.at <= at).pop();
+      const before = changes.filter((change) => change.at <= until).pop();
       const isDead = before ? before.isDead : !changes[0].isDead;
       return { name: seat.name, isDead };
     });
@@ -764,6 +773,7 @@ export default (store) => {
         }
         break;
       case "toggleNight":
+        if (state.grimoire.isNight) cutoffs.push(Date.now());
         cancelAll();
         call = null;
         if (!state.grimoire.isNight && isAuto() && state.grimoire.nightCount)
@@ -778,12 +788,21 @@ export default (store) => {
       // a vote is over: the next one may nominate
       // (whoever is about to die may try to get off the block)
       case "session/nomination":
+        if (state.session.nomination) cutoffs.push(Date.now());
         if (!state.session.nomination && isAuto()) {
           nominateSoon();
         }
         break;
-      // someone died by day (executed): a Moonchild chooses at once
       case "players/update":
+        // who was alive when: the Empath's neighbours on each night
+        if (payload && payload.property === "isDead" && payload.player) {
+          deaths.push({
+            name: payload.player.name,
+            at: Date.now(),
+            isDead: !!payload.value,
+          });
+        }
+        // someone died by day (executed): a Moonchild chooses at once
         if (
           payload &&
           payload.property === "isDead" &&

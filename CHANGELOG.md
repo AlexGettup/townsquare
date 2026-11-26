@@ -4,6 +4,11 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Practice game: the Empath's numbers now really count for the neighbours they had that night. Who died during the night counts, even if marked at dawn; who is executed by day doesn't change what an earlier number meant
+- Practice game: in long, chatty games the made-up players no longer forget their first-night cards ("These are your minions", the bluffs). When the chat reaches its 500 messages, the oldest talk goes first and the cards stay
+
 ### Version 3.40.0
 
 - Practice game: each made-up player gets a personality at random when the practice starts (Normal, Trusting, Liar, Strategist, Novice, Veteran, Hothead, Quiet). It changes how much they believe others, how they lie, how soon they nominate and how they vote. A new "Personalities" switch in the blue box shows each one's personality under their name (off at the start)
