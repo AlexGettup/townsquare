@@ -8,11 +8,19 @@
     <ul class="tokens" v-for="(teamRoles, team) in roleSelection" :key="team">
       <li
         class="count"
-        :class="[team, { off: !isCountRight(team) }]"
+        :class="[
+          team,
+          {
+            off: !isCountRight(team),
+            range: formatCounts(expected[team]).length > 1,
+          },
+        ]"
         :title="countTitle(team)"
       >
-        {{ teamRoles.reduce((a, { selected }) => a + selected, 0) }} /
-        {{ formatCounts(expected[team]) }}
+        <span>{{
+          teamRoles.reduce((a, { selected }) => a + selected, 0)
+        }}</span>
+        <span>/ {{ formatCounts(expected[team]) }}</span>
       </li>
       <li
         v-for="role in teamRoles"
@@ -173,10 +181,14 @@ export default {
     // usual counts for the number of players, then what the characters change
     expected: function () {
       const base = this.game[Math.max(5, this.nonTravellers) - 5];
-      return expectedCounts(base, [
-        ...this.chosenRoles.map((role) => role.id),
-        ...this.npcs.map((npc) => npc.id),
-      ]);
+      return expectedCounts(
+        base,
+        [
+          ...this.chosenRoles.map((role) => role.id),
+          ...this.npcs.map((npc) => npc.id),
+        ],
+        this.roles.has("drunk"),
+      );
     },
     repeatOptions: function () {
       return {
@@ -264,11 +276,19 @@ export default {
       return counts.includes(chosen);
     },
     countTitle(team) {
-      return this.isCountRight(team)
-        ? ""
-        : this.$t("modals.roles.countOff", {
-            count: formatCounts(this.expected[team]),
-          });
+      if (!this.isCountRight(team)) {
+        return this.$t("modals.roles.countOff", {
+          count: formatCounts(this.expected[team]),
+        });
+      }
+      // why one Outsider fewer and one Townsfolk more is also fine
+      const outsiders = this.expected.outsider;
+      return this.roles.has("drunk") &&
+        ["townsfolk", "outsider"].includes(team) &&
+        outsiders &&
+        outsiders.length > 1
+        ? this.$t("modals.roles.countDrunk")
+        : "";
     },
     // a character another one needs (the Huntsman's Damsel)
     addRequired(id) {
@@ -513,6 +533,23 @@ ul.tokens {
     }
     &.demon {
       color: $demon;
+    }
+    span + span {
+      margin-left: 0.25em;
+    }
+    // a range ("5–6") doesn't fit in one line: the count above it
+    &.range {
+      flex-direction: column;
+      font-size: 60%;
+      line-height: 1.1;
+      white-space: nowrap;
+      aspect-ratio: 1;
+      &:after {
+        display: none;
+      }
+      span + span {
+        margin-left: 0;
+      }
     }
     // not what the chosen characters call for (only a warning)
     &.off {

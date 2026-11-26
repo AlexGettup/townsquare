@@ -50,8 +50,11 @@ export const isBagDisabled = (role) => hasSpecial(role, "bag-disabled");
  * each a sorted list of the counts allowed, or null for any count.
  * @param base the usual counts for the number of players (counts.json)
  * @param active ids of the characters chosen and of the Fabled / Loric
+ * @param drunkOnScript whether the Drunk is on the script: one Outsider place
+ *   may then hold a Townsfolk token, the one secretly the Drunk (the Drunk's
+ *   token itself never goes in the bag)
  */
-export const expectedCounts = (base, active) => {
+export const expectedCounts = (base, active, drunkOnScript = false) => {
   const rules = active.map((id) => RULES[id]).filter(Boolean);
   if (rules.some((rule) => rule.free)) {
     return { townsfolk: null, outsider: null, minion: null, demon: null };
@@ -83,6 +86,11 @@ export const expectedCounts = (base, active) => {
     outsider = possible.length
       ? possible
       : outsider.map((count) => Math.max(0, Math.min(good, count)));
+    if (drunkOnScript) {
+      outsider = outsider.flatMap((count) =>
+        count > 0 ? [count, count - 1] : [count],
+      );
+    }
     outsider = [...new Set(outsider)].sort((a, b) => a - b);
   }
   const townsfolk = outsider

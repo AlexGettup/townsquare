@@ -470,6 +470,7 @@
       "shuffle": "Shuffle characters",
       "clear": "Clear selection",
       "add": "Add {name}",
+      "countDrunk": "With the Drunk on the script, one of the Townsfolk may be the Drunk: one Outsider fewer and one Townsfolk more is fine too",
       "countOff": "With these characters it should be {count}",
       "notes": {
         "drunk": "Not in the bag: put a Townsfolk in its place. On the first night, mark one of the Townsfolk with \"Is the Drunk\".",
