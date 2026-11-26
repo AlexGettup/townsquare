@@ -15,6 +15,13 @@ export const CHOICES = ["choosePlayer", "chooseTwoPlayers", "chooseCharacter"];
  */
 export const POINTING = "pointAtPlayer";
 
+/** Cards answered by tapping seats: how many seats to pick. */
+export const SEATS_TO_CHOOSE = {
+  choosePlayer: 1,
+  chooseTwoPlayers: 2,
+  [POINTING]: 1,
+};
+
 // in the order of the official app
 export const PHRASES = [
   "useAbility",

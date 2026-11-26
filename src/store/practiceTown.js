@@ -18,6 +18,7 @@ import {
   klutzChoice,
   madnessIn,
   moonchildChoice,
+  mostDoubted,
   nominationOf,
   publicOpinion,
   rollHunches,
@@ -26,7 +27,13 @@ import {
   votesFor,
   wantsSwap,
 } from "../practiceDay";
-import { rollPersonality, traitsOf } from "../practicePersonality";
+import {
+  convictionFactor,
+  rollConviction,
+  rollPersonality,
+  traitsOf,
+} from "../practicePersonality";
+import { dmTab } from "./modules/chat";
 import { grimoireSeats } from "./modules/practice";
 import { STORYTELLER } from "./modules/voice";
 import { valueFromReminders } from "./voteValue";
@@ -76,9 +83,15 @@ export default (store) => {
   // what each one said they learned at night, true or made up: [{ speaker,
   // roleId, lines }] (lines as practiceDay's infoOf gives them)
   let statements = [];
+  // who said "I suspect X" in the town square: [{ speaker, name }]
+  let accusations = [];
   // deaths and comebacks as they happened: [{ name, at, isDead }], to know
   // who was alive when a card came (the Empath's neighbours that night)
   let deaths = [];
+  // when each night fell and each nomination began: a night's info is
+  // about the seats as they were up to the next one of these (deaths in
+  // the night, marked then or at dawn, count; the day's executions don't)
+  let cutoffs = [];
   // player ID -> the grimoire they were shown (the Spy): { players: [{
   // name, roleId, alignment }], bluffs: [role IDs] }
   let seen = {};
@@ -114,7 +127,9 @@ export default (store) => {
     minds = {};
     claims = {};
     statements = [];
+    accusations = [];
     deaths = [];
+    cutoffs = [];
     seen = {};
     call = null;
   };
@@ -144,7 +159,7 @@ export default (store) => {
     store.state.chat.messages
       .filter(
         (message) =>
-          message.channel === "dm:" + playerId &&
+          message.channel === dmTab(playerId) &&
           message.from === STORYTELLER &&
           message.card &&
           !(
@@ -155,14 +170,18 @@ export default (store) => {
       )
       .map(({ card, choice, at }) => ({ card, choice, at }));
 
-  /** The seats as they were at that moment (who was alive). */
+  /**
+   * The seats as they were for info that came at that moment (who was
+   * alive): up to the next nightfall or nomination after it.
+   */
   const seatsAt = (at) => {
     const seats = store.state.players.players;
-    if (!at || !deaths.length) return seats;
+    const until = at && cutoffs.find((time) => time > at);
+    if (!until || !deaths.length) return seats;
     return seats.map((seat) => {
       const changes = deaths.filter(({ name }) => name === seat.name);
       if (!changes.length) return seat;
-      const before = changes.filter((change) => change.at <= at).pop();
+      const before = changes.filter((change) => change.at <= until).pop();
       const isDead = before ? before.isDead : !changes[0].isDead;
       return { name: seat.name, isDead };
     });
@@ -179,6 +198,35 @@ export default (store) => {
       });
     }
     return traitsOf(id);
+  };
+
+  /** How convincing they are (1 to 10), rolled now if not yet. */
+  const convictionFor = (playerId) => {
+    let conviction = store.state.practice.convictions[playerId];
+    if (!conviction) {
+      conviction = rollConviction();
+      store.commit("practice/setConviction", { id: playerId, conviction });
+    }
+    return conviction;
+  };
+
+  /**
+   * The nominations of the last day before that moment, as the vote
+   * history has them: [{ nominator, voters }] (the Flowergirl, the Town
+   * Crier).
+   */
+  const dayVotes = (at) => {
+    const before = store.state.session.voteHistory.filter(
+      ({ timestamp }) => !at || new Date(timestamp).getTime() < at,
+    );
+    if (!before.length) return [];
+    const last = before[before.length - 1].day;
+    return before
+      .filter(({ day }) => day === last)
+      .map(({ nominator, votes }) => ({
+        nominator,
+        voters: votes.map((name) => name.replace(/^−/, "")),
+      }));
   };
 
   /**
@@ -225,9 +273,24 @@ export default (store) => {
     };
   };
 
+  // the names of the alive ones among town()'s people
+  const aliveNames = (people) =>
+    people.filter(({ seat }) => !seat.isDead).map(({ seat }) => seat.name);
+  // they say in public what they are (claims[name] = role ID)
+  const claimAs = (seat, mind, roleId) => {
+    claims[seat.name] = roleId;
+    mind.claim = roleId;
+  };
+
   /** Everyone as the made-up players see themselves, with what they think. */
   const town = (until = null) => {
     const seats = grimoireSeats(store.state.players.players);
+    // how convincing each one is, by name
+    const factors = {};
+    seats.forEach(({ id, name }) => {
+      factors[name] = convictionFactor(convictionFor(id));
+    });
+    const convictionOf = (name) => factors[name] || 1;
     const people = seats.map((seat) => {
       const cards = cardsOf(seat.id, until);
       const me = withGrimoire(knowledgeOf(seat, cards, roleById), seat.id);
@@ -247,6 +310,9 @@ export default (store) => {
         traits,
         seatsAt,
         day: day(),
+        accusations,
+        convictionOf,
+        dayVotes,
       });
       // the storyteller's answer to the Artist's question
       if (mind.artist && mind.artist.name in scores) {
@@ -263,6 +329,9 @@ export default (store) => {
       statements,
       seatsAt,
       day: day(),
+      accusations,
+      convictionOf,
+      dayVotes,
     });
     return { seats, people, opinion };
   };
@@ -286,9 +355,15 @@ export default (store) => {
   };
   store.$practiceTown = { viewOf };
 
+  // a made-up player speaks in the town square, or writes to the
+  // storyteller in private
   const say = (playerId, key, values = {}) => {
     if (typeof store.$chat.sayAs !== "function") return;
     store.$chat.sayAs(playerId, i18n.t(`practice.say.${key}`, values));
+  };
+  const write = (playerId, key, values = {}) => {
+    if (typeof store.$chat.writeAs !== "function") return;
+    store.$chat.writeAs(playerId, i18n.t(`practice.say.${key}`, values));
   };
 
   /** One line of night info written out, as a player would say it. */
@@ -354,27 +429,21 @@ export default (store) => {
         const { people } = town();
         people.forEach(({ seat, me, mind, scores }) => {
           if (mind.shot || seat.isDead) return;
-          const alive = people
-            .filter(({ seat }) => !seat.isDead)
-            .map(({ seat }) => seat.name);
+          const alive = aliveNames(people);
           const target = slayerShot(me, scores, { alive, day: day() });
           if (!target) return;
           mind.shot = true;
-          claims[seat.name] = me.role.id;
-          mind.claim = me.role.id;
+          claimAs(seat, mind, me.role.id);
           say(seat.id, "slayer", { role: roleName(me.role.id), name: target });
         });
         // the Gossip's statement, once a day
         people.forEach(({ seat, me, mind, scores }) => {
           if (seat.isDead || mind.gossiped === day()) return;
-          const alive = people
-            .filter(({ seat }) => !seat.isDead)
-            .map(({ seat }) => seat.name);
+          const alive = aliveNames(people);
           const target = gossipStatement(me, scores, { alive, day: day() });
           if (!target) return;
           mind.gossiped = day();
-          claims[seat.name] = me.role.id;
-          mind.claim = me.role.id;
+          claimAs(seat, mind, me.role.id);
           say(seat.id, "gossip", { role: roleName(me.role.id), name: target });
         });
         sectsAndViolets(people);
@@ -391,13 +460,7 @@ export default (store) => {
    * question (once). Only good players with the real character.
    */
   const sectsAndViolets = (people) => {
-    const alive = people
-      .filter(({ seat }) => !seat.isDead)
-      .map(({ seat }) => seat.name);
-    const write = (playerId, key, values) => {
-      if (typeof store.$chat.writeAs !== "function") return;
-      store.$chat.writeAs(playerId, i18n.t(`practice.say.${key}`, values));
-    };
+    const alive = aliveNames(people);
     people.forEach(({ seat, me, mind, scores, cards }) => {
       if (seat.isDead || me.alignment !== "good") return;
       const role = roleName(me.role.id);
@@ -409,8 +472,7 @@ export default (store) => {
           scriptRoles: scriptRoles(),
         });
         if (!guesses) return;
-        claims[seat.name] = me.role.id;
-        mind.claim = me.role.id;
+        claimAs(seat, mind, me.role.id);
         say(seat.id, "juggler", {
           role,
           guesses: guesses
@@ -440,9 +502,7 @@ export default (store) => {
   const moonchildren = () => {
     if (!isAuto() || store.state.grimoire.isNight) return;
     const { people, opinion } = town();
-    const alive = people
-      .filter(({ seat }) => !seat.isDead)
-      .map(({ seat }) => seat.name);
+    const alive = aliveNames(people);
     people.forEach(({ seat, me, mind, scores }) => {
       // brought back (Shabaloth, Professor): they choose again next time
       if (!seat.isDead) mind.moonchild = mind.klutz = false;
@@ -451,16 +511,14 @@ export default (store) => {
       const klutz = !mind.klutz && klutzChoice(me, scores, { alive });
       if (klutz) {
         mind.klutz = true;
-        claims[seat.name] = me.role.id;
-        mind.claim = me.role.id;
+        claimAs(seat, mind, me.role.id);
         say(seat.id, "klutz", { role: roleName(me.role.id), name: klutz });
       }
       if (mind.moonchild) return;
       const target = moonchildChoice(me, scores, { alive, opinion });
       if (!target) return;
       mind.moonchild = true;
-      claims[seat.name] = me.role.id;
-      mind.claim = me.role.id;
+      claimAs(seat, mind, me.role.id);
       say(seat.id, "moonchild", { role: roleName(me.role.id), name: target });
     });
   };
@@ -476,8 +534,7 @@ export default (store) => {
     // nothing else, or might be executed
     if (mind.mad && mind.mad.day === day()) {
       if (mind.claim === mind.mad.roleId) return;
-      mind.claim = mind.mad.roleId;
-      claims[seat.name] = mind.claim;
+      claimAs(seat, mind, mind.mad.roleId);
       say(seat.id, "claim", { role: roleName(mind.claim) });
       return;
     }
@@ -540,18 +597,17 @@ export default (store) => {
       );
     // nothing new: who they doubt most, if anyone (the evil, a good player)
     if (!news) {
-      const doubted = Object.keys(scores)
-        .filter(
-          (name) => !people.find(({ seat }) => seat.name === name).seat.isDead,
-        )
-        .filter((name) => !isEvil || !me.teammates.includes(name))
-        .sort(
-          (a, b) =>
-            (isEvil ? opinion[b] || 0 : scores[b]) -
-            (isEvil ? opinion[a] || 0 : scores[a]),
-        )[0];
+      const alive = aliveNames(people);
+      const doubted = mostDoubted(
+        Object.keys(scores).filter(
+          (name) =>
+            alive.includes(name) && (!isEvil || !me.teammates.includes(name)),
+        ),
+        isEvil ? opinion : scores,
+      );
       if (doubted && (isEvil || scores[doubted] > 0.8)) {
         parts.push(i18n.t("practice.say.suspect", { name: doubted }));
+        accusations.push({ speaker: seat.name, name: doubted });
       } else if (first) {
         parts.push(i18n.t("practice.say.nothingYet"));
       }
@@ -598,10 +654,7 @@ export default (store) => {
     });
     if (!escape) return false;
     // the Saint says what they are: the good should want them off too
-    if (escape.reason === "saint") {
-      claims[condemned] = "saint";
-      person.mind.claim = "saint";
-    }
+    if (escape.reason === "saint") claimAs(person.seat, person.mind, "saint");
     nominate(person.seat.id, escape.target, `escape.${escape.reason}`, {
       role: roleName(person.me.role.id),
     });
@@ -764,6 +817,7 @@ export default (store) => {
         }
         break;
       case "toggleNight":
+        if (state.grimoire.isNight) cutoffs.push(Date.now());
         cancelAll();
         call = null;
         if (!state.grimoire.isNight && isAuto() && state.grimoire.nightCount)
@@ -778,12 +832,21 @@ export default (store) => {
       // a vote is over: the next one may nominate
       // (whoever is about to die may try to get off the block)
       case "session/nomination":
+        if (state.session.nomination) cutoffs.push(Date.now());
         if (!state.session.nomination && isAuto()) {
           nominateSoon();
         }
         break;
-      // someone died by day (executed): a Moonchild chooses at once
       case "players/update":
+        // who was alive when: the Empath's neighbours on each night
+        if (payload && payload.property === "isDead" && payload.player) {
+          deaths.push({
+            name: payload.player.name,
+            at: Date.now(),
+            isDead: !!payload.value,
+          });
+        }
+        // someone died by day (executed): a Moonchild chooses at once
         if (
           payload &&
           payload.property === "isDead" &&

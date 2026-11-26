@@ -1,5 +1,25 @@
 [
   {
+    "version": "3.41.0",
+    "date": "2026-11-26",
+    "title": {
+      "en": "Practice players who read the cards and convince",
+      "es": "Jugadores de práctica que leen las cartas y convencen"
+    },
+    "en": [
+      "Practice game: the made-up players use more of what the cards tell them. \"Good\" or \"Evil\" on a line makes them doubt or trust that player; the Chef's, Clockmaker's and Oracle's numbers and the Flowergirl's and Town Crier's yes or no move their doubts a little; a believed Mathematician makes everyone's info count a little less",
+      "Practice game: each made-up player also gets a conviction at random: how much the others believe what they say. A bare \"I suspect X\" now counts a little, only from a very convincing player. With \"Personalities\" on, it shows under the name",
+      "Practice game: the Empath's numbers count for the neighbours they had that night, also when someone died during the night",
+      "Practice game: in long, chatty games the made-up players no longer forget their first-night cards (their minions, the bluffs)"
+    ],
+    "es": [
+      "Partida de práctica: los jugadores inventados aprovechan más lo que dicen las cartas. \"Bueno\" o \"Malvado\" en una línea les hace desconfiar o fiarse de ese jugador; los números del Chef, el Relojero y el Oráculo y el sí o no de la Florista y el Pregonero mueven un poco sus sospechas; un Matemático creído hace que la información de todos cuente algo menos",
+      "Partida de práctica: cada jugador inventado saca también al azar una convicción: cuánto se creen los demás lo que dice. Un simple \"Sospecho de X\" ahora cuenta un poco, solo si lo dice alguien muy convincente. Con \"Personalidades\" activado se ve bajo el nombre",
+      "Partida de práctica: los números del Empático cuentan para los vecinos que tenía esa noche, también si alguien murió durante la noche",
+      "Partida de práctica: en partidas largas con mucho chat, los jugadores inventados ya no olvidan sus cartas de la primera noche (sus esbirros, los faroles)"
+    ]
+  },
+  {
     "version": "3.40.0",
     "date": "2026-11-26",
     "title": {

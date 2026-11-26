@@ -536,7 +536,7 @@
     "backToGrimoire": "Volver al grimorio",
     "autoHint": "Los jugadores inventados juegan solos: contestan a tus tarjetas, dicen qué son al amanecer, nominan cuando abres las nominaciones y votan.",
     "showPersonalities": "Personalidades",
-    "personalitiesHint": "Muestra la personalidad de cada jugador inventado bajo su nombre. Cada uno sacó una al azar al empezar la práctica: cambia cuánto creen a los demás, cómo mienten y cómo votan",
+    "personalitiesHint": "Muestra la personalidad de cada jugador inventado bajo su nombre, y cuánto convence. Cada uno sacó las dos al azar al empezar la práctica: la personalidad cambia cuánto creen a los demás, cómo mienten y cómo votan; la convicción, cuánto se creen los demás lo que dice",
     "personalities": {
       "normal": "Normal",
       "trusting": "Confiado",
@@ -546,6 +546,11 @@
       "veteran": "Veterano",
       "hothead": "Impulsivo",
       "quiet": "Callado"
+    },
+    "convictions": {
+      "low": "Convence poco",
+      "some": "Convence algo",
+      "high": "Convence mucho"
     },
     "leave": "Salir",
     "leaveConfirm": "¿Salir de la práctica? Se borra la partida de prueba.",

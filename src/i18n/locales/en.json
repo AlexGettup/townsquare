@@ -536,7 +536,7 @@
     "backToGrimoire": "Back to the grimoire",
     "autoHint": "The made-up players play by themselves: they answer your cards, say what they are at dawn, nominate when you open nominations, and vote.",
     "showPersonalities": "Personalities",
-    "personalitiesHint": "Show each made-up player's personality under their name. Each one got one at random when the practice started: it changes how they believe others, lie and vote",
+    "personalitiesHint": "Show each made-up player's personality under their name, and how convincing they are. Each one got both at random when the practice started: the personality changes how they believe others, lie and vote; the conviction, how much the others believe what they say",
     "personalities": {
       "normal": "Normal",
       "trusting": "Trusting",
@@ -546,6 +546,11 @@
       "veteran": "Veteran",
       "hothead": "Hothead",
       "quiet": "Quiet"
+    },
+    "convictions": {
+      "low": "Barely convincing",
+      "some": "Fairly convincing",
+      "high": "Very convincing"
     },
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",

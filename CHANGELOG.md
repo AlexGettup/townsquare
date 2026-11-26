@@ -4,6 +4,16 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.41.0
+
+- Practice game: the "Personalities" button's hint also explains the conviction
+- `docs/practice-wiki-audit.md`: audit of the practice game's made-up players against the official wiki (Trouble Brewing, Bad Moon Rising, Sects & Violets), in Spanish, updated to 3.40.0 (nothing changes in the app)
+- Practice game: the made-up players now use more of what the cards tell them. "Good" or "Evil" on a line ("Carl: Evil") makes them doubt or trust that player; the Chef's number, the Clockmaker's, the Oracle's and the Flowergirl's and Town Crier's yes or no (about who voted and nominated the day before) move their doubts a little; a believed Mathematician saying some abilities went wrong makes everyone's info count a little less. Numbers are hints, never proof
+- Practice game: each made-up player also gets a conviction at random when the practice starts, next to their personality: how much the others believe what they say (claims and info). A bare "I suspect X" now counts a little, only from a very convincing player and mostly on the Trusting and the Novices, like a strong voice at a real table. Whoever listens still weighs it with their own personality. With "Personalities" on, it shows under the name (for example "Veteran" and "Very convincing" on two lines)
+- Practice game: the Empath's numbers now really count for the neighbours they had that night. Who died during the night counts, even if marked at dawn; who is executed by day doesn't change what an earlier number meant
+- Practice game: in long, chatty games the made-up players no longer forget their first-night cards ("These are your minions", the bluffs). When the chat reaches its 500 messages, the oldest talk goes first and the cards stay
+- Practice game code: one list of how many seats each card asks for (it was written in three places), shared helpers for "pick one at random" and "the one they doubt / trust most", and a few repeated blocks merged. Nothing changes in the app: a test run of the practice players' decisions on 300 random games gives exactly the same answers before and after
+
 ### Version 3.40.0
 
 - Practice game: each made-up player gets a personality at random when the practice starts (Normal, Trusting, Liar, Strategist, Novice, Veteran, Hothead, Quiet). It changes how much they believe others, how they lie, how soon they nominate and how they vote. A new "Personalities" switch in the blue box shows each one's personality under their name (off at the start)

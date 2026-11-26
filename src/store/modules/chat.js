@@ -8,7 +8,7 @@
  * "place" (everything said around us) and one tab per private channel.
  */
 import { PLAZA, STORYTELLER } from "./voice";
-import { POINTING } from "../../cards";
+import { POINTING, SEATS_TO_CHOOSE } from "../../cards";
 
 export const PLACE_TAB = "place";
 export const dmTab = (playerId) => "dm:" + playerId;
@@ -18,9 +18,6 @@ export const tabOf = (message) =>
 // the card sent when dealing: "You are" and nothing else
 export const isRoleCard = ({ card }) =>
   !!card && card.phrase === "youAre" && (!card.parts || card.parts.length <= 1);
-// cards the player answers by tapping seats: how many they have to pick
-const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
-SEATS_TO_CHOOSE[POINTING] = 1;
 // a pointing vote card only counts while that vote is open
 const isOpenPointing = (rootState) =>
   !!rootState.session.pointing && !rootState.session.pointing.pairs;
@@ -29,6 +26,27 @@ const seatsToChoose = ({ card }, rootState) => {
   if (card.phrase === POINTING && rootState && !isOpenPointing(rootState))
     return 0;
   return SEATS_TO_CHOOSE[card.phrase] || 0;
+};
+// messages kept on this device
+export const MAX_MESSAGES = 500;
+/**
+ * The latest `max` messages. With keepCards (a practice game, where the
+ * made-up players' memory is their cards), the oldest plain messages go
+ * first and info cards stay, so "These are your minions" from the first
+ * night isn't lost in a long, chatty game.
+ */
+export const keepLatest = (messages, max = MAX_MESSAGES, keepCards = false) => {
+  if (messages.length <= max) return messages;
+  if (!keepCards) return messages.slice(-max);
+  let extra = messages.length - max;
+  const kept = messages.filter((message) => {
+    if (extra > 0 && !message.card) {
+      extra--;
+      return false;
+    }
+    return true;
+  });
+  return kept.slice(-max);
 };
 // without an answer from the server by then, the player can try again
 const ANSWER_TIMEOUT = 5 * 1000;
@@ -175,9 +193,13 @@ const mutations = {
     state.messages = messages;
     state.unread = {};
   },
-  addMessage(state, { message, unread }) {
+  addMessage(state, { message, unread, keepCards = false }) {
     if (state.messages.some(({ id }) => id === message.id)) return;
-    state.messages = [...state.messages, message].slice(-500);
+    state.messages = keepLatest(
+      [...state.messages, message],
+      MAX_MESSAGES,
+      keepCards,
+    );
     if (unread) addUnread(state, tabOf(message));
   },
   // a card was seen or answered

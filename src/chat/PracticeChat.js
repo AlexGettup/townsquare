@@ -1,12 +1,6 @@
+import { SEATS_TO_CHOOSE } from "../cards";
+import { MAX_MESSAGES, keepLatest } from "../store/modules/chat";
 import { PLAZA, STORYTELLER } from "../store/modules/voice";
-
-// cards the player answers by tapping seats: how many they have to pick
-const SEATS_TO_CHOOSE = {
-  choosePlayer: 1,
-  chooseTwoPlayers: 2,
-  // the pointing vote (Boomdandy)
-  pointAtPlayer: 1,
-};
 
 /**
  * Stands in for ChatClient in a practice game: no server, the messages stay
@@ -135,7 +129,7 @@ export default class PracticeChat {
       seen: null,
       choice: null,
     };
-    this.messages = [...this.messages, message].slice(-500);
+    this.messages = keepLatest([...this.messages, message], MAX_MESSAGES, true);
     this.onMessage({ ...message });
     return message;
   }
