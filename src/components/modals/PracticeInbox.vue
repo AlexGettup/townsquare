@@ -275,7 +275,27 @@ export default {
           }),
         };
       }
+      // the Cerenovus and the Pit-Hag: the character goes in the chat
+      if (answer.seats && answer.role) {
+        return {
+          seats: answer.seats,
+          text: this.$t("practice.say.pair", {
+            name: answer.seats[0],
+            role: this.$store.getters.localizeRole(roleById(answer.role)).name,
+          }),
+        };
+      }
       if (answer.seats) return answer;
+      // ... or the player, when the card asked for the character
+      if (answer.roleId && answer.target) {
+        return {
+          text: this.$t("practice.say.pair", {
+            name: answer.target,
+            role: this.$store.getters.localizeRole(roleById(answer.roleId))
+              .name,
+          }),
+        };
+      }
       if (answer.roleId) {
         return {
           text: this.$store.getters.localizeRole(roleById(answer.roleId)).name,

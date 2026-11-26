@@ -13,6 +13,12 @@
  * The evil players know who is on their side only from their cards. They
  * push on good players the town already doubts and protect their teammates,
  * but now and then vote or nominate one of them to look good.
+ *
+ * Sects & Violets: the Juggler guesses on their first day, the Savant visits
+ * the storyteller each day, the Artist asks one question, the Klutz chooses
+ * when they learn they died, a player the Cerenovus made mad claims that
+ * character the next day, the Mutant never claims an Outsider. With the
+ * Vortox on the script the good want an execution every day.
  */
 
 import { partsOf } from "./cards";
@@ -38,6 +44,18 @@ const GHOST_SURE = 2;
 const SLAYER_SURE = 2;
 // on a careful day (isCarefulDay) the good only execute when this sure
 const CAREFUL_SURE = 2.5;
+// with the Vortox on the script and nobody about to die: no execution today
+// loses the game, so on the last call they nominate and vote much sooner
+export const VORTOX_NOMINATE = 0.3;
+const VORTOX_VOTE = 0.6;
+// the Artist asks once they doubt someone this much (or now and then from
+// day 3)
+const ARTIST_SURE = 1.2;
+// the Juggler: up to this many guesses
+const JUGGLES = 5;
+
+const GOOD_TEAMS = ["townsfolk", "outsider"];
+const EVIL_TEAMS = ["minion", "demon"];
 
 /**
  * Three players alive, one of them claimed the Mayor: no execution wins
@@ -92,9 +110,35 @@ export const suspicionsOf = (
     scores[name] = (hunches[name] || 0) - (isDead ? 1 : 0);
   });
   let lastChoice = [];
+  const role = me.role.id;
   cards.forEach(({ card, choice }) => {
     if (!card) return;
     partsOf(card).forEach((part) => {
+      const teamsOf = part.roles
+        .map((id) => (roleById(id) || {}).team)
+        .filter(Boolean);
+      // the Dreamer: 1 good and 1 evil character, one of them true
+      if (
+        role === "dreamer" &&
+        teamsOf.some((team) => GOOD_TEAMS.includes(team)) &&
+        teamsOf.some((team) => EVIL_TEAMS.includes(team))
+      ) {
+        const about = part.players.length ? part.players : lastChoice;
+        about.forEach((name) => add(scores, name, 1));
+        return;
+      }
+      // the Sage: the Demon is one of these two
+      if (role === "sage" && part.players.length === 2 && !teamsOf.length) {
+        part.players.forEach((name) => add(scores, name, 1.75));
+        return;
+      }
+      // the Seamstress: "no", the two are not on the same side
+      if (role === "seamstress" && part.answer && lastChoice.length === 2) {
+        if (part.answer === "no") {
+          lastChoice.forEach((name) => add(scores, name, 1));
+        }
+        return;
+      }
       if (
         ["youAre", "thisIsTheDemon", "theseAreYourMinions"].includes(
           part.phrase,
@@ -109,8 +153,10 @@ export const suspicionsOf = (
           (team) => team === "minion" || team === "demon",
         );
         // one good player shown alone (the Grandmother's grandchild) is
-        // trusted for sure; one of two (the Washerwoman's) only a little
-        const good = part.players.length === 1 ? -2 : -0.5;
+        // trusted for sure; one of two (the Washerwoman's) only a little.
+        // An evil player shown a good one (the Evil Twin's twin) pushes them
+        const alone = me.alignment === "evil" ? 2 : -2;
+        const good = part.players.length === 1 ? alone : -0.5;
         part.players.forEach((name) =>
           add(scores, name, evil ? 2.5 / part.players.length + 0.5 : good),
         );
@@ -325,7 +371,8 @@ export const wantsSwap = (me, scores, { condemned, claims, alive }) => {
  * Do they raise their hand? nominee and nominator are names; dead: they
  * would spend their ghost vote; opinion: townOpinion(); mayor: the Mayor's
  * standoff; careful: isCarefulDay(); swap: they want
- * whoever is about to die off the block (wantsSwap).
+ * whoever is about to die off the block (wantsSwap); mustExecute: the
+ * Vortox is on the script and nobody is about to die yet.
  */
 export const votesFor = (
   me,
@@ -338,6 +385,7 @@ export const votesFor = (
     mayor,
     careful,
     swap,
+    mustExecute = false,
     random = Math.random,
   },
 ) => {
@@ -354,6 +402,7 @@ export const votesFor = (
       EVIL_YES + Math.min(Math.max(opinion[nominee] || 0, 0), 1) * 0.3
     );
   }
+  if (mustExecute && !dead) return score + random() * 0.5 >= VORTOX_VOTE;
   if (careful) return score >= CAREFUL_SURE;
   if (dead) return score >= GHOST_SURE;
   return score + random() * 0.5 >= 1.1;
@@ -362,12 +411,20 @@ export const votesFor = (
 /**
  * The character they say they are: their own if good; if evil, one of the
  * characters "not in play" they were given, or else a Townsfolk of the
- * script nobody claimed yet. Returns a role ID or null.
+ * script nobody claimed yet (a good Mutant too). Mad about a character
+ * (mad, a role ID): that one. Returns a role ID or null.
  */
-export const claimFor = (me, { scriptRoles, claims, random = Math.random }) => {
-  if (me.alignment !== "evil") return me.role.id || null;
+export const claimFor = (
+  me,
+  { scriptRoles, claims, mad = null, random = Math.random },
+) => {
+  // mad about a character (the Cerenovus): they claim it, or might die
+  if (mad) return mad;
+  // the Mutant can't say they are an Outsider: they claim a Townsfolk
+  const mutant = me.alignment !== "evil" && me.role.id === "mutant";
+  if (me.alignment !== "evil" && !mutant) return me.role.id || null;
   const taken = Object.values(claims);
-  const bluffs = me.bluffs.filter((id) => !taken.includes(id));
+  const bluffs = mutant ? [] : me.bluffs.filter((id) => !taken.includes(id));
   if (bluffs.length) return bluffs[Math.floor(random() * bluffs.length)];
   const free = scriptRoles.filter(
     ({ id, team }) =>
@@ -435,4 +492,102 @@ export const moonchildChoice = (me, scores, { alive, opinion = {} }) => {
   return (
     [...options].sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0] || null
   );
+};
+
+/**
+ * The Klutz learns they died: the alive player they choose in public (a
+ * name) or null. If that one is evil, their team loses: the good choose
+ * whoever they trust most, an evil Klutz a player not on their side.
+ */
+export const klutzChoice = (me, scores, { alive }) => {
+  if (me.role.id !== "klutz") return null;
+  const options = alive.filter(
+    (name) => name !== me.name && !me.teammates.includes(name),
+  );
+  return (
+    [...options].sort((a, b) => (scores[a] || 0) - (scores[b] || 0))[0] || null
+  );
+};
+
+/**
+ * The Juggler's guesses on their first day: [{ name, roleId }] or null.
+ * What the players they believe claimed, and the one they doubt most as a
+ * Demon of the script, up to 5.
+ */
+export const jugglerGuesses = (
+  me,
+  scores,
+  { alive, claims, scriptRoles, random = Math.random },
+) => {
+  if (me.role.id !== "juggler" || me.alignment !== "good") return null;
+  const known = (id) => scriptRoles.some((role) => role.id === id);
+  const others = alive.filter((name) => name !== me.name);
+  const guesses = others
+    .filter(
+      (name) => claims[name] && known(claims[name]) && (scores[name] || 0) < 1,
+    )
+    .sort((a, b) => (scores[a] || 0) - (scores[b] || 0))
+    .slice(0, JUGGLES - 1)
+    .map((name) => ({ name, roleId: claims[name] }));
+  const demons = scriptRoles.filter(({ team }) => team === "demon");
+  const doubted = others
+    .filter((name) => !guesses.some((guess) => guess.name === name))
+    .sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0];
+  if (doubted && (scores[doubted] || 0) >= 1 && demons.length) {
+    const demon = demons[Math.floor(random() * demons.length)];
+    guesses.push({ name: doubted, roleId: demon.id });
+  }
+  return guesses.length ? guesses : null;
+};
+
+/**
+ * The Artist's one question today: whom they ask about ("is X the
+ * Demon?"), a name, or null. Once per game (the caller remembers it).
+ */
+export const artistQuestion = (
+  me,
+  scores,
+  { alive, day, random = Math.random },
+) => {
+  if (me.role.id !== "artist" || me.alignment !== "good") return null;
+  const options = alive.filter((name) => name !== me.name);
+  if (!options.length) return null;
+  const best = [...options].sort(
+    (a, b) => (scores[b] || 0) - (scores[a] || 0),
+  )[0];
+  if ((scores[best] || 0) >= ARTIST_SURE) return best;
+  if (day >= 3 && random() < 0.4) return best;
+  return null;
+};
+
+/**
+ * The first "yes" or "no" on a card sent after the Artist's question (from:
+ * how many cards they had then), or null.
+ */
+export const answerAfter = (cards, from) => {
+  for (const { card } of cards.slice(from)) {
+    if (!card) continue;
+    const part = partsOf(card).find(({ answer }) => answer);
+    if (part) return part.answer;
+  }
+  return null;
+};
+
+/**
+ * The character the Cerenovus made them mad about, from these cards (the
+ * ones from last night): a card showing the Cerenovus and another
+ * character. A role ID or null.
+ */
+export const madnessIn = (cards) => {
+  let mad = null;
+  cards.forEach(({ card }) => {
+    if (!card) return;
+    const roles = partsOf(card)
+      .filter(({ phrase }) => phrase !== "notInPlay")
+      .flatMap(({ roles }) => roles);
+    if (!roles.includes("cerenovus")) return;
+    const other = roles.find((id) => id !== "cerenovus");
+    if (other) mad = other;
+  });
+  return mad;
 };

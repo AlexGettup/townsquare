@@ -3,12 +3,18 @@ import { CHOICES, alignmentOf, describePart, partsOf } from "../cards";
 import { knowledgeOf } from "../practiceBrain";
 import {
   NOMINATE_AT,
+  VORTOX_NOMINATE,
+  answerAfter,
+  artistQuestion,
   claimFor,
   condemnedOf,
   escapeOf,
   gossipStatement,
   isCarefulDay,
   isMayorStandoff,
+  jugglerGuesses,
+  klutzChoice,
+  madnessIn,
   moonchildChoice,
   nominationOf,
   rollHunches,
@@ -44,8 +50,12 @@ const between = ([min, max]) => min + Math.random() * (max - min);
  *   second and last call) the most convinced one nominates, then the next
  *   after each vote, while someone is sure enough.
  * - When the clock hand starts, each one votes from what they think.
- * - The Gossip may make a public statement, and the Moonchild chooses
- *   someone when they learn they died.
+ * - The Gossip may make a public statement, and the Moonchild and the Klutz
+ *   choose someone when they learn they died.
+ * - Sects & Violets: the Juggler guesses on day 1, the Savant visits the
+ *   storyteller each day and the Artist asks one question (in the private
+ *   chat), a player made mad by the Cerenovus claims that character, and
+ *   with the Vortox on the script they want an execution every day.
  * - At night, store.$practiceTown.viewOf() tells the cards window what a
  *   made-up player thinks, so they choose by it (src/practiceBrain.js).
  *
@@ -56,7 +66,9 @@ export default (store) => {
     store.state.practice.active && !store.state.session.gameOver;
   const isAuto = () => isActive() && store.state.practice.auto;
 
-  // player ID -> { day, hunches, claim, told, shot, gossiped, moonchild }
+  // player ID -> { day, hunches, claim, ownRole, told, shot, gossiped,
+  // moonchild, klutz, juggled, savant, artist: { name, from }, dawnCards,
+  // mad: { day, roleId } }
   let minds = {};
   // name -> role ID claimed in the town square
   let claims = {};
@@ -109,6 +121,11 @@ export default (store) => {
       ({ team }) => team !== "traveller" && team !== "fabled",
     );
   const day = () => store.state.grimoire.nightCount || 1;
+  // the Vortox on the script, and nobody about to die yet: no execution
+  // today loses the game
+  const mustExecute = () =>
+    store.state.roles.has("vortox") &&
+    !condemnedOf(store.getters["session/votesToBeat"]);
   const aliveCount = () =>
     store.state.players.players.filter(({ isDead }) => !isDead).length;
 
@@ -191,6 +208,11 @@ export default (store) => {
         claims,
         roleById,
       });
+      // the storyteller's answer to the Artist's question
+      if (mind.artist && mind.artist.name in scores) {
+        const answer = answerAfter(cards, mind.artist.from);
+        if (answer) scores[mind.artist.name] += answer === "yes" ? 3 : -1.5;
+      }
       return { seat, me, mind, cards, scores };
     });
     const opinion = townOpinion(
@@ -260,9 +282,17 @@ export default (store) => {
   /** Dawn: who speaks, one after the other. */
   const dawn = () => {
     const { people } = town();
+    // made mad last night (the Cerenovus): they say it today
+    people.forEach(({ mind, cards }) => {
+      const mad = madnessIn(cards.slice(mind.dawnCards || 0));
+      mind.dawnCards = cards.length;
+      if (mad) mind.mad = { day: day(), roleId: mad };
+    });
+    const isMad = (mind) => !!mind.mad && mind.mad.day === day();
     const speakers = people
       .filter(
         ({ mind }) =>
+          isMad(mind) ||
           Math.random() < (mind.claim ? 0.6 : day() > 1 ? 0.85 : 0.6),
       )
       .sort(() => Math.random() - 0.5);
@@ -301,6 +331,7 @@ export default (store) => {
           mind.claim = me.role.id;
           say(seat.id, "gossip", { role: roleName(me.role.id), name: target });
         });
+        sectsAndViolets(people);
       },
       wait + between(TALK_GAP),
     );
@@ -308,7 +339,58 @@ export default (store) => {
     later(moonchildren, between(TALK_GAP));
   };
 
-  /** Dead Moonchildren who haven't chosen yet choose someone, in public. */
+  /**
+   * Day abilities of Sects & Violets, once the others have spoken: the
+   * Juggler's guesses (day 1), the Savant's visit (each day), the Artist's
+   * question (once). Only good players with the real character.
+   */
+  const sectsAndViolets = (people) => {
+    const alive = people
+      .filter(({ seat }) => !seat.isDead)
+      .map(({ seat }) => seat.name);
+    const write = (playerId, key, values) => {
+      if (typeof store.$chat.writeAs !== "function") return;
+      store.$chat.writeAs(playerId, i18n.t(`practice.say.${key}`, values));
+    };
+    people.forEach(({ seat, me, mind, scores, cards }) => {
+      if (seat.isDead || me.alignment !== "good") return;
+      const role = roleName(me.role.id);
+      if (me.role.id === "juggler" && day() === 1 && !mind.juggled) {
+        mind.juggled = true;
+        const guesses = jugglerGuesses(me, scores, {
+          alive,
+          claims,
+          scriptRoles: scriptRoles(),
+        });
+        if (!guesses) return;
+        claims[seat.name] = me.role.id;
+        mind.claim = me.role.id;
+        say(seat.id, "juggler", {
+          role,
+          guesses: guesses
+            .map(({ name, roleId }) =>
+              i18n.t("practice.say.pair", { name, role: roleName(roleId) }),
+            )
+            .join(" "),
+        });
+      }
+      if (me.role.id === "savant" && mind.savant !== day()) {
+        mind.savant = day();
+        write(seat.id, "savant", { role });
+      }
+      if (me.role.id === "artist" && !mind.artist) {
+        const name = artistQuestion(me, scores, { alive, day: day() });
+        if (!name) return;
+        mind.artist = { name, from: cards.length };
+        write(seat.id, "artist", { role, name });
+      }
+    });
+  };
+
+  /**
+   * Dead Moonchildren and Klutzes who haven't chosen yet choose someone, in
+   * public.
+   */
   const moonchildren = () => {
     if (!isAuto() || store.state.grimoire.isNight) return;
     const { people, opinion } = town();
@@ -317,8 +399,17 @@ export default (store) => {
       .map(({ seat }) => seat.name);
     people.forEach(({ seat, me, mind, scores }) => {
       // brought back (Shabaloth, Professor): they choose again next time
-      if (!seat.isDead) mind.moonchild = false;
-      if (!seat.isDead || mind.moonchild) return;
+      if (!seat.isDead) mind.moonchild = mind.klutz = false;
+      if (!seat.isDead) return;
+      // the Klutz: if they choose an evil player, their team loses
+      const klutz = !mind.klutz && klutzChoice(me, scores, { alive });
+      if (klutz) {
+        mind.klutz = true;
+        claims[seat.name] = me.role.id;
+        mind.claim = me.role.id;
+        say(seat.id, "klutz", { role: roleName(me.role.id), name: klutz });
+      }
+      if (mind.moonchild) return;
       const target = moonchildChoice(me, scores, { alive, opinion });
       if (!target) return;
       mind.moonchild = true;
@@ -335,8 +426,22 @@ export default (store) => {
     if (!person) return;
     const { seat, me, mind, scores } = person;
     const isEvil = me.alignment === "evil";
-    const first = !mind.claim;
+    // mad about a character today (the Cerenovus): they claim it and say
+    // nothing else, or might be executed
+    if (mind.mad && mind.mad.day === day()) {
+      if (mind.claim === mind.mad.roleId) return;
+      mind.claim = mind.mad.roleId;
+      claims[seat.name] = mind.claim;
+      say(seat.id, "claim", { role: roleName(mind.claim) });
+      return;
+    }
+    // a good player whose character changed (Pit-Hag, Snake Charmer) says
+    // the new one
+    const changed =
+      !isEvil && mind.ownRole && me.role.id && mind.ownRole !== me.role.id;
+    const first = !mind.claim || changed;
     if (first) {
+      mind.ownRole = me.role.id;
       mind.claim = claimFor(me, { scriptRoles: scriptRoles(), claims });
       if (!mind.claim) return;
       claims[seat.name] = mind.claim;
@@ -433,6 +538,7 @@ export default (store) => {
       .map(({ name }) => name);
     if (tryEscape(mood, nominees) || !call) return;
     const hasBlock = !!store.getters["session/votesToBeat"];
+    const vortox = mustExecute();
     const wanted = people
       .filter(({ seat }) => {
         const player = players.players.find(({ id }) => id === seat.id);
@@ -445,10 +551,12 @@ export default (store) => {
           opinion,
           claims,
           hasBlock,
-          careful: isCarefulDay(
-            people.map(({ seat }) => seat),
-            claims,
-          ),
+          careful:
+            !vortox &&
+            isCarefulDay(
+              people.map(({ seat }) => seat),
+              claims,
+            ),
         }),
       }))
       .filter(({ nomination }) => nomination)
@@ -461,7 +569,11 @@ export default (store) => {
     const today = players.players.filter(
       (player) => player.hasNominated,
     ).length;
-    if (!wanted || wanted.eager < NOMINATE_AT[call] + today * 0.1) {
+    const needed =
+      vortox && call === "lastCall"
+        ? VORTOX_NOMINATE
+        : NOMINATE_AT[call] + today * 0.1;
+    if (!wanted || wanted.eager < needed) {
       // nobody is sure enough: until the storyteller calls again
       call = null;
       return;
@@ -492,6 +604,7 @@ export default (store) => {
       claims,
     );
     const condemned = condemnedOf(store.getters["session/votesToBeat"]);
+    const vortox = mustExecute();
     const alive = aliveCount();
     const counts = {};
     const decide = (player, index) => {
@@ -510,7 +623,8 @@ export default (store) => {
           dead: spendsGhostVote,
           opinion,
           mayor,
-          careful,
+          careful: careful && !vortox,
+          mustExecute: vortox,
           swap: wantsSwap(person.me, person.scores, {
             condemned,
             claims,
