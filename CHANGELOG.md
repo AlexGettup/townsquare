@@ -4,7 +4,7 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
-### Next version
+### Version 3.40.0
 
 - Practice game: each made-up player gets a personality at random when the practice starts (Normal, Trusting, Liar, Strategist, Novice, Veteran, Hothead, Quiet). It changes how much they believe others, how they lie, how soon they nominate and how they vote. A new "Personalities" switch in the blue box shows each one's personality under their name (off at the start)
 - Practice game: the made-up players now listen to what others say in the town square (claims and info), believing it more or less depending on their personality and how much they doubt whoever says it. The evil make up info for their bluff ("I'm the Empath, I got a 1", "Ana or Carlos is the Chef" covering a teammate), two players claiming the same character makes the whole town suspicious, the Washerwoman, Librarian and Investigator check what they saw against what each one claimed, a Fortune Teller who thinks it through checks the players they doubt, a thinking Demon leaves a claimed Soldier alone, and some test a claimed Virgin by nominating her. Some good players keep their character to themselves on the first day

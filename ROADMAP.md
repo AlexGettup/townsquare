@@ -76,6 +76,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
 - **3.38.0** Guided night uses the whole height of its tab on upright screens; practice guided
   night keeps only Send info and Next; Bad Moon Rising characters play by their rules in practice
 - **3.39.0** Sects & Violets characters play by their rules in practice games
+- **3.40.0** Practice players with personalities who listen to and weigh what others say in
+  the town square; evil bluffs with made-up info
 
 ## Planned
 
