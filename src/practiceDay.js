@@ -85,6 +85,19 @@ const add = (scores, name, amount) => {
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+/** One of the list at random, or null when it is empty. */
+export const pickOne = (list, random = Math.random) =>
+  list.length ? list[Math.floor(random() * list.length)] : null;
+
+/**
+ * The name they doubt most (the highest score), or the one they trust most
+ * (the lowest), the first of the list on a tie; null when none.
+ */
+export const mostDoubted = (names, scores) =>
+  [...names].sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0] || null;
+export const mostTrusted = (names, scores) =>
+  [...names].sort((a, b) => (scores[a] || 0) - (scores[b] || 0))[0] || null;
+
 // what one source can move someone's suspicion, at most: their own night
 // info (the Empath's numbers night after night don't add up for ever)...
 const OWN_INFO = [-3, 4.5];
@@ -244,10 +257,8 @@ export const evidenceOf = (
   // the Librarian's 0: no Outsiders in play, whoever claims one lies
   if (hasNumber && !line.number && role === "librarian") {
     Object.keys(claims).forEach((name) => {
-      if (isGood((roleById(claims[name]) || {}).team)) {
-        if ((roleById(claims[name]) || {}).team === "outsider") {
-          put(name, 1.5 * logic);
-        }
+      if ((roleById(claims[name]) || {}).team === "outsider") {
+        put(name, 1.5 * logic);
       }
     });
   }
@@ -495,16 +506,13 @@ export const nominationOf = (
   const carefulExtra =
     careful && me.alignment !== "evil" ? CAREFUL_SURE - 1 : 0;
   if (me.alignment === "evil") {
-    const doubted = options.filter((name) => me.teammates.includes(name));
-    const mostDoubted = doubted.sort(
-      (a, b) => (opinion[b] || 0) - (opinion[a] || 0),
-    )[0];
-    if (
-      mostDoubted &&
-      (opinion[mostDoubted] || 0) > 1.2 &&
-      random() < SACRIFICE
-    ) {
-      return { target: mostDoubted, score: 2, reason: "sacrifice" };
+    // the teammate the town doubts most, now and then
+    const mate = mostDoubted(
+      options.filter((name) => me.teammates.includes(name)),
+      opinion,
+    );
+    if (mate && (opinion[mate] || 0) > 1.2 && random() < SACRIFICE) {
+      return { target: mate, score: 2, reason: "sacrifice" };
     }
     const good = options.filter((name) => !me.teammates.includes(name));
     if (!good.length) return null;
@@ -696,16 +704,16 @@ export const claimFor = (
           ),
       )
       .map(([, id]) => id);
-    if (clash.length) return clash[Math.floor(random() * clash.length)];
+    if (clash.length) return pickOne(clash, random);
   }
   const bluffs = mutant ? [] : me.bluffs.filter((id) => !taken.includes(id));
-  if (bluffs.length) return bluffs[Math.floor(random() * bluffs.length)];
+  if (bluffs.length) return pickOne(bluffs, random);
   const free = scriptRoles.filter(
     ({ id, team }) =>
       team === "townsfolk" && id !== me.role.id && !taken.includes(id),
   );
-  if (!free.length) return null;
-  return free[Math.floor(random() * free.length)].id;
+  const picked = pickOne(free, random);
+  return picked ? picked.id : null;
 };
 
 // characters whose made-up info is only told on the first day (they learn
@@ -751,8 +759,7 @@ export const fakeInfo = (
     return null;
   if (random() >= traits.lies) return null;
   const bold = random() < traits.lies * 0.7;
-  const pick = (list) =>
-    list.length ? list[Math.floor(random() * list.length)] : null;
+  const pick = (list) => pickOne(list, random);
   const shuffle = (list) => [...list].sort(() => random() - 0.5);
   const alive = players
     .filter(({ name, isDead }) => !isDead && name !== me.name)
@@ -843,7 +850,7 @@ export const slayerShot = (
   if (me.role.id !== "slayer" || me.alignment !== "good") return null;
   const options = alive.filter((name) => name !== me.name);
   if (!options.length) return null;
-  const best = options.sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0];
+  const best = mostDoubted(options, scores);
   if ((scores[best] || 0) >= SLAYER_SURE) return best;
   if (day >= 3 && random() < 0.35) return best;
   return null;
@@ -863,9 +870,7 @@ export const gossipStatement = (
   if (me.role.id !== "gossip" || me.alignment !== "good") return null;
   const options = alive.filter((name) => name !== me.name);
   if (!options.length) return null;
-  const best = [...options].sort(
-    (a, b) => (scores[b] || 0) - (scores[a] || 0),
-  )[0];
+  const best = mostDoubted(options, scores);
   if ((scores[best] || 0) >= 1.2 && random() < 0.7) return best;
   if (day >= 2 && random() < 0.3) return best;
   return null;
@@ -882,13 +887,9 @@ export const moonchildChoice = (me, scores, { alive, opinion = {} }) => {
   const options = alive.filter((name) => name !== me.name);
   if (me.alignment === "evil") {
     const good = options.filter((name) => !me.teammates.includes(name));
-    return (
-      [...good].sort((a, b) => (opinion[a] || 0) - (opinion[b] || 0))[0] || null
-    );
+    return mostTrusted(good, opinion);
   }
-  return (
-    [...options].sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0] || null
-  );
+  return mostDoubted(options, scores);
 };
 
 /**
@@ -901,9 +902,7 @@ export const klutzChoice = (me, scores, { alive }) => {
   const options = alive.filter(
     (name) => name !== me.name && !me.teammates.includes(name),
   );
-  return (
-    [...options].sort((a, b) => (scores[a] || 0) - (scores[b] || 0))[0] || null
-  );
+  return mostTrusted(options, scores);
 };
 
 /**
@@ -927,12 +926,12 @@ export const jugglerGuesses = (
     .slice(0, JUGGLES - 1)
     .map((name) => ({ name, roleId: claims[name] }));
   const demons = scriptRoles.filter(({ team }) => team === "demon");
-  const doubted = others
-    .filter((name) => !guesses.some((guess) => guess.name === name))
-    .sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0];
+  const doubted = mostDoubted(
+    others.filter((name) => !guesses.some((guess) => guess.name === name)),
+    scores,
+  );
   if (doubted && (scores[doubted] || 0) >= 1 && demons.length) {
-    const demon = demons[Math.floor(random() * demons.length)];
-    guesses.push({ name: doubted, roleId: demon.id });
+    guesses.push({ name: doubted, roleId: pickOne(demons, random).id });
   }
   return guesses.length ? guesses : null;
 };
@@ -949,9 +948,7 @@ export const artistQuestion = (
   if (me.role.id !== "artist" || me.alignment !== "good") return null;
   const options = alive.filter((name) => name !== me.name);
   if (!options.length) return null;
-  const best = [...options].sort(
-    (a, b) => (scores[b] || 0) - (scores[a] || 0),
-  )[0];
+  const best = mostDoubted(options, scores);
   if ((scores[best] || 0) >= ARTIST_SURE) return best;
   if (day >= 3 && random() < 0.4) return best;
   return null;

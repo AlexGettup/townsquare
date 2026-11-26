@@ -8,7 +8,7 @@
  * "place" (everything said around us) and one tab per private channel.
  */
 import { PLAZA, STORYTELLER } from "./voice";
-import { POINTING } from "../../cards";
+import { POINTING, SEATS_TO_CHOOSE } from "../../cards";
 
 export const PLACE_TAB = "place";
 export const dmTab = (playerId) => "dm:" + playerId;
@@ -18,9 +18,6 @@ export const tabOf = (message) =>
 // the card sent when dealing: "You are" and nothing else
 export const isRoleCard = ({ card }) =>
   !!card && card.phrase === "youAre" && (!card.parts || card.parts.length <= 1);
-// cards the player answers by tapping seats: how many they have to pick
-const SEATS_TO_CHOOSE = { choosePlayer: 1, chooseTwoPlayers: 2 };
-SEATS_TO_CHOOSE[POINTING] = 1;
 // a pointing vote card only counts while that vote is open
 const isOpenPointing = (rootState) =>
   !!rootState.session.pointing && !rootState.session.pointing.pairs;

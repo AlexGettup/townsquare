@@ -8,6 +8,7 @@ release of this fork; older versions belong to the original project.
 
 - Practice game: the Empath's numbers now really count for the neighbours they had that night. Who died during the night counts, even if marked at dawn; who is executed by day doesn't change what an earlier number meant
 - Practice game: in long, chatty games the made-up players no longer forget their first-night cards ("These are your minions", the bluffs). When the chat reaches its 500 messages, the oldest talk goes first and the cards stay
+- Practice game code: one list of how many seats each card asks for (it was written in three places), shared helpers for "pick one at random" and "the one they doubt / trust most", and a few repeated blocks merged. Nothing changes in the app: a test run of the practice players' decisions on 300 random games gives exactly the same answers before and after
 
 ### Version 3.40.0
 

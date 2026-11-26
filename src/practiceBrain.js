@@ -35,17 +35,9 @@
  * Kept apart from Vue and the store so it can be tried on its own.
  */
 
-import { CHOICES, alignmentOf, partsOf } from "./cards";
-import { neighboursOf } from "./practiceDay";
+import { CHOICES, SEATS_TO_CHOOSE, alignmentOf, partsOf } from "./cards";
+import { neighboursOf, pickOne } from "./practiceDay";
 import { PERSONALITIES } from "./practicePersonality";
-
-// cards answered by tapping seats: how many to pick
-export const SEATS_TO_CHOOSE = {
-  choosePlayer: 1,
-  chooseTwoPlayers: 2,
-  // the pointing vote (Boomdandy)
-  pointAtPlayer: 1,
-};
 
 // evil characters whose choice protects instead of hurting
 const PROTECTS_EVIL = ["devilsadvocate"];
@@ -406,15 +398,12 @@ export const chooseSeats = (
       if (seats) return { seats };
     }
     groups = [without(targets, last), targets, without(alive, [me.name])];
-  } else if (CHECKS.includes(role.id) && scores && random() < traits.logic) {
-    // the two they doubt most (the Fortune Teller looking for the Demon)
-    const seats = firstOf(
-      [...ranked(others(alive), scores, random), ...others(dead), ...self],
-      count,
-    );
-    if (seats) return { seats };
-    groups = [others(alive), alive];
-  } else if (HUNTS.includes(role.id) && scores) {
+  } else if (
+    // the ones they doubt most (a thinking Fortune Teller looking for the
+    // Demon, the Sailor, the Exorcist...)
+    (CHECKS.includes(role.id) && scores && random() < traits.logic) ||
+    (HUNTS.includes(role.id) && scores)
+  ) {
     const seats = firstOf(
       [...ranked(others(alive), scores, random), ...others(dead), ...self],
       count,
@@ -463,18 +452,15 @@ export const chooseCharacter = (
   if (NAMES_EVIL.includes(role.id) && me.alignment !== "evil") {
     const team = random() < 0.6 ? "demon" : "minion";
     const evil = notMine.filter((other) => other.team === team);
-    if (evil.length) return evil[Math.floor(random() * evil.length)].id;
+    if (evil.length) return pickOne(evil, random).id;
   }
   const list =
     (NAMES_GOOD.includes(role.id) || me.alignment === "evil") && good.length
       ? good
       : notMine;
-  if (!list.length) return null;
-  return list[Math.floor(random() * list.length)].id;
+  const picked = pickOne(list, random);
+  return picked ? picked.id : null;
 };
-
-const pickOne = (list, random) =>
-  list.length ? list[Math.floor(random() * list.length)] : null;
 
 /**
  * The character the Cerenovus or the Pit-Hag pairs with their player
@@ -629,10 +615,7 @@ export const gamble = (
   );
   const guesses = demons.length ? demons : townsfolk;
   if (!doubted || !guesses.length) return null;
-  return {
-    seats: [doubted],
-    guess: guesses[Math.floor(random() * guesses.length)].id,
-  };
+  return { seats: [doubted], guess: pickOne(guesses, random).id };
 };
 
 /**
