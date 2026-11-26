@@ -1,5 +1,5 @@
 import i18n from "../i18n";
-import { CHOICES, alignmentOf, describePart, partsOf } from "../cards";
+import { CHOICES, alignmentOf, describePart } from "../cards";
 import { knowledgeOf } from "../practiceBrain";
 import {
   NOMINATE_AT,
@@ -9,7 +9,9 @@ import {
   claimFor,
   condemnedOf,
   escapeOf,
+  fakeInfo,
   gossipStatement,
+  infoOf,
   isCarefulDay,
   isMayorStandoff,
   jugglerGuesses,
@@ -17,13 +19,14 @@ import {
   madnessIn,
   moonchildChoice,
   nominationOf,
+  publicOpinion,
   rollHunches,
   slayerShot,
   suspicionsOf,
-  townOpinion,
   votesFor,
   wantsSwap,
 } from "../practiceDay";
+import { rollPersonality, traitsOf } from "../practicePersonality";
 import { grimoireSeats } from "./modules/practice";
 import { STORYTELLER } from "./modules/voice";
 import { valueFromReminders } from "./voteValue";
@@ -33,8 +36,6 @@ const EXILE_YES = 0.5;
 // pauses, in ms: between people talking at dawn, before a nomination
 const TALK_GAP = [2500, 5000];
 const NOMINATE_GAP = [3000, 6000];
-// the evil team's secrets, never told in the town square
-const SECRET = ["youAre", "thisIsTheDemon", "theseAreYourMinions", "notInPlay"];
 // lines that only ask something: what they learned is the rest of the line
 const ASKS = [...CHOICES, "useAbility", "pointAtPlayer"];
 
@@ -72,6 +73,12 @@ export default (store) => {
   let minds = {};
   // name -> role ID claimed in the town square
   let claims = {};
+  // what each one said they learned at night, true or made up: [{ speaker,
+  // roleId, lines }] (lines as practiceDay's infoOf gives them)
+  let statements = [];
+  // deaths and comebacks as they happened: [{ name, at, isDead }], to know
+  // who was alive when a card came (the Empath's neighbours that night)
+  let deaths = [];
   // player ID -> the grimoire they were shown (the Spy): { players: [{
   // name, roleId, alignment }], bluffs: [role IDs] }
   let seen = {};
@@ -106,6 +113,8 @@ export default (store) => {
     cancelAll();
     minds = {};
     claims = {};
+    statements = [];
+    deaths = [];
     seen = {};
     call = null;
   };
@@ -144,7 +153,33 @@ export default (store) => {
             message.id >= until.messageId
           ),
       )
-      .map(({ card, choice }) => ({ card, choice }));
+      .map(({ card, choice, at }) => ({ card, choice, at }));
+
+  /** The seats as they were at that moment (who was alive). */
+  const seatsAt = (at) => {
+    const seats = store.state.players.players;
+    if (!at || !deaths.length) return seats;
+    return seats.map((seat) => {
+      const changes = deaths.filter(({ name }) => name === seat.name);
+      if (!changes.length) return seat;
+      const before = changes.filter((change) => change.at <= at).pop();
+      const isDead = before ? before.isDead : !changes[0].isDead;
+      return { name: seat.name, isDead };
+    });
+  };
+
+  /** Their personality's traits, rolled now if they have none yet. */
+  const traitsFor = (playerId) => {
+    let id = store.state.practice.personalities[playerId];
+    if (!id) {
+      id = rollPersonality();
+      store.commit("practice/setPersonality", {
+        id: playerId,
+        personality: id,
+      });
+    }
+    return traitsOf(id);
+  };
 
   /**
    * An evil player who was shown the grimoire (the Spy) knows the whole
@@ -197,9 +232,10 @@ export default (store) => {
       const cards = cardsOf(seat.id, until);
       const me = withGrimoire(knowledgeOf(seat, cards, roleById), seat.id);
       const mind = minds[seat.id] || (minds[seat.id] = { told: 0 });
+      const traits = traitsFor(seat.id);
       if (mind.day !== day()) {
         mind.day = day();
-        mind.hunches = rollHunches(me, seats);
+        mind.hunches = rollHunches(me, seats, Math.random, traits.hunch);
       }
       const scores = suspicionsOf(me, {
         cards,
@@ -207,19 +243,27 @@ export default (store) => {
         hunches: mind.hunches,
         claims,
         roleById,
+        statements,
+        traits,
+        seatsAt,
+        day: day(),
       });
       // the storyteller's answer to the Artist's question
       if (mind.artist && mind.artist.name in scores) {
         const answer = answerAfter(cards, mind.artist.from);
         if (answer) scores[mind.artist.name] += answer === "yes" ? 3 : -1.5;
       }
-      return { seat, me, mind, cards, scores };
+      return { seat, me, mind, cards, scores, traits };
     });
-    const opinion = townOpinion(
-      people
-        .filter(({ me }) => me.alignment !== "evil")
-        .map(({ scores }) => scores),
-    );
+    // what the town square says: what the evil can read of the town
+    const opinion = publicOpinion({
+      players: seats,
+      claims,
+      roleById,
+      statements,
+      seatsAt,
+      day: day(),
+    });
     return { seats, people, opinion };
   };
 
@@ -237,6 +281,7 @@ export default (store) => {
       scores: person.scores,
       opinion,
       claims: { ...claims },
+      traits: person.traits,
     };
   };
   store.$practiceTown = { viewOf };
@@ -246,37 +291,34 @@ export default (store) => {
     store.$chat.sayAs(playerId, i18n.t(`practice.say.${key}`, values));
   };
 
-  /** What they learned at night and haven't told yet, as one line. */
-  const newsOf = ({ cards, mind }) => {
-    let lastChoice = [];
-    const lines = [];
-    cards.forEach(({ card, choice }, index) => {
-      partsOf(card).forEach((part) => {
-        if (index < mind.told || SECRET.includes(part.phrase)) return;
-        const info = ASKS.includes(part.phrase)
-          ? { ...part, phrase: null }
-          : part;
-        const onlyNumber =
-          !info.phrase &&
-          info.number !== null &&
-          !info.players.length &&
-          !info.roles.length &&
-          !info.answer;
-        const line = onlyNumber
-          ? i18n.t("practice.say.number", { n: info.number })
-          : describePart(info, (key) => i18n.t(key), roleName);
-        if (!line) return;
-        // a yes or no about the players they chose (Fortune Teller)
-        lines.push(
-          part.answer && lastChoice.length && !part.players.length
-            ? `${lastChoice.join(", ")}: ${line}`
-            : line,
-        );
-      });
-      if (choice && choice.length) lastChoice = choice;
-    });
-    mind.told = cards.length;
-    return lines.join("; ");
+  /** One line of night info written out, as a player would say it. */
+  const lineText = (line) => {
+    const info = ASKS.includes(line.phrase) ? { ...line, phrase: null } : line;
+    const onlyNumber =
+      !info.phrase &&
+      info.number !== null &&
+      !info.players.length &&
+      !info.roles.length &&
+      !info.answer;
+    const text = onlyNumber
+      ? i18n.t("practice.say.number", { n: info.number })
+      : describePart(info, (key) => i18n.t(key), roleName);
+    if (!text) return "";
+    // a yes or no about the players they chose (Fortune Teller)
+    return line.answer && line.about.length && !line.players.length
+      ? `${line.about.join(", ")}: ${text}`
+      : text;
+  };
+
+  /**
+   * What they learned at night and haven't told yet: { lines, text } (text
+   * as one line, "" when nothing).
+   */
+  const newsOf = ({ seat, cards, mind }) => {
+    const all = infoOf(seat.name, cards, seatsAt);
+    const lines = all.slice(mind.told).filter((line) => lineText(line));
+    mind.told = all.length;
+    return { lines, text: lines.map(lineText).join("; ") };
   };
 
   /** Dawn: who speaks, one after the other. */
@@ -291,9 +333,13 @@ export default (store) => {
     const isMad = (mind) => !!mind.mad && mind.mad.day === day();
     const speakers = people
       .filter(
-        ({ mind }) =>
+        ({ mind, traits }) =>
           isMad(mind) ||
-          Math.random() < (mind.claim ? 0.6 : day() > 1 ? 0.85 : 0.6),
+          Math.random() <
+            Math.min(
+              (mind.claim ? 0.6 : day() > 1 ? 0.85 : 0.6) * traits.talk,
+              0.95,
+            ),
       )
       .sort(() => Math.random() - 0.5);
     let wait = between(TALK_GAP);
@@ -424,7 +470,7 @@ export default (store) => {
     const { people, opinion } = town();
     const person = people.find(({ seat }) => seat.id === playerId);
     if (!person) return;
-    const { seat, me, mind, scores } = person;
+    const { seat, me, mind, scores, traits } = person;
     const isEvil = me.alignment === "evil";
     // mad about a character today (the Cerenovus): they claim it and say
     // nothing else, or might be executed
@@ -440,13 +486,49 @@ export default (store) => {
     const changed =
       !isEvil && mind.ownRole && me.role.id && mind.ownRole !== me.role.id;
     const first = !mind.claim || changed;
+    // some good players keep their character to themselves on the first day
+    // (their personality's hides): they say so, and tell it all later
+    if (first && !isEvil && !changed && day() === 1 && !mind.hid) {
+      mind.hid = true;
+      if (Math.random() < traits.hides) {
+        say(seat.id, "hiding");
+        return;
+      }
+    }
     if (first) {
       mind.ownRole = me.role.id;
-      mind.claim = claimFor(me, { scriptRoles: scriptRoles(), claims });
+      mind.claim = claimFor(me, {
+        scriptRoles: scriptRoles(),
+        claims,
+        traits,
+      });
       if (!mind.claim) return;
       claims[seat.name] = mind.claim;
     }
-    const news = isEvil ? "" : newsOf(person);
+    // what they learned, or for the evil what they make up for their bluff
+    let told = { lines: [], text: "" };
+    if (!isEvil) told = newsOf(person);
+    else if (mind.faked !== day()) {
+      mind.faked = day();
+      const lines =
+        fakeInfo(me, mind.claim, {
+          players: store.state.players.players,
+          claims,
+          opinion,
+          scriptRoles: scriptRoles(),
+          day: day(),
+          traits,
+        }) || [];
+      told = { lines, text: lines.map(lineText).filter(Boolean).join("; ") };
+    }
+    if (told.lines.length) {
+      statements.push({
+        speaker: seat.name,
+        roleId: mind.claim,
+        lines: told.lines,
+      });
+    }
+    const news = told.text;
     const parts = [];
     if (first)
       parts.push(i18n.t("practice.say.claim", { role: roleName(mind.claim) }));
@@ -557,6 +639,9 @@ export default (store) => {
               people.map(({ seat }) => seat),
               claims,
             ),
+          traits: person.traits,
+          day: day(),
+          hunches: person.mind.hunches,
         }),
       }))
       .filter(({ nomination }) => nomination)
@@ -625,6 +710,7 @@ export default (store) => {
           mayor,
           careful: careful && !vortox,
           mustExecute: vortox,
+          traits: person.traits,
           swap: wantsSwap(person.me, person.scores, {
             condemned,
             claims,

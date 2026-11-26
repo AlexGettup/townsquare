@@ -37,6 +37,7 @@
 
 import { CHOICES, alignmentOf, partsOf } from "./cards";
 import { neighboursOf } from "./practiceDay";
+import { PERSONALITIES } from "./practicePersonality";
 
 // cards answered by tapping seats: how many to pick
 export const SEATS_TO_CHOOSE = {
@@ -52,11 +53,25 @@ const PROTECTS_EVIL = ["devilsadvocate"];
 const PROTECTS = ["monk", "innkeeper", "tealady"];
 // good characters who choose whoever they doubt most (the Sailor makes them
 // drunk, the Exorcist stops the Demon, the Chambermaid sees if they woke)
-const HUNTS = ["exorcist", "sailor", "chambermaid", "snakecharmer", "dreamer"];
+const HUNTS = [
+  "exorcist",
+  "sailor",
+  "chambermaid",
+  "snakecharmer",
+  "dreamer",
+  "ravenkeeper",
+];
+// good characters who learn something about two players they choose: a
+// thinking player checks the ones they doubt (how likely: their logic)
+const CHECKS = ["fortuneteller"];
+// whoever claimed these can't be killed by the Demon (or not by night)
+const UNKILLABLE = ["soldier"];
 // whoever they chose before, they keep choosing most nights
 const KEEPS_CHOICE = { butler: 0.75, sailor: 0.3 };
-// a Demon that may choose themselves to pass the Demon on (Imp)
+// a Demon that may choose themselves to pass the Demon on (Imp), more when
+// the town doubts them and they think it through (their logic)
 const STARPASS = { imp: 0.08 };
+const STARPASS_DOUBTED = 0.3;
 // characters that choose a good character with "choose a character"
 const NAMES_GOOD = ["philosopher", "cerenovus", "pixie", "huntsman"];
 // characters that choose an evil one: the Courtier makes them drunk
@@ -278,6 +293,7 @@ export const chooseSeats = (
     opinion = null,
     claims = {},
     scriptRoles = [],
+    traits = PERSONALITIES.normal,
     random = Math.random,
   } = {},
 ) => {
@@ -294,7 +310,9 @@ export const chooseSeats = (
     const minionAlive = players.some(
       ({ name, isDead }) => !isDead && me.teammates.includes(name),
     );
-    if (minionAlive && random() < starpass) return { seats: [me.name] };
+    const doubted = !!opinion && (opinion[me.name] || 0) >= 1.5;
+    const chance = starpass + (doubted ? STARPASS_DOUBTED * traits.logic : 0);
+    if (minionAlive && random() < chance) return { seats: [me.name] };
   }
 
   // the Butler keeps their master
@@ -368,7 +386,14 @@ export const chooseSeats = (
     // Whoever the town trusts most first: they leave the doubted ones for
     // the town to execute
     const side = [...me.teammates, me.name];
-    const targets = without(alive, side);
+    // a claimed Soldier is left alone by a Demon who thinks (their logic)
+    const demon = role.team === "demon";
+    const safe = Object.keys(claims).filter(
+      (name) => UNKILLABLE.includes(claims[name]) && random() < traits.logic,
+    );
+    const everyone = without(alive, side);
+    const spared = demon ? without(everyone, safe) : everyone;
+    const targets = spared.length ? spared : everyone;
     if (opinion) {
       const seats = firstOf(
         [
@@ -381,6 +406,14 @@ export const chooseSeats = (
       if (seats) return { seats };
     }
     groups = [without(targets, last), targets, without(alive, [me.name])];
+  } else if (CHECKS.includes(role.id) && scores && random() < traits.logic) {
+    // the two they doubt most (the Fortune Teller looking for the Demon)
+    const seats = firstOf(
+      [...ranked(others(alive), scores, random), ...others(dead), ...self],
+      count,
+    );
+    if (seats) return { seats };
+    groups = [others(alive), alive];
   } else if (HUNTS.includes(role.id) && scores) {
     const seats = firstOf(
       [...ranked(others(alive), scores, random), ...others(dead), ...self],
