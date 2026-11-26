@@ -7,6 +7,7 @@ release of this fork; older versions belong to the original project.
 ### Next version
 
 - Storyteller on phones and tablets held upright: the guided night uses the whole height of its "Night" tab. The character's text is no longer cut after three lines (it takes the room left and scrolls when longer), and the buttons are a little bigger. Landscape screens and computers don't change
+- Practice game, guided night: only "Send info" and "Next" are left, in one row. "Wake" did nothing there (the made-up players don't listen to voice), so "Sleep and next" is now just "Next", and "Skip" did the same as "Next". Real games don't change
 
 ### Version 3.37.0
 

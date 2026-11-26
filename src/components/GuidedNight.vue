@@ -108,6 +108,11 @@
             <font-awesome-icon icon="comment-dots" />
             {{ $t("guidedNight.sendCard") }}
           </span>
+          <!-- practice: one row, nothing else to do -->
+          <span v-if="isPractice" class="button townsfolk" @click="next">
+            {{ $t("guidedNight.next") }}
+            <font-awesome-icon icon="chevron-right" />
+          </span>
         </div>
 
         <!-- what came back since this step started -->
@@ -118,7 +123,7 @@
           </li>
         </ul>
 
-        <div class="actions">
+        <div class="actions" v-if="!isPractice || !hasPlayers">
           <span class="button townsfolk" @click="next">
             {{
               canWake && hasPlayers
@@ -127,7 +132,9 @@
             }}
             <font-awesome-icon icon="chevron-right" />
           </span>
-          <span class="button" @click="skip">{{ $t("guidedNight.skip") }}</span>
+          <span class="button" v-if="!isPractice" @click="skip">{{
+            $t("guidedNight.skip")
+          }}</span>
         </div>
       </template>
     </template>
@@ -227,9 +234,10 @@ export default {
         .replace(/:reminder:/g, "")
         .trim();
     },
-    // waking goes through voice: in voice, or in a practice game
+    // waking goes through voice. Not in a practice game: the made-up
+    // players don't listen, so there "Next" and "Send info" are enough
     canWake() {
-      return this.isConnected || this.isPractice;
+      return this.isConnected && !this.isPractice;
     },
     isAwake() {
       return (
