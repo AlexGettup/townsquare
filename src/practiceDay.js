@@ -144,6 +144,7 @@ export const infoOf = (name, cards, seatsAt) => {
         ...part,
         about: lastChoice,
         neighbours: neighboursOf(name, seatsAt(at)),
+        at,
       });
     });
     if (choice && choice.length) lastChoice = choice;
@@ -160,17 +161,115 @@ const SECRET = ["youAre", "thisIsTheDemon", "theseAreYourMinions", "notInPlay"];
  * or the one claimed by whoever told it); self: who learned it; claims:
  * name -> role ID claimed; trusted(name): whoever reads it trusts them;
  * logic: how much they reason with it (the personality); evilReader: an
- * evil player shown a good one pushes them instead (the Evil Twin).
+ * evil player shown a good one pushes them instead (the Evil Twin);
+ * players: [{ name, isDead }] in seat order; scoreOf(name): what whoever
+ * reads it thinks of them so far; dayVotes(at): the nominations of the
+ * last day before that moment ([{ nominator, voters }], the Flowergirl's
+ * and the Town Crier's day).
  */
 export const evidenceOf = (
   line,
-  { role, self, claims, roleById, trusted, logic, evilReader = false },
+  {
+    role,
+    self,
+    claims,
+    roleById,
+    trusted,
+    logic,
+    evilReader = false,
+    players = [],
+    scoreOf = () => 0,
+    dayVotes = () => [],
+  },
 ) => {
   const found = {};
   const put = (name, amount) => {
     if (name === self) return;
     found[name] = (found[name] || 0) + amount;
   };
+  const hasNumber = line.number !== null && line.number !== undefined;
+  // whoever they doubt most, if they doubt anyone (1 or more)
+  const topDoubted = () => {
+    let best = null;
+    players.forEach(({ name }) => {
+      if (name === self || scoreOf(name) < 1) return;
+      if (best === null || scoreOf(name) > scoreOf(best)) best = name;
+    });
+    return best;
+  };
+  // "Carl: Evil" on a line of its own: as if shown an evil character
+  if (
+    line.alignment &&
+    line.players.length === 1 &&
+    !line.roles.length &&
+    !evilReader
+  ) {
+    put(line.players[0], line.alignment === "evil" ? 2.5 : -2);
+  }
+  // the Chef: pairs of evil neighbours. 0: whoever they doubt most has no
+  // evil neighbour; more: their neighbours are a little suspicious
+  if (role === "chef" && hasNumber && !line.players.length) {
+    const top = topDoubted();
+    if (top) {
+      neighboursOf(top, players).forEach((name) =>
+        put(name, line.number ? 0.4 * Math.min(line.number, 2) : -0.3),
+      );
+    }
+    return found;
+  }
+  // the Clockmaker: steps from the Demon to the nearest Minion. Those that
+  // far from whoever they doubt most are a little suspicious
+  if (role === "clockmaker" && hasNumber && !line.players.length) {
+    const top = topDoubted();
+    const seat = players.findIndex(({ name }) => name === top);
+    if (top && line.number > 0 && seat >= 0) {
+      [1, -1].forEach((step) => {
+        const other =
+          players[
+            (((seat + step * line.number) % players.length) + players.length) %
+              players.length
+          ];
+        if (other && other.name !== top) put(other.name, 0.5);
+      });
+    }
+    return found;
+  }
+  // the Oracle: how many dead players are evil
+  if (role === "oracle" && hasNumber && !line.players.length) {
+    players
+      .filter(({ name, isDead }) => isDead && name !== self)
+      .forEach(({ name }) => {
+        if (!line.number) put(name, -0.8);
+        else if (scoreOf(name) >= 0.5) {
+          put(name, 0.4 * Math.min(line.number, 3));
+        }
+      });
+    return found;
+  }
+  // the Flowergirl (did the Demon vote?) and the Town Crier (did a Minion
+  // nominate?) about the last day: those who voted, or nominated
+  if (
+    (role === "flowergirl" || role === "towncrier") &&
+    line.answer &&
+    !line.players.length
+  ) {
+    const votes = dayVotes(line.at);
+    const names = [
+      ...new Set(
+        role === "flowergirl"
+          ? votes.flatMap(({ voters }) => voters)
+          : votes.map(({ nominator }) => nominator),
+      ),
+    ];
+    const amount =
+      line.answer === "yes" ? Math.min(0.6, 2 / (names.length || 1)) : -0.3;
+    names.forEach((name) => put(name, amount));
+    return found;
+  }
+  // the Mathematician's number is about everyone's info (see heardBy)
+  if (role === "mathematician" && hasNumber && !line.players.length) {
+    return found;
+  }
   const teams = line.roles.map((id) => (roleById(id) || {}).team);
   const isGood = (team) => GOOD_TEAMS.includes(team);
   const isEvil = (team) => EVIL_TEAMS.includes(team);
@@ -239,7 +338,6 @@ export const evidenceOf = (
       about.forEach((name) => put(name, -1));
     }
   }
-  const hasNumber = line.number !== null && line.number !== undefined;
   // the Empath's number about their alive neighbours that night
   if (hasNumber && role === "empath" && line.neighbours) {
     const near = line.neighbours;
@@ -273,8 +371,20 @@ export const evidenceOf = (
  * whoever said it.
  */
 const heardBy = (me, statements, base, context) => {
-  const { traits, claims, roleById } = context;
+  const {
+    traits,
+    claims,
+    roleById,
+    players,
+    dayVotes,
+    accusations = [],
+    convictionOf = () => 1,
+  } = context;
   const heard = {};
+  // how much they believe a speaker: their trust, less the more they doubt
+  // them, more the more convincing the speaker is
+  const beliefIn = (speaker) =>
+    traits.trust * clamp(1 - base[speaker] / 2, 0, 1.2) * convictionOf(speaker);
   // all that each one told, read together (their Empath numbers night
   // after night are one reading each)
   const told = {};
@@ -285,8 +395,17 @@ const heardBy = (me, statements, base, context) => {
     }
     told[speaker].lines.push(...lines);
   });
+  // a believed Mathematician says some abilities went wrong last night:
+  // everyone's info counts a little less
+  const misfires = Object.entries(told)
+    .filter(
+      ([speaker, { roleId }]) =>
+        roleId === "mathematician" && (base[speaker] || 0) < 1,
+    )
+    .flatMap(([, { lines }]) => lines.map(({ number }) => number || 0));
+  const doubt = 1 - 0.1 * Math.min(Math.max(0, ...misfires), 3);
   Object.entries(told).forEach(([speaker, { roleId, lines }]) => {
-    const belief = traits.trust * clamp(1 - base[speaker] / 2, 0, 1.2);
+    const belief = beliefIn(speaker) * doubt;
     const found = readAll(lines, {
       role: roleId,
       self: speaker,
@@ -294,6 +413,9 @@ const heardBy = (me, statements, base, context) => {
       roleById,
       trusted: (name) => name === me.name || (base[name] || 0) < TRUSTED,
       logic: traits.logic,
+      players,
+      scoreOf: (name) => (name === me.name ? -5 : base[name] || 0),
+      dayVotes,
     });
     Object.entries(found).forEach(([name, amount]) => {
       if (name === me.name) {
@@ -306,8 +428,35 @@ const heardBy = (me, statements, base, context) => {
       heard[name] = (heard[name] || 0) + amount * belief;
     });
   });
+  // "I suspect X" with no reason given: each one's latest, and only from a
+  // very convincing speaker. It moves the trusting and the novices a
+  // little, the careful ones (strategists, veterans) hardly or not at all
+  const gullible =
+    clamp((traits.trust - 0.4) / 0.55, 0, 1) * (1 - 0.5 * traits.logic);
+  const latest = {};
+  accusations.forEach(({ speaker, name }) => (latest[speaker] = name));
+  Object.entries(latest).forEach(([speaker, name]) => {
+    if (speaker === me.name || !(speaker in base)) return;
+    if (convictionOf(speaker) < CONVINCING) return;
+    if (name === me.name) {
+      // a good player accused: the accuser is wrong, or lies
+      if (me.alignment === "good") {
+        heard[speaker] = (heard[speaker] || 0) + 0.2;
+      }
+      return;
+    }
+    heard[name] =
+      (heard[name] || 0) +
+      ACCUSATION * clamp(1 - base[speaker] / 2, 0, 1.2) * gullible;
+  });
   return heard;
 };
+
+// how much one "I suspect X" counts, at most (a very gullible listener)
+const ACCUSATION = 0.15;
+// only a speaker this convincing (convictionFactor of 8 or more) sways
+// anyone with a bare "I suspect X"
+const CONVINCING = 1.25;
 
 /**
  * All the lines of one player's info read together: name -> amount. The
@@ -342,7 +491,10 @@ const readAll = (lines, context) => {
  * claimed Saint is left alone; from day 2 someone alive who never said
  * what they are is a little suspicious (the personality's quiet).
  */
-const claimsSay = (me, { claims, players, traits, day }) => {
+const claimsSay = (
+  me,
+  { claims, players, traits, day, convictionOf = () => 1 },
+) => {
   const said = {};
   const put = (name, amount) => (said[name] = (said[name] || 0) + amount);
   const good = me.alignment !== "evil";
@@ -357,7 +509,10 @@ const claimsSay = (me, { claims, players, traits, day }) => {
   Object.values(byRole).forEach((names) => {
     const living = names.filter((name) => alive.includes(name));
     if (living.length < 2) return;
-    living.forEach((name) => put(name, 0.4 + 1.2 * traits.logic));
+    // the less convincing one is doubted more
+    living.forEach((name) =>
+      put(name, (0.4 + 1.2 * traits.logic) * (2 - convictionOf(name))),
+    );
   });
   if (day >= 2 && traits.quiet) {
     alive
@@ -377,7 +532,10 @@ const claimsSay = (me, { claims, players, traits, day }) => {
  * square; statements: what others said they learned ([{ speaker, roleId,
  * lines }], lines from infoOf); traits: their personality
  * (practicePersonality.js); seatsAt(at): the seats when a card came (who
- * was alive); day: the day it is; roleById(id): a character.
+ * was alive); day: the day it is; roleById(id): a character;
+ * accusations: who said "I suspect X" ([{ speaker, name }]);
+ * convictionOf(name): how convincing someone is (practicePersonality.js's
+ * convictionFactor, 1 on average); dayVotes(at): see evidenceOf.
  */
 export const suspicionsOf = (
   me,
@@ -391,6 +549,9 @@ export const suspicionsOf = (
     traits = PERSONALITIES.normal,
     seatsAt = () => players,
     day = 1,
+    accusations = [],
+    convictionOf = () => 1,
+    dayVotes = () => [],
   },
 ) => {
   const scores = {};
@@ -400,9 +561,9 @@ export const suspicionsOf = (
     scores[name] = (hunches[name] || 0) - (isDead ? 1 : 0);
   });
   // what the town square says about claims
-  Object.entries(claimsSay(me, { claims, players, traits, day })).forEach(
-    ([name, amount]) => add(scores, name, amount),
-  );
+  Object.entries(
+    claimsSay(me, { claims, players, traits, day, convictionOf }),
+  ).forEach(([name, amount]) => add(scores, name, amount));
   // their own night info, read with what they trust so far
   const before = { ...scores };
   const own = readAll(infoOf(me.name, cards, seatsAt), {
@@ -413,13 +574,24 @@ export const suspicionsOf = (
     trusted: (name) => (before[name] || 0) < TRUSTED,
     logic: traits.logic,
     evilReader: me.alignment === "evil",
+    players,
+    scoreOf: (name) => before[name] || 0,
+    dayVotes,
   });
   Object.entries(own).forEach(([name, amount]) =>
     add(scores, name, clamp(amount * traits.weight, ...OWN_INFO)),
   );
   // what others said they learned, as much as they believe them
   const base = { ...scores };
-  const heard = heardBy(me, statements, base, { traits, claims, roleById });
+  const heard = heardBy(me, statements, base, {
+    traits,
+    claims,
+    roleById,
+    players,
+    dayVotes,
+    accusations,
+    convictionOf,
+  });
   Object.entries(heard).forEach(([name, amount]) =>
     add(scores, name, clamp(amount, ...HEARD_INFO)),
   );

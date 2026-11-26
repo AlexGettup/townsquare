@@ -150,6 +150,16 @@ module.exports = (store) => {
       localStorage.removeItem("practicePersonalities");
     }
   }
+  if (localStorage.practiceConvictions) {
+    try {
+      store.commit(
+        "practice/setConvictions",
+        JSON.parse(localStorage.practiceConvictions),
+      );
+    } catch (e) {
+      localStorage.removeItem("practiceConvictions");
+    }
+  }
   if (localStorage.practiceShowPersonalities === "1")
     store.commit("practice/setShowPersonalities", true);
   if (localStorage.voiceProcessing !== undefined) {
@@ -274,6 +284,7 @@ module.exports = (store) => {
         else localStorage.removeItem("practice");
         if (!payload) localStorage.removeItem("practiceAuto");
         if (!payload) localStorage.removeItem("practicePersonalities");
+        if (!payload) localStorage.removeItem("practiceConvictions");
         break;
       case "practice/setAuto":
         if (payload) localStorage.setItem("practiceAuto", "1");
@@ -284,6 +295,13 @@ module.exports = (store) => {
         localStorage.setItem(
           "practicePersonalities",
           JSON.stringify(state.practice.personalities),
+        );
+        break;
+      case "practice/setConvictions":
+      case "practice/setConviction":
+        localStorage.setItem(
+          "practiceConvictions",
+          JSON.stringify(state.practice.convictions),
         );
         break;
       case "practice/setShowPersonalities":

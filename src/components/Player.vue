@@ -255,6 +255,10 @@
         <span class="personality" v-if="personality">{{
           $t(`practice.personalities.${personality}`)
         }}</span>
+        <!-- ...and how convincing they are, on a line of its own -->
+        <span class="personality conviction" v-if="personality && conviction">{{
+          $t(`practice.convictions.${conviction}`)
+        }}</span>
       </div>
 
       <!-- you have a note about this player -->
@@ -571,6 +575,7 @@ import { mapGetters, mapState } from "vuex";
 import peerNames from "../voice/peerNames";
 import closeOnOutsideClick from "../closeOnOutsideClick";
 import { PLAZA, isConversation } from "../store/modules/voice";
+import { convictionLevel } from "../practicePersonality";
 
 // Token sizes as a share of the circle's diameter, measured on 11 screen sizes
 // so that with up to 13 players neither tokens nor names touch each other.
@@ -636,6 +641,11 @@ export default {
         this.practice;
       if (!active || !showPersonalities || viewAs) return null;
       return personalities[this.player.id] || null;
+    },
+    // ...and how convincing they are, in words (low / some / high)
+    conviction() {
+      const conviction = this.practice.convictions[this.player.id];
+      return conviction ? convictionLevel(conviction) : null;
     },
     ...mapGetters("chat", ["isPicking"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
@@ -1835,6 +1845,12 @@ li.picking-seat .reminderHoverTarget {
     padding-bottom: 4px;
     color: $townsfolk;
     font-style: italic;
+  }
+
+  // the conviction right under the personality, no gap between them
+  .personality.conviction {
+    flex-grow: 0;
+    margin-top: -2px;
   }
 }
 

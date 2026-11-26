@@ -27,7 +27,12 @@ import {
   votesFor,
   wantsSwap,
 } from "../practiceDay";
-import { rollPersonality, traitsOf } from "../practicePersonality";
+import {
+  convictionFactor,
+  rollConviction,
+  rollPersonality,
+  traitsOf,
+} from "../practicePersonality";
 import { dmTab } from "./modules/chat";
 import { grimoireSeats } from "./modules/practice";
 import { STORYTELLER } from "./modules/voice";
@@ -78,6 +83,8 @@ export default (store) => {
   // what each one said they learned at night, true or made up: [{ speaker,
   // roleId, lines }] (lines as practiceDay's infoOf gives them)
   let statements = [];
+  // who said "I suspect X" in the town square: [{ speaker, name }]
+  let accusations = [];
   // deaths and comebacks as they happened: [{ name, at, isDead }], to know
   // who was alive when a card came (the Empath's neighbours that night)
   let deaths = [];
@@ -120,6 +127,7 @@ export default (store) => {
     minds = {};
     claims = {};
     statements = [];
+    accusations = [];
     deaths = [];
     cutoffs = [];
     seen = {};
@@ -192,6 +200,35 @@ export default (store) => {
     return traitsOf(id);
   };
 
+  /** How convincing they are (1 to 10), rolled now if not yet. */
+  const convictionFor = (playerId) => {
+    let conviction = store.state.practice.convictions[playerId];
+    if (!conviction) {
+      conviction = rollConviction();
+      store.commit("practice/setConviction", { id: playerId, conviction });
+    }
+    return conviction;
+  };
+
+  /**
+   * The nominations of the last day before that moment, as the vote
+   * history has them: [{ nominator, voters }] (the Flowergirl, the Town
+   * Crier).
+   */
+  const dayVotes = (at) => {
+    const before = store.state.session.voteHistory.filter(
+      ({ timestamp }) => !at || new Date(timestamp).getTime() < at,
+    );
+    if (!before.length) return [];
+    const last = before[before.length - 1].day;
+    return before
+      .filter(({ day }) => day === last)
+      .map(({ nominator, votes }) => ({
+        nominator,
+        voters: votes.map((name) => name.replace(/^−/, "")),
+      }));
+  };
+
   /**
    * An evil player who was shown the grimoire (the Spy) knows the whole
    * evil team, and can bluff a character that isn't in play.
@@ -248,6 +285,12 @@ export default (store) => {
   /** Everyone as the made-up players see themselves, with what they think. */
   const town = (until = null) => {
     const seats = grimoireSeats(store.state.players.players);
+    // how convincing each one is, by name
+    const factors = {};
+    seats.forEach(({ id, name }) => {
+      factors[name] = convictionFactor(convictionFor(id));
+    });
+    const convictionOf = (name) => factors[name] || 1;
     const people = seats.map((seat) => {
       const cards = cardsOf(seat.id, until);
       const me = withGrimoire(knowledgeOf(seat, cards, roleById), seat.id);
@@ -267,6 +310,9 @@ export default (store) => {
         traits,
         seatsAt,
         day: day(),
+        accusations,
+        convictionOf,
+        dayVotes,
       });
       // the storyteller's answer to the Artist's question
       if (mind.artist && mind.artist.name in scores) {
@@ -283,6 +329,9 @@ export default (store) => {
       statements,
       seatsAt,
       day: day(),
+      accusations,
+      convictionOf,
+      dayVotes,
     });
     return { seats, people, opinion };
   };
@@ -558,6 +607,7 @@ export default (store) => {
       );
       if (doubted && (isEvil || scores[doubted] > 0.8)) {
         parts.push(i18n.t("practice.say.suspect", { name: doubted }));
+        accusations.push({ speaker: seat.name, name: doubted });
       } else if (first) {
         parts.push(i18n.t("practice.say.nothingYet"));
       }
