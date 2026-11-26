@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Storyteller on phones and tablets held upright: the guided night is one more tab ("Night") in the strip at the bottom, next to Chat and Bluffs, instead of a panel covering it. It opens by itself when night falls, and at day the strip goes back to the tab it showed before. Its tab is a little taller so the buttons stay in view. Landscape screens and computers don't change
+
 ### Version 3.36.0
 
 - Practice game, Trouble Brewing: the made-up Butler only raises their hand if their master does; the good leave a claimed Saint alone (the evil push for them); with 3 alive and a claimed Mayor the good only nominate or vote when very sure; a Spy shown the grimoire knows the whole evil team and bluffs a character that isn't in play
