@@ -6,7 +6,8 @@ release of this fork; older versions belong to the original project.
 
 ### Next version
 
-- Practice game by day, with "Automatic" on: a made-up player about to die whose death loses the game for their team (the Demon, the Saint) nominates at once, if they haven't yet today, whoever the town doubts most, to tie or beat their vote. The Saint says what they are ("I'm the Saint! Execute me and we lose"); the Demon only says it isn't them. They raise their hand in every later vote, and so do the evil who know they're the Demon and the good who believe the Saint
+- Practice game by day, with "Automatic" on: a made-up player about to die whose death loses the game for their team (the Demon, the Saint, or a good player with 3 alive) nominates at once, if they haven't yet today, whoever the town doubts most, to tie or beat their vote. The Saint says what they are ("I'm the Saint! Execute me and we lose"), a good player with 3 alive that 2 would be left; the Demon only says it isn't them. They raise their hand in every later vote, and so do the evil who know they're the Demon and the good who believe the one about to die (a claimed Saint, anyone with 3 alive)
+- Practice game: with 4 alive the good hold back and only nominate or vote when very sure, as with a claimed Mayor at 3 (a wrong execution leaves 3, the Demon kills and the evil win)
 
 ### Version 3.36.0
 

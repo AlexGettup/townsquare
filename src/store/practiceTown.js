@@ -6,6 +6,7 @@ import {
   claimFor,
   condemnedOf,
   escapeOf,
+  isCarefulDay,
   isMayorStandoff,
   nominationOf,
   rollHunches,
@@ -102,6 +103,8 @@ export default (store) => {
       ({ team }) => team !== "traveller" && team !== "fabled",
     );
   const day = () => store.state.grimoire.nightCount || 1;
+  const aliveCount = () =>
+    store.state.players.players.filter(({ isDead }) => !isDead).length;
 
   const cardsOf = (playerId) =>
     store.state.chat.messages
@@ -338,6 +341,7 @@ export default (store) => {
       condemned,
       nominees,
       opinion,
+      alive: aliveCount(),
     });
     if (!escape) return false;
     // the Saint says what they are: the good should want them off too
@@ -375,7 +379,7 @@ export default (store) => {
           opinion,
           claims,
           hasBlock,
-          mayor: isMayorStandoff(
+          careful: isCarefulDay(
             people.map(({ seat }) => seat),
             claims,
           ),
@@ -417,7 +421,12 @@ export default (store) => {
       people.map(({ seat }) => seat),
       claims,
     );
+    const careful = isCarefulDay(
+      people.map(({ seat }) => seat),
+      claims,
+    );
     const condemned = condemnedOf(store.getters["session/votesToBeat"]);
+    const alive = aliveCount();
     const counts = {};
     const decide = (player, index) => {
       const canVote = !player.isVoteless || isExile;
@@ -435,7 +444,12 @@ export default (store) => {
           dead: spendsGhostVote,
           opinion,
           mayor,
-          swap: wantsSwap(person.me, person.scores, { condemned, claims }),
+          careful,
+          swap: wantsSwap(person.me, person.scores, {
+            condemned,
+            claims,
+            alive,
+          }),
         });
         // the Butler only votes if their master does
         const master = butlerMaster(person.me);

@@ -36,8 +36,8 @@ const EVIL_YES = 0.55;
 const GHOST_SURE = 2;
 // the Slayer shoots once they are this sure, or at random from day 3
 const SLAYER_SURE = 2;
-// with 3 alive and a Mayor, the good only execute when this sure
-const MAYOR_SURE = 2.5;
+// on a careful day (isCarefulDay) the good only execute when this sure
+const CAREFUL_SURE = 2.5;
 
 /**
  * Three players alive, one of them claimed the Mayor: no execution wins
@@ -50,6 +50,15 @@ export const isMayorStandoff = (players, claims) => {
     alive.length === 3 && alive.some(({ name }) => claims[name] === "mayor")
   );
 };
+
+/**
+ * A day when the good hold back and only execute when very sure: the
+ * Mayor's standoff, or 4 alive (a wrong execution leaves 3, the Demon kills
+ * at night and 2 are left: the evil win). players: [{ name, isDead }].
+ */
+export const isCarefulDay = (players, claims) =>
+  isMayorStandoff(players, claims) ||
+  players.filter(({ isDead }) => !isDead).length === 4;
 
 const add = (scores, name, amount) => {
   if (name in scores) scores[name] += amount;
@@ -184,18 +193,20 @@ export const townOpinion = (allScores) => {
  * "hunch" or "sacrifice" (evil nominating a teammate).
  *
  * nominees: names that can be nominated now; opinion: townOpinion();
- * claims: name -> role ID; hasBlock: someone is already about to die.
+ * claims: name -> role ID; hasBlock: someone is already about to die;
+ * careful: isCarefulDay().
  */
 export const nominationOf = (
   me,
   scores,
-  { nominees, opinion, claims, hasBlock, mayor, random = Math.random },
+  { nominees, opinion, claims, hasBlock, careful, random = Math.random },
 ) => {
   const options = nominees.filter((name) => name !== me.name);
   if (!options.length) return null;
   const extra = hasBlock ? BLOCK_EXTRA : 0;
-  // the good: only someone they are very sure of, with the Mayor's win near
-  const mayorExtra = mayor && me.alignment !== "evil" ? MAYOR_SURE - 1 : 0;
+  // the good: only someone they are very sure of on a careful day
+  const carefulExtra =
+    careful && me.alignment !== "evil" ? CAREFUL_SURE - 1 : 0;
   if (me.alignment === "evil") {
     const doubted = options.filter((name) => me.teammates.includes(name));
     const mostDoubted = doubted.sort(
@@ -240,17 +251,19 @@ export const nominationOf = (
       : (scores[name] || 0) > 1.5
         ? "info"
         : "hunch";
-  return { target: name, score: score - extra - mayorExtra, reason };
+  return { target: name, score: score - extra - carefulExtra, reason };
 };
 
 /**
- * Why their own execution would lose the game for their team: "demon" or
- * "saint", or null. They know it from their character (their token or the
- * last "You are" card).
+ * Why their own execution would lose the game for their team: "demon",
+ * "saint" or "final" (a good player with 3 alive: 2 would be left), or
+ * null. They know it from their character (their token or the last "You
+ * are" card); alive: how many are alive.
  */
-export const deathLoses = (me) => {
+export const deathLoses = (me, alive) => {
   if (me.alignment === "evil" && me.role.team === "demon") return "demon";
   if (me.alignment === "good" && me.role.id === "saint") return "saint";
+  if (me.alignment === "good" && alive === 3) return "final";
   return null;
 };
 
@@ -268,11 +281,15 @@ export const condemnedOf = (block) =>
  * { target, reason } (reason from deathLoses) or null.
  *
  * condemned: condemnedOf(); nominees: names that can be nominated now;
- * opinion: townOpinion().
+ * opinion: townOpinion(); alive: how many are alive.
  */
-export const escapeOf = (me, scores, { condemned, nominees, opinion }) => {
+export const escapeOf = (
+  me,
+  scores,
+  { condemned, nominees, opinion, alive },
+) => {
   if (condemned !== me.name) return null;
-  const reason = deathLoses(me);
+  const reason = deathLoses(me, alive);
   if (!reason) return null;
   const options = nominees.filter(
     (name) => name !== me.name && !me.teammates.includes(name),
@@ -290,24 +307,36 @@ export const escapeOf = (me, scores, { condemned, nominees, opinion }) => {
 /**
  * Do they want whoever is about to die swapped for anyone else? The
  * condemned themselves (if their death loses), the evil if it's the Demon
- * they know of, the good if it's a claimed Saint they believe.
+ * they know of, the good if it's a claimed Saint they believe, or anyone
+ * they believe with 3 alive.
  */
-export const wantsSwap = (me, scores, { condemned, claims }) => {
+export const wantsSwap = (me, scores, { condemned, claims, alive }) => {
   if (!condemned) return false;
-  if (condemned === me.name) return !!deathLoses(me);
+  if (condemned === me.name) return !!deathLoses(me, alive);
   if (me.alignment === "evil") return me.demons.includes(condemned);
-  return claims[condemned] === "saint" && (scores[condemned] || 0) < 1;
+  const believed = (scores[condemned] || 0) < 1;
+  return believed && (claims[condemned] === "saint" || alive === 3);
 };
 
 /**
  * Do they raise their hand? nominee and nominator are names; dead: they
- * would spend their ghost vote; opinion: townOpinion(); swap: they want
+ * would spend their ghost vote; opinion: townOpinion(); mayor: the Mayor's
+ * standoff; careful: isCarefulDay(); swap: they want
  * whoever is about to die off the block (wantsSwap).
  */
 export const votesFor = (
   me,
   scores,
-  { nominee, nominator, dead, opinion, mayor, swap, random = Math.random },
+  {
+    nominee,
+    nominator,
+    dead,
+    opinion,
+    mayor,
+    careful,
+    swap,
+    random = Math.random,
+  },
 ) => {
   if (nominator === me.name && !mayor) return true;
   if (nominee === me.name) return false;
@@ -322,7 +351,7 @@ export const votesFor = (
       EVIL_YES + Math.min(Math.max(opinion[nominee] || 0, 0), 1) * 0.3
     );
   }
-  if (mayor) return score >= MAYOR_SURE;
+  if (careful) return score >= CAREFUL_SURE;
   if (dead) return score >= GHOST_SURE;
   return score + random() * 0.5 >= 1.1;
 };
