@@ -73,6 +73,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   box on phones
 - **3.37.0** Guided night as a "Night" tab of the bottom strip on upright screens; practice
   players about to die try to get off the block; counters that allow for the Drunk
+- **3.38.0** Guided night uses the whole height of its tab on upright screens; practice guided
+  night keeps only Send info and Next; Bad Moon Rising characters play by their rules in practice
 
 ## Planned
 
