@@ -6,7 +6,7 @@ release of this fork; older versions belong to the original project.
 
 ### Next version
 
-- `docs/practice-wiki-audit.md`: audit of the practice game's made-up players against the official wiki (Trouble Brewing, Bad Moon Rising, Sects & Violets), in Spanish (nothing changes in the app)
+- `docs/practice-wiki-audit.md`: audit of the practice game's made-up players against the official wiki (Trouble Brewing, Bad Moon Rising, Sects & Violets), in Spanish, updated to 3.40.0 (nothing changes in the app)
 - Practice game code: one list of how many seats each card asks for (it was written in three places), shared helpers for "pick one at random" and "the one they doubt / trust most", and a few repeated blocks merged. Nothing changes in the app: a test run of the practice players' decisions on 300 random games gives exactly the same answers before and after
 
 ### Version 3.40.0
