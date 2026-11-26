@@ -1,4 +1,5 @@
 import { SEATS_TO_CHOOSE } from "../cards";
+import { MAX_MESSAGES, keepLatest } from "../store/modules/chat";
 import { PLAZA, STORYTELLER } from "../store/modules/voice";
 
 /**
@@ -128,7 +129,7 @@ export default class PracticeChat {
       seen: null,
       choice: null,
     };
-    this.messages = [...this.messages, message].slice(-500);
+    this.messages = keepLatest([...this.messages, message], MAX_MESSAGES, true);
     this.onMessage({ ...message });
     return message;
   }
