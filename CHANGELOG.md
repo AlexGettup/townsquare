@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Practice game code: one list of how many seats each card asks for (it was written in three places), shared helpers for "pick one at random" and "the one they doubt / trust most", and a few repeated blocks merged. Nothing changes in the app: a test run of the practice players' decisions on 300 random games gives exactly the same answers before and after
+
 ### Version 3.40.0
 
 - Practice game: each made-up player gets a personality at random when the practice starts (Normal, Trusting, Liar, Strategist, Novice, Veteran, Hothead, Quiet). It changes how much they believe others, how they lie, how soon they nominate and how they vote. A new "Personalities" switch in the blue box shows each one's personality under their name (off at the start)

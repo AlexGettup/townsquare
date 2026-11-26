@@ -97,7 +97,8 @@ import Modal from "./Modal";
 import InfoCard from "../InfoCard";
 import { grimoireSeats } from "../../store/modules/practice";
 import { STORYTELLER } from "../../store/modules/voice";
-import { SEATS_TO_CHOOSE, decide, knowledgeOf } from "../../practiceBrain";
+import { SEATS_TO_CHOOSE } from "../../cards";
+import { decide, knowledgeOf } from "../../practiceBrain";
 
 // automatic players take between this and twice this to answer (ms)
 const AUTO_DELAY = 1200;
