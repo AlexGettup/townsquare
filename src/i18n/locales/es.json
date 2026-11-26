@@ -596,7 +596,9 @@
       "juggler": "Soy {role}. Mis apuestas: {guesses}",
       "savant": "Soy {role}: ¿cuáles son mis 2 cosas de hoy?",
       "artist": "Soy {role}. Mi pregunta: ¿{name} es el Demonio?",
-      "klutz": "Soy {role}: elijo a {name}. Si es malvado, perdemos."
+      "klutz": "Soy {role}: elijo a {name}. Si es malvado, perdemos.",
+      "mayBePoisoned": "Ojo: puede que esté envenenado o borracho.",
+      "infoClashes": "Mi información no cuadra con lo que se ha dicho: puede que esté envenenado o borracho."
     }
   },
   "pointing": {

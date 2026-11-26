@@ -596,7 +596,9 @@
       "juggler": "I'm the {role}. My guesses: {guesses}",
       "savant": "I'm the {role}: what are my 2 things today?",
       "artist": "I'm the {role}. My question: is {name} the Demon?",
-      "klutz": "I'm the {role}: I choose {name}. If they're evil, we lose."
+      "klutz": "I'm the {role}: I choose {name}. If they're evil, we lose.",
+      "mayBePoisoned": "Careful: I may be poisoned or drunk.",
+      "infoClashes": "My info doesn't match what others said: I may be poisoned or drunk."
     }
   },
   "pointing": {

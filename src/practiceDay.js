@@ -275,8 +275,17 @@ export const evidenceOf = (
   const isEvil = (team) => EVIL_TEAMS.includes(team);
   const about = line.players.length ? line.players : line.about || [];
   // the Dreamer: 1 good and 1 evil character, one of them true
+  // what they claimed is the good one: likely true; neither: they lie
   if (role === "dreamer" && teams.some(isGood) && teams.some(isEvil)) {
-    about.forEach((name) => put(name, 1));
+    about.forEach((name) => {
+      const claimed = claims[name];
+      const goodShown = line.roles.filter(
+        (id, index) => isGood(teams[index]) && id === claimed,
+      );
+      if (goodShown.length) put(name, -0.6 * (0.5 + logic));
+      else if (claimed) put(name, 1 + logic);
+      else put(name, 1);
+    });
     return found;
   }
   // the Sage: the Demon is one of these two
@@ -285,8 +294,18 @@ export const evidenceOf = (
     return found;
   }
   // the Seamstress: "no", the two are not on the same side
+  // "yes", the same side: one they trust vouches for the other
   if (role === "seamstress" && line.answer && about.length === 2) {
     if (line.answer === "no") about.forEach((name) => put(name, 1));
+    else {
+      const sure = about.filter((name) => name === self || trusted(name));
+      if (sure.length === 1 && logic >= 0.5) {
+        put(
+          about.find((name) => !sure.includes(name)),
+          -1,
+        );
+      }
+    }
     return found;
   }
   if (line.players.length && teams.length && teams.every(Boolean)) {
@@ -396,14 +415,11 @@ const heardBy = (me, statements, base, context) => {
     told[speaker].lines.push(...lines);
   });
   // a believed Mathematician says some abilities went wrong last night:
-  // everyone's info counts a little less
-  const misfires = Object.entries(told)
-    .filter(
-      ([speaker, { roleId }]) =>
-        roleId === "mathematician" && (base[speaker] || 0) < 1,
-    )
-    .flatMap(([, { lines }]) => lines.map(({ number }) => number || 0));
-  const doubt = 1 - 0.1 * Math.min(Math.max(0, ...misfires), 3);
+  // everyone's info counts a little less; and more so for a careful
+  // listener when the script can poison or make drunk
+  const doubt =
+    (1 - misfiresHeard(me, statements, base)) *
+    (1 - 0.5 * (traits.doubts || 0) * (context.risk || 0));
   Object.entries(told).forEach(([speaker, { roleId, lines }]) => {
     const belief = beliefIn(speaker) * doubt;
     const found = readAll(lines, {
@@ -451,6 +467,56 @@ const heardBy = (me, statements, base, context) => {
   });
   return heard;
 };
+
+/**
+ * A believed Mathematician said some abilities went wrong (their highest
+ * number): how much less info counts, 0 to 0.3.
+ */
+const misfiresHeard = (me, statements, base) => {
+  const numbers = statements
+    .filter(
+      ({ speaker, roleId }) =>
+        roleId === "mathematician" &&
+        speaker !== me.name &&
+        speaker in base &&
+        (base[speaker] || 0) < 1,
+    )
+    .flatMap(({ lines }) => lines.map(({ number }) => number || 0));
+  return 0.1 * Math.min(Math.max(0, ...numbers), 3);
+};
+
+// characters that can make a good player's info wrong (poisoned, drunk, or
+// the Vortox's false info), and how much each one on the script makes a
+// careful player doubt. The Drunk and the Marionette are never dealt here
+const DROISONERS = {
+  poisoner: 0.35,
+  widow: 0.3,
+  nodashii: 0.25,
+  pukka: 0.25,
+  vigormortis: 0.15,
+  vortox: 0.5,
+  sailor: 0.1,
+  innkeeper: 0.1,
+  courtier: 0.1,
+  minstrel: 0.1,
+  philosopher: 0.05,
+  goon: 0.05,
+  sweetheart: 0.05,
+};
+
+/** How likely the script makes info wrong: 0 to 0.6 (role IDs). */
+export const scriptRisk = (script = []) =>
+  Math.min(
+    0.6,
+    script.reduce((sum, id) => sum + (DROISONERS[id] || 0), 0),
+  );
+
+// at most, how much of their own info a good player sets aside
+const MAX_DOUBT = 0.6;
+// what one clash between their info and what others told adds, and how
+// much the others' info must say against theirs to count as one
+const CLASH = 0.2;
+const HEARD_CLASH = 0.6;
 
 // how much one "I suspect X" counts, at most (a very gullible listener)
 const ACCUSATION = 0.15;
@@ -537,9 +603,20 @@ const claimsSay = (
  * convictionOf(name): how convincing someone is (practicePersonality.js's
  * convictionFactor, 1 on average); dayVotes(at): see evidenceOf.
  */
-export const suspicionsOf = (
+export const suspicionsOf = (me, context) => thinkOf(me, context).scores;
+
+/**
+ * Like suspicionsOf, and how much of their own night info they set aside
+ * because they may be poisoned or drunk: { scores, doubt, why }. doubt: 0
+ * to 0.6 (their personality's doubts, times how likely it is); why:
+ * "clash" (their info goes against what others told), "script" (the
+ * script has characters that do it) or null. script: the role IDs on the
+ * script.
+ */
+export const thinkOf = (
   me,
   {
+    script = [],
     cards,
     players,
     hunches,
@@ -578,10 +655,13 @@ export const suspicionsOf = (
     scoreOf: (name) => before[name] || 0,
     dayVotes,
   });
-  Object.entries(own).forEach(([name, amount]) =>
-    add(scores, name, clamp(amount * traits.weight, ...OWN_INFO)),
-  );
+  const ownAdded = {};
+  Object.entries(own).forEach(([name, amount]) => {
+    ownAdded[name] = clamp(amount * traits.weight, ...OWN_INFO);
+    add(scores, name, ownAdded[name]);
+  });
   // what others said they learned, as much as they believe them
+  const risk = scriptRisk(script);
   const base = { ...scores };
   const heard = heardBy(me, statements, base, {
     traits,
@@ -591,15 +671,36 @@ export const suspicionsOf = (
     dayVotes,
     accusations,
     convictionOf,
+    risk,
   });
   Object.entries(heard).forEach(([name, amount]) =>
     add(scores, name, clamp(amount, ...HEARD_INFO)),
   );
+  // a good player may be poisoned or drunk: the script can do it, their
+  // info goes against what others told, or a believed Mathematician says
+  // abilities went wrong. The careful ones (their doubts) set part of it
+  // aside
+  let doubt = 0;
+  let why = null;
+  if (me.alignment !== "evil" && Object.keys(ownAdded).length) {
+    const clashes = Object.entries(ownAdded).filter(
+      ([name, amount]) =>
+        Math.abs(amount) >= 1 &&
+        Math.abs(heard[name] || 0) >= HEARD_CLASH &&
+        Math.sign(amount) !== Math.sign(heard[name]),
+    ).length;
+    const likely = risk + CLASH * clashes + misfiresHeard(me, statements, base);
+    doubt = Math.min(MAX_DOUBT, (traits.doubts || 0) * likely);
+    why = clashes ? "clash" : risk ? "script" : null;
+    Object.entries(ownAdded).forEach(([name, amount]) =>
+      add(scores, name, -amount * doubt),
+    );
+  }
   // evil: their teammates are never suspects
   me.teammates.forEach((name) => {
     if (name in scores) scores[name] = -5;
   });
-  return scores;
+  return { scores, doubt, why };
 };
 
 /**
@@ -889,9 +990,33 @@ export const claimFor = (
 };
 
 // characters whose made-up info is only told on the first day (they learn
-// it on the first night), and those who tell it every day
-const FIRST_NIGHT_INFO = ["washerwoman", "librarian", "investigator", "chef"];
-const NIGHTLY_INFO = ["empath", "fortuneteller"];
+// it on the first night), those who tell it every day, and those who tell it
+// once (the Seamstress)
+const FIRST_NIGHT_INFO = [
+  "washerwoman",
+  "librarian",
+  "investigator",
+  "chef",
+  "grandmother",
+  "clockmaker",
+];
+const NIGHTLY_INFO = [
+  "empath",
+  "fortuneteller",
+  "undertaker",
+  "chambermaid",
+  "dreamer",
+  "mathematician",
+  "flowergirl",
+  "towncrier",
+  "oracle",
+];
+const ONCE_INFO = ["seamstress"];
+// info learned only from the second night (about the day before, the dead)
+const FROM_NIGHT_2 = ["undertaker", "flowergirl", "towncrier", "oracle"];
+
+/** The characters an evil player could make up info for. */
+export const FAKED_INFO = [...FIRST_NIGHT_INFO, ...NIGHTLY_INFO, ...ONCE_INFO];
 
 /**
  * The night info an evil player makes up for the character they claimed,
@@ -904,13 +1029,32 @@ const NIGHTLY_INFO = ["empath", "fortuneteller"];
  * - Librarian: 0, or two players and an Outsider.
  * - Investigator: two good players and a Minion of the script; a bold one
  *   names whoever the town trusts most.
- * - Chef: 0 or 1.
+ * - Chef: 0 or 1. Clockmaker: a small number (1 to 3).
  * - Empath: 0 when a teammate sits next to them, else 1 when bold.
  * - Fortune Teller: "no" about a teammate and someone (covering them), or
  *   "yes" about two good players when bold.
+ * - Grandmother: a teammate as the grandchild, with the character they
+ *   claimed (covering them), or a good player with theirs.
+ * - Undertaker: the character of whoever was executed the day before: a
+ *   teammate's claim (covering them), the real claim, or a Minion of the
+ *   script when bold (so the town thinks it got one).
+ * - Chambermaid: two players and how many of them woke at night, from the
+ *   characters they claimed.
+ * - Dreamer: a teammate with the character they claimed and an evil one, or
+ *   when bold a good player with two characters they didn't claim.
+ * - Mathematician: 0, or when bold 1 or 2 (everyone's info counts less).
+ * - Flowergirl and Town Crier: "no" if their Demon voted (or a Minion they
+ *   know nominated) the day before, else "yes" when bold.
+ * - Oracle: how many of the dead they know are evil, one more when bold.
+ * - Seamstress (once): "yes" about a teammate and a trusted good player, or
+ *   "no" about two good players when bold.
  *
  * roleId: the character they claimed; players: [{ name, isDead }] in seat
- * order; claims: name -> role ID; opinion: publicOpinion(); day: the day.
+ * order; claims: name -> role ID; opinion: publicOpinion(); day: the day;
+ * votes: the nominations of the day before ([{ nominator, voters }]);
+ * executed: who was executed the day before (a name or null); wakes(id):
+ * that character wakes at night; told: they already told info for this
+ * claim on an earlier day.
  */
 export const fakeInfo = (
   me,
@@ -921,14 +1065,19 @@ export const fakeInfo = (
     opinion = {},
     scriptRoles = [],
     day = 1,
+    votes = [],
+    executed = null,
+    wakes = () => false,
+    told = false,
     traits = PERSONALITIES.normal,
     random = Math.random,
   },
 ) => {
   if (me.alignment !== "evil" || !roleId) return null;
+  if (!FAKED_INFO.includes(roleId)) return null;
   if (FIRST_NIGHT_INFO.includes(roleId) && day !== 1) return null;
-  if (!FIRST_NIGHT_INFO.includes(roleId) && !NIGHTLY_INFO.includes(roleId))
-    return null;
+  if (FROM_NIGHT_2.includes(roleId) && day < 2) return null;
+  if (ONCE_INFO.includes(roleId) && told) return null;
   if (random() >= traits.lies) return null;
   const bold = random() < traits.lies * 0.7;
   const pick = (list) => pickOne(list, random);
@@ -944,6 +1093,19 @@ export const fakeInfo = (
   );
   const teamOf = (id) =>
     (scriptRoles.find((role) => role.id === id) || {}).team;
+  const ofTeam = (team) =>
+    scriptRoles.filter(
+      (role) =>
+        role.team === team && !["drunk", "marionette"].includes(role.id),
+    );
+  const isGoodRole = (id) => GOOD_TEAMS.includes(teamOf(id));
+  // the Demon and the Minions, as far as they know
+  const isDemon = me.role.team === "demon";
+  const demons = isDemon ? [me.name, ...me.demons] : me.demons;
+  const minions = [
+    ...(me.role.team === "minion" ? [me.name] : []),
+    ...me.teammates.filter((name) => !me.demons.includes(name)),
+  ];
   const line = (values) => ({
     phrase: null,
     roles: [],
@@ -971,9 +1133,7 @@ export const fakeInfo = (
     ];
   }
   if (roleId === "librarian") {
-    const outsiders = scriptRoles.filter(
-      ({ team, id }) => team === "outsider" && !["drunk"].includes(id),
-    );
+    const outsiders = ofTeam("outsider");
     const two = shuffle(good).slice(0, 2);
     if (!bold || !outsiders.length || two.length < 2) {
       return [line({ number: 0 })];
@@ -981,15 +1141,19 @@ export const fakeInfo = (
     return [line({ players: two, roles: [pick(outsiders).id] })];
   }
   if (roleId === "investigator") {
-    const minions = scriptRoles.filter(({ team }) => team === "minion");
+    const found = ofTeam("minion");
     const first = bold ? trusted[0] : pick(good);
     const second = pick(good.filter((name) => name !== first));
-    if (!minions.length || !first || !second) return null;
+    if (!found.length || !first || !second) return null;
     return [
-      line({ players: shuffle([first, second]), roles: [pick(minions).id] }),
+      line({ players: shuffle([first, second]), roles: [pick(found).id] }),
     ];
   }
   if (roleId === "chef") return [line({ number: bold ? 1 : 0 })];
+  if (roleId === "clockmaker") {
+    const most = Math.max(1, Math.min(3, Math.floor(players.length / 2)));
+    return [line({ number: 1 + Math.floor(random() * most) })];
+  }
   if (roleId === "empath") {
     const covering = neighbours.some((name) => me.teammates.includes(name));
     const number = covering ? 0 : bold ? 1 : random() < 0.5 ? 1 : 0;
@@ -1006,6 +1170,105 @@ export const fakeInfo = (
       : shuffle(good).slice(0, 2);
     if (two.length < 2 || !two.every(Boolean)) return null;
     return [line({ answer: bold ? "yes" : "no", about: two })];
+  }
+  if (roleId === "grandmother") {
+    const mate = mates.find((name) => isGoodRole(claims[name]));
+    if (mate && (bold || random() < 0.5)) {
+      return [line({ players: [mate], roles: [claims[mate]] })];
+    }
+    const claimed = good.filter(
+      (name) => isGoodRole(claims[name]) && claims[name] !== roleId,
+    );
+    const grandchild = pick(claimed);
+    if (!grandchild) return null;
+    return [line({ players: [grandchild], roles: [claims[grandchild]] })];
+  }
+  if (roleId === "undertaker") {
+    if (!executed) return null;
+    const claimed = claims[executed];
+    let shown = claimed && isGoodRole(claimed) ? claimed : null;
+    const isMate = me.teammates.includes(executed);
+    if (!isMate && bold && ofTeam("minion").length) {
+      shown = pick(ofTeam("minion")).id;
+    }
+    if (!shown) {
+      const free = ofTeam("townsfolk").filter(
+        ({ id }) => !Object.values(claims).includes(id),
+      );
+      shown = (pick(free) || {}).id;
+    }
+    if (!shown) return null;
+    return [line({ players: [executed], roles: [shown] })];
+  }
+  if (roleId === "chambermaid") {
+    const two = shuffle(alive).slice(0, 2);
+    if (two.length < 2) return null;
+    // as if it were true of the characters they claimed
+    const number = two.filter(
+      (name) => claims[name] && wakes(claims[name]),
+    ).length;
+    return [line({ number, about: two })];
+  }
+  if (roleId === "dreamer") {
+    const evil = [...ofTeam("minion"), ...ofTeam("demon")];
+    const mate = pick(mates.filter((name) => isGoodRole(claims[name])));
+    if (mate && evil.length && !bold) {
+      return [
+        line({
+          roles: shuffle([claims[mate], pick(evil).id]),
+          about: [mate],
+        }),
+      ];
+    }
+    const target = bold ? trusted[0] : pick(good);
+    if (!target || !evil.length) return null;
+    const goodOnes = [...ofTeam("townsfolk"), ...ofTeam("outsider")].filter(
+      ({ id }) => id !== claims[target] && id !== roleId,
+    );
+    // bold: neither is what they claimed (they lie); else their claim
+    const shownGood =
+      bold || !isGoodRole(claims[target])
+        ? (pick(goodOnes) || {}).id
+        : claims[target];
+    if (!shownGood) return null;
+    return [
+      line({ roles: shuffle([shownGood, pick(evil).id]), about: [target] }),
+    ];
+  }
+  if (roleId === "mathematician") {
+    return [line({ number: bold ? 1 + Math.floor(random() * 2) : 0 })];
+  }
+  if (roleId === "flowergirl" || roleId === "towncrier") {
+    if (!votes.length) return null;
+    const ours = roleId === "flowergirl" ? demons : minions;
+    const acted = votes.some(({ nominator, voters }) =>
+      roleId === "flowergirl"
+        ? voters.some((name) => ours.includes(name))
+        : ours.includes(nominator),
+    );
+    return [line({ answer: acted || !bold ? "no" : "yes" })];
+  }
+  if (roleId === "oracle") {
+    const dead = players.filter(
+      ({ name, isDead }) => isDead && name !== me.name,
+    );
+    if (!dead.length) return null;
+    const evil = dead.filter(({ name }) => me.teammates.includes(name)).length;
+    const number = bold && evil < dead.length ? evil + 1 : evil;
+    return [line({ number })];
+  }
+  if (roleId === "seamstress") {
+    if (mates.length && trusted.length && !bold) {
+      return [
+        line({
+          answer: "yes",
+          about: shuffle([pick(mates), trusted[0]]),
+        }),
+      ];
+    }
+    const two = shuffle(good).slice(0, 2);
+    if (two.length < 2) return null;
+    return [line({ answer: bold ? "no" : "yes", about: two })];
   }
   return null;
 };
