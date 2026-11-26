@@ -547,7 +547,21 @@
     "nominate": "Random nomination",
     "nominateHint": "A made-up player nominates another, both at random",
     "random": "Let {name} decide",
-    "allRandom": "Let them all decide"
+    "allRandom": "Let them all decide",
+    "say": {
+      "claim": "I'm the {role}.",
+      "learned": "What I know: {info}.",
+      "lastNight": "Last night: {info}.",
+      "suspect": "I suspect {name}.",
+      "nothingYet": "I don't know anything else yet.",
+      "slayer": "I'm the {role}: I shoot {name}.",
+      "nominate": {
+        "info": "I nominate {name}: my info points there.",
+        "sameClaim": "I nominate {name}: they say they're the {role}, and I'm the {role}.",
+        "hunch": "I nominate {name}: I don't trust them."
+      },
+      "number": "I got a {n}"
+    }
   },
   "pointing": {
     "title": "Pointing vote",
