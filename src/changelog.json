@@ -1,5 +1,23 @@
 [
   {
+    "version": "3.39.0",
+    "date": "2026-11-26",
+    "title": {
+      "en": "Sects & Violets practice",
+      "es": "Práctica con Sects & Violets"
+    },
+    "en": [
+      "Practice game, Sects & Violets: the made-up players choose at night by what they think of the others (the Snake Charmer, the Dreamer, the Seamstress, the Fang Gu, the Cerenovus, the Pit-Hag…) and use what they learn",
+      "Practice game, Sects & Violets by day: the Juggler guesses on day 1, the Savant asks for their 2 things in the private chat, the Artist asks a yes or no question, the Klutz chooses when they die, and a player made mad claims that character",
+      "Practice game: with the Vortox on the script, the made-up players nominate and vote much sooner on the last call"
+    ],
+    "es": [
+      "Partida de práctica, Sects & Violets: los jugadores inventados eligen de noche según lo que piensan de los demás (el Encantador de Serpientes, el Soñador, la Costurera, el Fang Gu, el Cerenovus, la Pit-Hag…) y usan lo que averiguan",
+      "Partida de práctica, Sects & Violets de día: el Malabarista adivina el día 1, el Erudito pide sus 2 cosas en el chat privado, el Artista hace una pregunta de sí o no, el Patoso elige al morir y un jugador enloquecido dice ser ese personaje",
+      "Partida de práctica: con el Vortox en el guion, los jugadores inventados nominan y votan mucho antes en la última llamada"
+    ]
+  },
+  {
     "version": "3.38.0",
     "date": "2026-11-26",
     "title": {
