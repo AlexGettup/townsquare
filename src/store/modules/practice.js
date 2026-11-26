@@ -8,6 +8,7 @@
 
 import { STORYTELLER } from "./voice";
 import { dmTab } from "./chat";
+import { rollPersonality } from "../../practicePersonality";
 
 // made-up players get IDs like these, so cards and the grimoire can go to them
 export const PRACTICE_ID = "practice-";
@@ -102,6 +103,11 @@ const state = () => ({
   // what the made-up players received and haven't closed yet, oldest first:
   // { id, playerId, kind: "card" | "grimoire", messageId }
   inbox: [],
+  // player ID -> personality key (src/practicePersonality.js), rolled at
+  // random when the practice starts
+  personalities: {},
+  // the storyteller sees each one's personality under their name
+  showPersonalities: false,
 });
 
 const getters = {
@@ -129,6 +135,15 @@ const mutations = {
   },
   setAuto(state, auto) {
     state.auto = auto;
+  },
+  setPersonalities(state, personalities) {
+    state.personalities = { ...personalities };
+  },
+  setPersonality(state, { id, personality }) {
+    state.personalities = { ...state.personalities, [id]: personality };
+  },
+  setShowPersonalities(state, show) {
+    state.showPersonalities = show;
   },
   setViewAs(state, playerId) {
     state.viewAs = playerId;
@@ -172,6 +187,12 @@ const actions = {
         { root: true },
       );
     });
+    // each one plays with a personality of their own, at random
+    const personalities = {};
+    rootState.players.players.forEach(({ id }) => {
+      personalities[id] = rollPersonality();
+    });
+    commit("setPersonalities", personalities);
     commit("setActive", true);
     // the made-up players play by themselves unless switched off
     commit("setAuto", true);

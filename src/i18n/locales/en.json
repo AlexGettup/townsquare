@@ -535,6 +535,18 @@
     "viewing": "Viewing as {name}",
     "backToGrimoire": "Back to the grimoire",
     "autoHint": "The made-up players play by themselves: they answer your cards, say what they are at dawn, nominate when you open nominations, and vote.",
+    "showPersonalities": "Personalities",
+    "personalitiesHint": "Show each made-up player's personality under their name. Each one got one at random when the practice started: it changes how they believe others, lie and vote",
+    "personalities": {
+      "normal": "Normal",
+      "trusting": "Trusting",
+      "liar": "Liar",
+      "strategist": "Strategist",
+      "novice": "Novice",
+      "veteran": "Veteran",
+      "hothead": "Hothead",
+      "quiet": "Quiet"
+    },
     "leave": "Leave",
     "leaveConfirm": "Leave the practice? The practice game is deleted.",
     "sees": "What {name} sees",
@@ -556,11 +568,13 @@
       "lastNight": "Last night: {info}.",
       "suspect": "I suspect {name}.",
       "nothingYet": "I don't know anything else yet.",
+      "hiding": "I'd rather not say what I am yet.",
       "slayer": "I'm the {role}: I shoot {name}.",
       "nominate": {
         "info": "I nominate {name}: my info points there.",
         "sameClaim": "I nominate {name}: they say they're the {role}, and I'm the {role}.",
-        "hunch": "I nominate {name}: I don't trust them."
+        "hunch": "I nominate {name}: I don't trust them.",
+        "virgin": "I nominate {name}: they say they're the Virgin, let's check it."
       },
       "escape": {
         "saint": "I'm the {role}! Execute me and we lose. I nominate {name}.",

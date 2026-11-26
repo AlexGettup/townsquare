@@ -97,7 +97,8 @@ import Modal from "./Modal";
 import InfoCard from "../InfoCard";
 import { grimoireSeats } from "../../store/modules/practice";
 import { STORYTELLER } from "../../store/modules/voice";
-import { SEATS_TO_CHOOSE, decide, knowledgeOf } from "../../practiceBrain";
+import { SEATS_TO_CHOOSE } from "../../cards";
+import { decide, knowledgeOf } from "../../practiceBrain";
 
 // automatic players take between this and twice this to answer (ms)
 const AUTO_DELAY = 1200;
@@ -248,7 +249,12 @@ export default {
         scriptRoles: this.scriptRoles,
         nightCount: this.$store.state.grimoire.nightCount || 1,
         ...(view
-          ? { scores: view.scores, opinion: view.opinion, claims: view.claims }
+          ? {
+              scores: view.scores,
+              opinion: view.opinion,
+              claims: view.claims,
+              traits: view.traits,
+            }
           : {}),
       });
       if (!answer) return null;

@@ -7,6 +7,14 @@ release of this fork; older versions belong to the original project.
 ### Next version
 
 - `docs/practice-wiki-audit.md`: audit of the practice game's made-up players against the official wiki (Trouble Brewing, Bad Moon Rising, Sects & Violets), in Spanish (nothing changes in the app)
+- Practice game code: one list of how many seats each card asks for (it was written in three places), shared helpers for "pick one at random" and "the one they doubt / trust most", and a few repeated blocks merged. Nothing changes in the app: a test run of the practice players' decisions on 300 random games gives exactly the same answers before and after
+
+### Version 3.40.0
+
+- Practice game: each made-up player gets a personality at random when the practice starts (Normal, Trusting, Liar, Strategist, Novice, Veteran, Hothead, Quiet). It changes how much they believe others, how they lie, how soon they nominate and how they vote. A new "Personalities" switch in the blue box shows each one's personality under their name (off at the start)
+- Practice game: the made-up players now listen to what others say in the town square (claims and info), believing it more or less depending on their personality and how much they doubt whoever says it. The evil make up info for their bluff ("I'm the Empath, I got a 1", "Ana or Carlos is the Chef" covering a teammate), two players claiming the same character makes the whole town suspicious, the Washerwoman, Librarian and Investigator check what they saw against what each one claimed, a Fortune Teller who thinks it through checks the players they doubt, a thinking Demon leaves a claimed Soldier alone, and some test a claimed Virgin by nominating her. Some good players keep their character to themselves on the first day
+- Practice game: the Empath's numbers count only for the neighbours they had that night, and the same number night after night no longer adds up without limit
+- Practice game: the evil choose by what the town has said in public, not by what each good player thinks in private
 
 ### Version 3.39.0
 

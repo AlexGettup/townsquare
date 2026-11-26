@@ -40,6 +40,22 @@
       <font-awesome-icon icon="robot" />
       {{ $t("practice.auto") }}
     </span>
+    <!-- each made-up player's personality, under their name -->
+    <span
+      class="nominate"
+      v-if="!viewing"
+      :class="{ on: practice.showPersonalities }"
+      :title="$t('practice.personalitiesHint')"
+      @click="
+        $store.commit(
+          'practice/setShowPersonalities',
+          !practice.showPersonalities,
+        )
+      "
+    >
+      <font-awesome-icon icon="theater-masks" />
+      {{ $t("practice.showPersonalities") }}
+    </span>
   </div>
 </template>
 

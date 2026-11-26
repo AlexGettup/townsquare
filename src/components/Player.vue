@@ -251,6 +251,10 @@
         <span class="pronouns" v-if="player.pronouns">{{
           player.pronouns
         }}</span>
+        <!-- practice: the made-up player's personality, if asked to see it -->
+        <span class="personality" v-if="personality">{{
+          $t(`practice.personalities.${personality}`)
+        }}</span>
       </div>
 
       <!-- you have a note about this player -->
@@ -625,6 +629,14 @@ export default {
   computed: {
     ...mapState("players", ["players"]),
     ...mapState(["grimoire", "session", "voice", "chat", "practice"]),
+    // practice: this made-up player's personality, when the storyteller
+    // switched "Personalities" on (not while viewing as a player)
+    personality() {
+      const { active, showPersonalities, viewAs, personalities } =
+        this.practice;
+      if (!active || !showPersonalities || viewAs) return null;
+      return personalities[this.player.id] || null;
+    },
     ...mapGetters("chat", ["isPicking"]),
     ...mapGetters({ nightOrder: "players/nightOrder" }),
     ...mapGetters(["getImage", "localizeRole", "localizeReminder"]),
@@ -1815,6 +1827,14 @@ li.picking-seat .reminderHoverTarget {
     font-size: 60%;
     line-height: 1;
     padding-bottom: 5px;
+  }
+
+  .personality {
+    font-size: 60%;
+    line-height: 1;
+    padding-bottom: 4px;
+    color: $townsfolk;
+    font-style: italic;
   }
 }
 
