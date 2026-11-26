@@ -470,6 +470,7 @@
       "shuffle": "Barajar personajes",
       "clear": "Borrar selección",
       "add": "Añadir {name}",
+      "countDrunk": "Con el Borracho en el guion, uno de los Aldeanos puede ser el Borracho: un Forastero menos y un Aldeano más también vale",
       "countOff": "Con estos personajes deberían ser {count}",
       "notes": {
         "drunk": "No va en la bolsa: pon un Aldeano en su lugar. La primera noche, marca a uno de los Aldeanos con «Es el Borracho».",
