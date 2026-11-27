@@ -4,6 +4,12 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Practice game: fewer votes where nearly the whole town raises its hand. A good made-up player's vote is now as likely to tip either way (it leaned to "yes"), the town's mood counts half when they vote (what they heard is already in their own doubts), and the evil vote like the town instead of raising a hand against almost any good player
+- Practice game: a made-up player's gut feeling about someone now lasts the whole game and changes a little each morning, instead of being rolled again every day, so a doubt builds up
+- Practice game: the good made-up players read the votes. Whoever kept their hand down on someone they are fairly sure is evil is a little more doubted (the evil rarely vote on a teammate), and whoever voted on, or nominated, someone they trust is too. Someone the Demon killed at night counts as good: whoever said that player was evil, voted on them or nominated them is doubted
+
 ### Version 3.42.0
 
 - Practice game: the evil made-up players now make up info for every info character of Trouble Brewing, Bad Moon Rising and Sects & Violets they can bluff, not only 6: also the Undertaker, Grandmother, Chambermaid, Clockmaker, Dreamer, Mathematician, Flowergirl, Town Crier, Oracle and Seamstress. It fits their bluff and their team: a Grandmother or a Dreamer covers a teammate with the character they claimed, an Undertaker calls yesterday's executed good player a Minion, a Flowergirl says "no" when their Demon voted, a bold Mathematician says abilities went wrong. A Seamstress tells it only once
