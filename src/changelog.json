@@ -1,5 +1,27 @@
 [
   {
+    "version": "3.42.0",
+    "date": "2026-11-27",
+    "title": {
+      "en": "Sharper practice players: better lies, doubts and targets",
+      "es": "Jugadores de práctica más astutos: mejores mentiras, dudas y objetivos"
+    },
+    "en": [
+      "Practice game: the evil made-up players now make up info for every info character they can bluff (Undertaker, Grandmother, Chambermaid, Dreamer, Seamstress and more), fitting their bluff and covering their teammates",
+      "Practice game: the good made-up players may think they are poisoned or drunk and count their own info for less, depending on the script and on info that goes against what others told. When they doubt enough, they say so",
+      "Practice game: the Dreamer's and Seamstress's info counts for the players they chose, and info about chosen players is said with their names",
+      "Practice game: the Demon and the Minions go for the characters that hurt them most once someone believable claims one (a Fortune Teller or an Empath first), and leave a claimed Ravenkeeper or Sage alone",
+      "Practice game: good players with those characters keep it to themselves on the first day more often, and \"I'd rather not say what I am yet\" now raises a little doubt from the first day"
+    ],
+    "es": [
+      "Partida de práctica: los jugadores inventados malvados ahora se inventan información para cualquier personaje informativo del que puedan ir de farol (Enterrador, Abuela, Sirvienta, Soñador, Costurera y más), acorde con su farol y cubriendo a sus compañeros",
+      "Partida de práctica: los jugadores inventados buenos pueden pensar que están envenenados o borrachos y fiarse menos de su propia información, según el guion y si choca con lo que dicen otros. Cuando dudan bastante, lo dicen",
+      "Partida de práctica: la información del Soñador y la Costurera cuenta para los jugadores que eligieron, y la información sobre jugadores elegidos se dice con sus nombres",
+      "Partida de práctica: el Demonio y los Esbirros van a por los personajes que más daño les hacen en cuanto alguien creíble dice serlo (primero una Pitonisa o un Empático), y dejan en paz a un Guardián de Cuervos o un Sabio declarado",
+      "Partida de práctica: los buenos con esos personajes se lo guardan más a menudo el primer día, y \"Prefiero no decir todavía qué soy\" ahora levanta algo de sospecha desde el primer día"
+    ]
+  },
+  {
     "version": "3.41.0",
     "date": "2026-11-26",
     "title": {
