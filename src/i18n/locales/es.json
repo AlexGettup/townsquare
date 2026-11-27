@@ -572,6 +572,7 @@
       "learned": "Lo que sé: {info}.",
       "lastNight": "Anoche: {info}.",
       "suspect": "Sospecho de {name}.",
+      "virginProven": "Entonces {name} es {role} de verdad. Confío en {name}.",
       "nothingYet": "Todavía no sé nada más.",
       "hiding": "Prefiero no decir todavía qué soy.",
       "slayer": "Soy {role}: disparo a {name}.",

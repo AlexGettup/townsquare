@@ -106,6 +106,14 @@ export default (store) => {
   let seen = {};
   // the storyteller's open call for nominations (an announcement key)
   let call = null;
+  // the nomination going on or last made: { nominator, nominee, day,
+  // first } (names), to see a Virgin's ability go off
+  let lastNomination = null;
+  // claimed Virgins already nominated once: her ability is spent (names)
+  let tested = [];
+  // a claimed Virgin whose nominator was executed at once: [{ virgin,
+  // nominator, day }]
+  let virginKills = [];
   const timers = new Set();
   // a nomination is on its way (said, about to be made): only one at a time
   let nominating = null;
@@ -143,6 +151,9 @@ export default (store) => {
     cutoffs = [];
     seen = {};
     call = null;
+    lastNomination = null;
+    tested = [];
+    virginKills = [];
   };
 
   const roleById = (id) =>
@@ -331,6 +342,7 @@ export default (store) => {
         hidden,
         convictionOf,
         dayVotes,
+        virginKills,
       });
       // the storyteller's answer to the Artist's question
       if (mind.artist && mind.artist.name in scores) {
@@ -352,6 +364,7 @@ export default (store) => {
       hidden,
       convictionOf,
       dayVotes,
+      virginKills,
     });
     return { seats, people, opinion };
   };
@@ -722,6 +735,8 @@ export default (store) => {
     nominating = null;
     const { session, grimoire, players } = store.state;
     if (!isAuto() || grimoire.isNight || session.nomination) return;
+    // the Virgin's nominator was executed: no more nominations today
+    if (virginKills.some((kill) => kill.day === day())) return;
     const mood = town();
     const { people, opinion } = mood;
     const nominees = players.players
@@ -751,6 +766,7 @@ export default (store) => {
           traits: person.traits,
           day: day(),
           hunches: person.mind.hunches,
+          tested,
         }),
       }))
       .filter(({ nomination }) => nomination)
@@ -859,6 +875,42 @@ export default (store) => {
     return chosen.length ? chosen[chosen.length - 1].choice[0] : null;
   };
 
+  /**
+   * Someone died by day: the nominator of a claimed Virgin, in her first
+   * nomination and before any vote on it, was executed by her ability.
+   */
+  const virginKilled = (name, state) => {
+    const last = lastNomination;
+    if (!last || last.day !== day() || last.nominator !== name) return;
+    if (claims[last.nominee] !== "virgin" || !last.first) return;
+    const voted = state.session.voteHistory.some(
+      (entry) =>
+        entry.nominator === last.nominator && entry.nominee === last.nominee,
+    );
+    if (voted) return;
+    virginKills.push({
+      virgin: last.nominee,
+      nominator: last.nominator,
+      day: day(),
+    });
+    call = null;
+    // someone in the town square says it out loud
+    if (!isAuto()) return;
+    later(() => {
+      const { people } = town();
+      const speakers = people.filter(
+        ({ seat }) =>
+          !seat.isDead && ![last.nominee, last.nominator].includes(seat.name),
+      );
+      if (!speakers.length) return;
+      const speaker = speakers[Math.floor(Math.random() * speakers.length)];
+      say(speaker.seat.id, "virginProven", {
+        name: last.nominee,
+        role: roleName("virgin"),
+      });
+    }, between(TALK_GAP));
+  };
+
   store.subscribe(({ type, payload }, state) => {
     if (type === "practice/setActive" && !payload) forget();
     if (!isActive()) return;
@@ -888,7 +940,24 @@ export default (store) => {
       // a vote is over: the next one may nominate
       // (whoever is about to die may try to get off the block)
       case "session/nomination":
-        if (state.session.nomination) cutoffs.push(Date.now());
+        if (state.session.nomination) {
+          cutoffs.push(Date.now());
+          const [from, to] = state.session.nomination;
+          const seats = state.players.players;
+          if (seats[from] && seats[to]) {
+            const nominee = seats[to].name;
+            lastNomination = {
+              nominator: seats[from].name,
+              nominee,
+              day: day(),
+              // her first nomination: only this one can set her ability off
+              first: !tested.includes(nominee),
+            };
+            if (claims[nominee] === "virgin" && !tested.includes(nominee)) {
+              tested.push(nominee);
+            }
+          }
+        }
         if (!state.session.nomination && isAuto()) {
           nominateSoon();
         }
@@ -909,6 +978,7 @@ export default (store) => {
           !state.grimoire.isNight
         ) {
           executions.push({ name: payload.player.name, day: day() });
+          virginKilled(payload.player.name, state);
         }
         // someone died by day (executed): a Moonchild chooses at once
         if (
