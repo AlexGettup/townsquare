@@ -8,7 +8,9 @@
  * plus what the storyteller told them at night (a "yes" from the Fortune
  * Teller, the Empath's number, "one of these two is the Poisoner") and what
  * others claimed (someone claiming their own character). Around 1 they
- * would nominate or vote, from 2 they are fairly sure.
+ * would nominate or vote, from 2 they are fairly sure. The hunch lasts the
+ * game and drifts a little each morning; the good also read the votes (who
+ * held back on a likely evil player, who piled on a trusted one).
  *
  * The evil players know who is on their side only from their cards. They
  * push on good players the town already doubts and protect their teammates,
@@ -37,8 +39,13 @@ export const NOMINATE_AT = {
 const BLOCK_EXTRA = 0.5;
 // an evil player votes for (or nominates) a teammate to look good
 export const SACRIFICE = 0.15;
-// an evil player raises a hand against a good one
-const EVIL_YES = 0.55;
+// an evil player raises a hand against a good one: this often, plus up
+// to EVIL_FOLLOW when the town already doubts them (they vote like the
+// town, so they don't stand out, nor pile on everyone)
+const EVIL_YES = 0.3;
+const EVIL_FOLLOW = 0.4;
+// how sure a good player needs to be to raise a hand
+const VOTE_AT = 1.1;
 // a dead player spends their only vote only when this sure
 const GHOST_SURE = 2;
 // the Slayer shoots once they are this sure, or at random from day 3
@@ -173,6 +180,32 @@ export const rollHunches = (
     if (name !== me.name) hunches[name] = random() * size;
   });
   return hunches;
+};
+
+// how much of a hunch changes each morning (the rest stays from the day
+// before, so a doubt builds up instead of being rolled again)
+const HUNCH_DRIFT = 0.3;
+
+/**
+ * This morning's hunch about everyone else, from yesterday's (before:
+ * name -> hunch, or none on the first day): each moves HUNCH_DRIFT of the
+ * way to a new roll. Stays between 0 and size.
+ */
+export const driftHunches = (
+  me,
+  players,
+  before,
+  random = Math.random,
+  size = HUNCH,
+) => {
+  const fresh = rollHunches(me, players, random, size);
+  if (!before) return fresh;
+  Object.keys(fresh).forEach((name) => {
+    if (name in before) {
+      fresh[name] = before[name] + (fresh[name] - before[name]) * HUNCH_DRIFT;
+    }
+  });
+  return fresh;
 };
 
 /**
@@ -449,6 +482,7 @@ const heardBy = (me, statements, base, context) => {
     dayVotes,
     accusations = [],
     convictionOf = () => 1,
+    provenGood = [],
   } = context;
   const heard = {};
   // how much they believe a speaker: their trust, less the more they doubt
@@ -485,13 +519,15 @@ const heardBy = (me, statements, base, context) => {
       dayVotes,
     });
     Object.entries(found).forEach(([name, amount]) => {
-      if (name === me.name) {
-        // "you are evil", to a good player: the speaker lies or is wrong
-        if (amount > 0.5 && me.alignment === "good") {
-          heard[speaker] = (heard[speaker] || 0) + 0.6 + 0.6 * traits.logic;
-        }
-        return;
+      // "you are evil", to a good player, or about someone the Demon
+      // killed since: the speaker lies or is wrong
+      const wrong =
+        me.alignment === "good" &&
+        (name === me.name || provenGood.includes(name));
+      if (wrong && amount > 0.5) {
+        heard[speaker] = (heard[speaker] || 0) + 0.6 + 0.6 * traits.logic;
       }
+      if (name === me.name) return;
       heard[name] = (heard[name] || 0) + amount * belief;
     });
   });
@@ -647,6 +683,63 @@ const claimsSay = (
   return said;
 };
 
+// reading the votes: a nominee they doubt this much was likely evil...
+const VOTE_SURE = 1.5;
+// ...and whoever kept their hand down on them, alive, is a little more
+// doubted (the evil rarely vote on a teammate), whoever raised it a little
+// less; whoever voted on someone they trust is a little more doubted
+const HELD_BACK = 0.2;
+const JOINED = -0.1;
+const PILED_ON = 0.25;
+// what the votes can move someone's suspicion, at most
+const VOTES_SAY = [-0.5, 1.2];
+
+/**
+ * What the votes so far say, to a good player who thinks them through:
+ * name -> amount. pastVotes: every nomination of the game ([{ nominee,
+ * nominator, voters }], names); scores: what they think so far; the more
+ * logic, the more it counts. A vote on themselves, or on someone the Demon
+ * killed since (provenGood: names), counts as one on someone trusted, and
+ * whoever nominated them is doubted too.
+ */
+export const votesSay = (
+  me,
+  pastVotes,
+  scores,
+  players,
+  traits,
+  provenGood = [],
+) => {
+  const said = {};
+  const put = (name, amount) => {
+    if (name === me.name) return;
+    said[name] = (said[name] || 0) + amount;
+  };
+  const weight = 0.3 + 0.7 * traits.logic;
+  const alive = players.filter(({ isDead }) => !isDead).map(({ name }) => name);
+  pastVotes.forEach(({ nominee, nominator, voters }) => {
+    const sure = nominee === me.name || provenGood.includes(nominee);
+    const doubt = sure ? -5 : scores[nominee];
+    if (doubt === undefined) return;
+    if (doubt >= VOTE_SURE) {
+      alive
+        .filter((name) => name !== nominee)
+        .forEach((name) =>
+          put(name, (voters.includes(name) ? JOINED : HELD_BACK) * weight),
+        );
+    } else if (doubt <= TRUSTED) {
+      voters
+        .filter((name) => name !== nominee)
+        .forEach((name) => put(name, PILED_ON * weight));
+      if (sure && nominator) put(nominator, PILED_ON * weight);
+    }
+  });
+  Object.keys(said).forEach(
+    (name) => (said[name] = clamp(said[name], ...VOTES_SAY)),
+  );
+  return said;
+};
+
 /**
  * What a made-up player thinks of the others: name -> suspicion. Around 1
  * they would nominate or vote, from 2 they are fairly sure.
@@ -663,7 +756,10 @@ const claimsSay = (
  * convictionOf(name): how convincing someone is (practicePersonality.js's
  * convictionFactor, 1 on average); dayVotes(at): see evidenceOf;
  * virginKills: a claimed Virgin's nominator executed at once ([{ virgin,
- * nominator }]), nobody doubts either of them after that.
+ * nominator }]), nobody doubts either of them after that;
+ * pastVotes: every nomination of the game so far ([{ nominee, voters }]),
+ * read by the good (votesSay); executed: who was executed by day (names;
+ * the other dead were killed at night, so good).
  */
 export const suspicionsOf = (me, context) => thinkOf(me, context).scores;
 
@@ -693,8 +789,14 @@ export const thinkOf = (
     convictionOf = () => 1,
     dayVotes = () => [],
     virginKills = [],
+    pastVotes = [],
+    executed = [],
   },
 ) => {
+  // killed at night (dead, not executed): good, as far as anyone can tell
+  const provenGood = players
+    .filter(({ name, isDead }) => isDead && !executed.includes(name))
+    .map(({ name }) => name);
   const scores = {};
   // the Virgin's ability went off: both are what they look like, whatever
   // else they hear (applied before reading info, so they are believed, and
@@ -749,6 +851,7 @@ export const thinkOf = (
     accusations,
     convictionOf,
     risk,
+    provenGood,
   });
   Object.entries(heard).forEach(([name, amount]) =>
     add(scores, name, clamp(amount, ...HEARD_INFO)),
@@ -772,6 +875,18 @@ export const thinkOf = (
     Object.entries(ownAdded).forEach(([name, amount]) =>
       add(scores, name, -amount * doubt),
     );
+  }
+  // the good: who held back on whom, and who piled on whom
+  if (me.alignment !== "evil" && pastVotes.length) {
+    const said = votesSay(
+      me,
+      pastVotes,
+      { ...scores },
+      players,
+      traits,
+      provenGood,
+    );
+    Object.entries(said).forEach(([name, amount]) => add(scores, name, amount));
   }
   proven();
   // evil: their teammates are never suspects
@@ -1008,8 +1123,10 @@ export const votesFor = (
   if (nominee === me.name) return false;
   // anyone but the one about to die (see wantsSwap)
   if (swap) return true;
+  // what the town heard is already in their own doubts: the mood counts
+  // half here, or the whole town raises its hands together
   const score =
-    (scores[nominee] || 0) + (opinion[nominee] || 0) * traits.follow;
+    (scores[nominee] || 0) + (opinion[nominee] || 0) * traits.follow * 0.5;
   if (me.alignment === "evil") {
     if (me.teammates.includes(nominee)) return random() < SACRIFICE;
     if (dead) return random() < 0.15;
@@ -1020,14 +1137,15 @@ export const votesFor = (
       random() <
       EVIL_YES +
         traits.eager +
-        Math.min(Math.max(opinion[nominee] || 0, 0), 1) * 0.3
+        Math.min(Math.max(opinion[nominee] || 0, 0), 1) * EVIL_FOLLOW
     );
   }
-  const luck = random() * traits.noise * 2 - traits.noise / 2;
+  // as likely to tip them one way as the other
+  const luck = (random() * 2 - 1) * traits.noise;
   if (mustExecute && !dead) return score + luck >= VORTOX_VOTE;
   if (careful) return score >= CAREFUL_SURE;
   if (dead) return score >= GHOST_SURE;
-  return score + luck >= 1.1 - traits.eager;
+  return score + luck >= VOTE_AT - traits.eager;
 };
 
 /**

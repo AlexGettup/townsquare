@@ -23,7 +23,7 @@ import {
   mostDoubted,
   nominationOf,
   publicOpinion,
-  rollHunches,
+  driftHunches,
   slayerShot,
   thinkOf,
   votesFor,
@@ -257,6 +257,32 @@ export default (store) => {
   };
 
   /**
+   * Who was executed (died by day after being nominated that day): the
+   * other dead were killed at night (or by a Virgin), so good.
+   */
+  const executedNames = () =>
+    executions
+      .filter(({ name, day: when }) =>
+        store.state.session.voteHistory.some(
+          (entry) => entry.day === when && entry.nominee === name,
+        ),
+      )
+      .map(({ name }) => name);
+
+  /**
+   * Every nomination of the game so far: [{ nominator, nominee, voters }]
+   * (names).
+   */
+  const pastVotes = () =>
+    store.state.session.voteHistory
+      .filter(({ type }) => type !== "Exile")
+      .map(({ nominator, nominee, votes }) => ({
+        nominator,
+        nominee,
+        voters: votes.map((name) => name.replace(/^−/, "")),
+      }));
+
+  /**
    * An evil player who was shown the grimoire (the Spy) knows the whole
    * evil team, and can bluff a character that isn't in play.
    */
@@ -325,7 +351,13 @@ export default (store) => {
       const traits = traitsFor(seat.id);
       if (mind.day !== day()) {
         mind.day = day();
-        mind.hunches = rollHunches(me, seats, Math.random, traits.hunch);
+        mind.hunches = driftHunches(
+          me,
+          seats,
+          mind.hunches,
+          Math.random,
+          traits.hunch,
+        );
       }
       const { scores, doubt, why } = thinkOf(me, {
         script: scriptIds(),
@@ -343,6 +375,8 @@ export default (store) => {
         convictionOf,
         dayVotes,
         virginKills,
+        pastVotes: pastVotes(),
+        executed: executedNames(),
       });
       // the storyteller's answer to the Artist's question
       if (mind.artist && mind.artist.name in scores) {
@@ -365,6 +399,8 @@ export default (store) => {
       convictionOf,
       dayVotes,
       virginKills,
+      pastVotes: pastVotes(),
+      executed: executedNames(),
     });
     return { seats, people, opinion };
   };
