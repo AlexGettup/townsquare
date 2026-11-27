@@ -12,6 +12,7 @@ import {
   escapeOf,
   fakeInfo,
   gossipStatement,
+  hidingChance,
   infoOf,
   isCarefulDay,
   isMayorStandoff,
@@ -88,6 +89,8 @@ export default (store) => {
   let statements = [];
   // who said "I suspect X" in the town square: [{ speaker, name }]
   let accusations = [];
+  // who said on the first day they'd rather not say what they are (names)
+  let hidden = [];
   // who died by day, and on which day: [{ name, day }] (the Undertaker's
   // made-up info)
   let executions = [];
@@ -134,6 +137,7 @@ export default (store) => {
     claims = {};
     statements = [];
     accusations = [];
+    hidden = [];
     deaths = [];
     executions = [];
     cutoffs = [];
@@ -324,6 +328,7 @@ export default (store) => {
         seatsAt,
         day: day(),
         accusations,
+        hidden,
         convictionOf,
         dayVotes,
       });
@@ -344,6 +349,7 @@ export default (store) => {
       seatsAt,
       day: day(),
       accusations,
+      hidden,
       convictionOf,
       dayVotes,
     });
@@ -564,10 +570,12 @@ export default (store) => {
       !isEvil && mind.ownRole && me.role.id && mind.ownRole !== me.role.id;
     const first = !mind.claim || changed;
     // some good players keep their character to themselves on the first day
-    // (their personality's hides): they say so, and tell it all later
+    // (their personality's hides, more with a character the Demon would
+    // kill first): they say so, and tell it all later
     if (first && !isEvil && !changed && day() === 1 && !mind.hid) {
       mind.hid = true;
-      if (Math.random() < traits.hides) {
+      if (Math.random() < hidingChance(me.role.id, traits)) {
+        hidden.push(seat.name);
         say(seat.id, "hiding");
         return;
       }

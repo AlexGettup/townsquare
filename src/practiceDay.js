@@ -79,6 +79,52 @@ export const isCarefulDay = (players, claims) =>
   isMayorStandoff(players, claims) ||
   players.filter(({ isDead }) => !isDead).length === 4;
 
+/**
+ * How much the evil want a good character out of the way once it is
+ * claimed, 0 to 1: the ones who learn something every night first (a
+ * Fortune Teller, an Empath), then those who protect or hunt; whoever
+ * already told all they learn on the first night, hardly. Below 0: the
+ * Demon would rather not kill them (the Ravenkeeper and the Sage learn
+ * something when they die).
+ */
+export const THREATS = {
+  fortuneteller: 1,
+  empath: 1,
+  dreamer: 0.9,
+  undertaker: 0.8,
+  savant: 0.8,
+  flowergirl: 0.7,
+  towncrier: 0.7,
+  oracle: 0.6,
+  chambermaid: 0.6,
+  exorcist: 0.6,
+  slayer: 0.6,
+  mathematician: 0.5,
+  monk: 0.5,
+  seamstress: 0.4,
+  innkeeper: 0.4,
+  juggler: 0.3,
+  artist: 0.3,
+  ravenkeeper: -0.6,
+  sage: -0.6,
+};
+// a good player with such a character hides it on the first day more
+// often, the more they think it through (their logic)
+const EXPOSED = 0.7;
+const EXPOSED_HIDES = 0.35;
+
+/**
+ * How likely a good player keeps their character to themselves on the
+ * first day: their personality's hides, more with a character the Demon
+ * would kill first (see THREATS).
+ */
+export const hidingChance = (roleId, traits = PERSONALITIES.normal) =>
+  Math.min(
+    0.9,
+    (traits.hides || 0) +
+      ((THREATS[roleId] || 0) >= EXPOSED ? EXPOSED_HIDES * traits.logic : 0),
+  );
+
 const add = (scores, name, amount) => {
   if (name in scores) scores[name] += amount;
 };
@@ -555,11 +601,12 @@ const readAll = (lines, context) => {
  * claiming their own character lies; two others claiming the same one,
  * one of them lies (how much it counts: the personality's logic); a
  * claimed Saint is left alone; from day 2 someone alive who never said
- * what they are is a little suspicious (the personality's quiet).
+ * what they are is a little suspicious (the personality's quiet), and on
+ * the first day whoever said they'd rather not say it yet (hidden: names).
  */
 const claimsSay = (
   me,
-  { claims, players, traits, day, convictionOf = () => 1 },
+  { claims, players, traits, day, hidden = [], convictionOf = () => 1 },
 ) => {
   const said = {};
   const put = (name, amount) => (said[name] = (said[name] || 0) + amount);
@@ -584,6 +631,13 @@ const claimsSay = (
     alive
       .filter((name) => name !== me.name && !claims[name])
       .forEach((name) => put(name, traits.quiet));
+  } else if (traits.quiet) {
+    // the first day: only whoever said they'd rather not say it yet
+    alive
+      .filter(
+        (name) => name !== me.name && !claims[name] && hidden.includes(name),
+      )
+      .forEach((name) => put(name, traits.quiet));
   }
   return said;
 };
@@ -599,7 +653,8 @@ const claimsSay = (
  * lines }], lines from infoOf); traits: their personality
  * (practicePersonality.js); seatsAt(at): the seats when a card came (who
  * was alive); day: the day it is; roleById(id): a character;
- * accusations: who said "I suspect X" ([{ speaker, name }]);
+ * accusations: who said "I suspect X" ([{ speaker, name }]); hidden: who
+ * said on the first day they'd rather not say what they are (names);
  * convictionOf(name): how convincing someone is (practicePersonality.js's
  * convictionFactor, 1 on average); dayVotes(at): see evidenceOf.
  */
@@ -627,6 +682,7 @@ export const thinkOf = (
     seatsAt = () => players,
     day = 1,
     accusations = [],
+    hidden = [],
     convictionOf = () => 1,
     dayVotes = () => [],
   },
@@ -639,7 +695,7 @@ export const thinkOf = (
   });
   // what the town square says about claims
   Object.entries(
-    claimsSay(me, { claims, players, traits, day, convictionOf }),
+    claimsSay(me, { claims, players, traits, day, hidden, convictionOf }),
   ).forEach(([name, amount]) => add(scores, name, amount));
   // their own night info, read with what they trust so far
   const before = { ...scores };
