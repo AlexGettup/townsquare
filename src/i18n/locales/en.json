@@ -572,6 +572,7 @@
       "learned": "What I know: {info}.",
       "lastNight": "Last night: {info}.",
       "suspect": "I suspect {name}.",
+      "virginProven": "So {name} really is the {role}. I trust {name}.",
       "nothingYet": "I don't know anything else yet.",
       "hiding": "I'd rather not say what I am yet.",
       "slayer": "I'm the {role}: I shoot {name}.",

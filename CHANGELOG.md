@@ -4,6 +4,10 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Next version
+
+- Practice game: when a claimed Virgin's ability goes off (her first nominator is executed at once), the made-up players now know she is the real Virgin, and her nominator a Townsfolk. Nobody suspects or nominates her again, the evil hardly ever vote against her, one of them says it out loud ("So Ana really is the Virgin. I trust Ana.") and nobody nominates again that day. A claimed Virgin who was already nominated once is no longer "tested" a second time
+
 ### Version 3.42.0
 
 - Practice game: the evil made-up players now make up info for every info character of Trouble Brewing, Bad Moon Rising and Sects & Violets they can bluff, not only 6: also the Undertaker, Grandmother, Chambermaid, Clockmaker, Dreamer, Mathematician, Flowergirl, Town Crier, Oracle and Seamstress. It fits their bluff and their team: a Grandmother or a Dreamer covers a teammate with the character they claimed, an Undertaker calls yesterday's executed good player a Minion, a Flowergirl says "no" when their Demon voted, a bold Mathematician says abilities went wrong. A Seamstress tells it only once

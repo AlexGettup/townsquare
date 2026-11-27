@@ -152,6 +152,11 @@ const HEARD_INFO = [-2.5, 3.5];
 // someone they doubt this little is someone they trust (their info and a
 // pair they appear in)
 const TRUSTED = -0.8;
+// a claimed Virgin whose first nominator was executed at once: she is the
+// Virgin, sober and healthy, and so a Townsfolk. Her nominator registered
+// as a Townsfolk (one, or a Spy)
+const PROVEN_VIRGIN = -3;
+const PROVEN_NOMINATOR = -1.5;
 
 /**
  * A new morning hunch about everyone else: name -> 0..size (the
@@ -656,7 +661,9 @@ const claimsSay = (
  * accusations: who said "I suspect X" ([{ speaker, name }]); hidden: who
  * said on the first day they'd rather not say what they are (names);
  * convictionOf(name): how convincing someone is (practicePersonality.js's
- * convictionFactor, 1 on average); dayVotes(at): see evidenceOf.
+ * convictionFactor, 1 on average); dayVotes(at): see evidenceOf;
+ * virginKills: a claimed Virgin's nominator executed at once ([{ virgin,
+ * nominator }]), nobody doubts either of them after that.
  */
 export const suspicionsOf = (me, context) => thinkOf(me, context).scores;
 
@@ -685,9 +692,22 @@ export const thinkOf = (
     hidden = [],
     convictionOf = () => 1,
     dayVotes = () => [],
+    virginKills = [],
   },
 ) => {
   const scores = {};
+  // the Virgin's ability went off: both are what they look like, whatever
+  // else they hear (applied before reading info, so they are believed, and
+  // again at the end)
+  const proven = () =>
+    virginKills.forEach(({ virgin, nominator }) => {
+      if (virgin in scores) {
+        scores[virgin] = Math.min(scores[virgin], PROVEN_VIRGIN);
+      }
+      if (nominator in scores) {
+        scores[nominator] = Math.min(scores[nominator], PROVEN_NOMINATOR);
+      }
+    });
   players.forEach(({ name, isDead }) => {
     if (name === me.name) return;
     // killed at night: most likely good
@@ -697,6 +717,7 @@ export const thinkOf = (
   Object.entries(
     claimsSay(me, { claims, players, traits, day, hidden, convictionOf }),
   ).forEach(([name, amount]) => add(scores, name, amount));
+  proven();
   // their own night info, read with what they trust so far
   const before = { ...scores };
   const own = readAll(infoOf(me.name, cards, seatsAt), {
@@ -752,6 +773,7 @@ export const thinkOf = (
       add(scores, name, -amount * doubt),
     );
   }
+  proven();
   // evil: their teammates are never suspects
   me.teammates.forEach((name) => {
     if (name in scores) scores[name] = -5;
@@ -811,7 +833,9 @@ export const neighboursOf = (name, players) => {
  * careful: isCarefulDay(); traits: their personality (nerve: how sure they
  * need to be, follow: how much the town's mood counts, virgin: how likely
  * they test a claimed Virgin); day: the day it is; hunches: their gut
- * feelings today (a nomination by hunch doesn't say "my info").
+ * feelings today (a nomination by hunch doesn't say "my info"); tested:
+ * claimed Virgins already nominated once (her ability is spent: nobody
+ * tests her again).
  */
 export const nominationOf = (
   me,
@@ -825,6 +849,7 @@ export const nominationOf = (
     traits = PERSONALITIES.normal,
     day = 1,
     hunches = {},
+    tested = [],
     random = Math.random,
   },
 ) => {
@@ -865,7 +890,10 @@ export const nominationOf = (
   // a claimed Virgin, tested early by a Townsfolk: if the nominator is
   // executed at once, both are who they say
   const virgin = options.find(
-    (name) => claims[name] === "virgin" && (scores[name] || 0) < 1,
+    (name) =>
+      claims[name] === "virgin" &&
+      !tested.includes(name) &&
+      (scores[name] || 0) < 1,
   );
   const townsfolk = !["virgin", "saint", "recluse"].includes(me.role.id);
   if (virgin && townsfolk && day <= 2 && !hasBlock && !careful) {
@@ -985,6 +1013,9 @@ export const votesFor = (
   if (me.alignment === "evil") {
     if (me.teammates.includes(nominee)) return random() < SACRIFICE;
     if (dead) return random() < 0.15;
+    // a good player the whole town trusts (a proven Virgin): a hand up
+    // would give them away
+    if ((opinion[nominee] || 0) <= PROVEN_VIRGIN) return random() < SACRIFICE;
     return (
       random() <
       EVIL_YES +
