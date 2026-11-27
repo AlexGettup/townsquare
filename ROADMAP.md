@@ -80,6 +80,8 @@ Ideas move from here to a `feature/<name>` branch once we decide to build them.
   the town square; evil bluffs with made-up info
 - **3.41.0** Practice players read more card info and each has a conviction; Empath counts
   that night's neighbours; first-night cards kept in long chats
+- **3.42.0** Practice evil make up info for every info character and target dangerous claimed
+  roles; good players may suspect they are poisoned
 
 ## Planned
 
