@@ -7,6 +7,9 @@ release of this fork; older versions belong to the original project.
 ### Next version
 
 - Practice game: when a claimed Virgin's ability goes off (her first nominator is executed at once), the made-up players now know she is the real Virgin, and her nominator a Townsfolk. Nobody suspects or nominates her again, the evil hardly ever vote against her, one of them says it out loud ("So Ana really is the Virgin. I trust Ana.") and nobody nominates again that day. A claimed Virgin who was already nominated once is no longer "tested" a second time
+- Practice game: fewer votes where nearly the whole town raises its hand. A good made-up player's vote is now as likely to tip either way (it leaned to "yes"), the town's mood counts half when they vote (what they heard is already in their own doubts), and the evil vote like the town instead of raising a hand against almost any good player
+- Practice game: a made-up player's gut feeling about someone now lasts the whole game and changes a little each morning, instead of being rolled again every day, so a doubt builds up
+- Practice game: the good made-up players read the votes. Whoever kept their hand down on someone they are fairly sure is evil is a little more doubted (the evil rarely vote on a teammate), and whoever voted on, or nominated, someone they trust is too. Someone the Demon killed at night counts as good: whoever said that player was evil, voted on them or nominated them is doubted
 
 ### Version 3.42.0
 
