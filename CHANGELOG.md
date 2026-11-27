@@ -4,6 +4,14 @@ Versions follow [Semantic Versioning](https://semver.org): a new feature bumps t
 version (3.1.0), fixes only bump the patch version (3.0.1). Version 3.0.0 is the first
 release of this fork; older versions belong to the original project.
 
+### Version 3.42.0
+
+- Practice game: the evil made-up players now make up info for every info character of Trouble Brewing, Bad Moon Rising and Sects & Violets they can bluff, not only 6: also the Undertaker, Grandmother, Chambermaid, Clockmaker, Dreamer, Mathematician, Flowergirl, Town Crier, Oracle and Seamstress. It fits their bluff and their team: a Grandmother or a Dreamer covers a teammate with the character they claimed, an Undertaker calls yesterday's executed good player a Minion, a Flowergirl says "no" when their Demon voted, a bold Mathematician says abilities went wrong. A Seamstress tells it only once
+- Practice game: the good made-up players may now think they are poisoned or drunk, and count their own info for less. It depends on the script (a Poisoner, a No Dashii, the Vortox…), on their info going against what others told, and on a believed Mathematician. The careful ones (Veteran, Strategist) doubt most, the Novice and the Trusting hardly at all. When they doubt enough they say so ("Careful: I may be poisoned or drunk")
+- Practice game: a Dreamer's info counts for the player they chose: showing the character that player claimed makes them a little more trusted, two others make them doubted. A Seamstress's "yes" with someone trusted vouches for the other. Info about the players they chose (Chambermaid, Dreamer, Seamstress) is said with their names ("Ana, Carl: 1")
+- Practice game: the Demon and the Minions now go for the characters that hurt them most once someone claims one and the town believes it: a Fortune Teller or an Empath first, then an Undertaker, a Savant, a Monk, a Slayer… The thinking ones (Strategist, Veteran) do it most, the Novice hardly. The Demon leaves a claimed Ravenkeeper or Sage alone (they learn something when they die). Whoever already told everything on the first night (Washerwoman, Chef…) is no special target
+- Practice game: knowing it, a good made-up player with one of those characters keeps it to themselves on the first day more often, the more they think it through. And "I'd rather not say what I am yet" now counts from the first day: the distrustful ones (Veteran, Strategist) doubt them a little, as they already did from the second day with anyone who never said what they are
+
 ### Version 3.41.0
 
 - Practice game: the "Personalities" button's hint also explains the conviction

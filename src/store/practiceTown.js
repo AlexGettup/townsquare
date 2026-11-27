@@ -1,4 +1,5 @@
 import i18n from "../i18n";
+import nightsheet from "../nightsheet.json";
 import { CHOICES, alignmentOf, describePart } from "../cards";
 import { knowledgeOf } from "../practiceBrain";
 import {
@@ -11,6 +12,7 @@ import {
   escapeOf,
   fakeInfo,
   gossipStatement,
+  hidingChance,
   infoOf,
   isCarefulDay,
   isMayorStandoff,
@@ -23,7 +25,7 @@ import {
   publicOpinion,
   rollHunches,
   slayerShot,
-  suspicionsOf,
+  thinkOf,
   votesFor,
   wantsSwap,
 } from "../practiceDay";
@@ -45,6 +47,8 @@ const TALK_GAP = [2500, 5000];
 const NOMINATE_GAP = [3000, 6000];
 // lines that only ask something: what they learned is the rest of the line
 const ASKS = [...CHOICES, "useAbility", "pointAtPlayer"];
+// from how much doubt about their own info a good player says it (0 to 0.6)
+const DOUBT_SAID = 0.2;
 
 const between = ([min, max]) => min + Math.random() * (max - min);
 
@@ -85,6 +89,11 @@ export default (store) => {
   let statements = [];
   // who said "I suspect X" in the town square: [{ speaker, name }]
   let accusations = [];
+  // who said on the first day they'd rather not say what they are (names)
+  let hidden = [];
+  // who died by day, and on which day: [{ name, day }] (the Undertaker's
+  // made-up info)
+  let executions = [];
   // deaths and comebacks as they happened: [{ name, at, isDead }], to know
   // who was alive when a card came (the Empath's neighbours that night)
   let deaths = [];
@@ -128,7 +137,9 @@ export default (store) => {
     claims = {};
     statements = [];
     accusations = [];
+    hidden = [];
     deaths = [];
+    executions = [];
     cutoffs = [];
     seen = {};
     call = null;
@@ -144,6 +155,11 @@ export default (store) => {
     [...store.state.roles.values()].filter(
       ({ team }) => team !== "traveller" && team !== "fabled",
     );
+  const scriptIds = () => scriptRoles().map(({ id }) => id);
+  // that character wakes at night (from the second night on: the other
+  // nights' order), as far as the night order says
+  const wakes = (id) =>
+    (day() > 1 ? nightsheet.otherNight : nightsheet.firstNight).includes(id);
   const day = () => store.state.grimoire.nightCount || 1;
   // the Vortox on the script, and nobody about to die yet: no execution
   // today loses the game
@@ -300,7 +316,8 @@ export default (store) => {
         mind.day = day();
         mind.hunches = rollHunches(me, seats, Math.random, traits.hunch);
       }
-      const scores = suspicionsOf(me, {
+      const { scores, doubt, why } = thinkOf(me, {
+        script: scriptIds(),
         cards,
         players: seats,
         hunches: mind.hunches,
@@ -311,6 +328,7 @@ export default (store) => {
         seatsAt,
         day: day(),
         accusations,
+        hidden,
         convictionOf,
         dayVotes,
       });
@@ -319,10 +337,11 @@ export default (store) => {
         const answer = answerAfter(cards, mind.artist.from);
         if (answer) scores[mind.artist.name] += answer === "yes" ? 3 : -1.5;
       }
-      return { seat, me, mind, cards, scores, traits };
+      return { seat, me, mind, cards, scores, traits, doubt, why };
     });
     // what the town square says: what the evil can read of the town
     const opinion = publicOpinion({
+      script: scriptIds(),
       players: seats,
       claims,
       roleById,
@@ -330,6 +349,7 @@ export default (store) => {
       seatsAt,
       day: day(),
       accusations,
+      hidden,
       convictionOf,
       dayVotes,
     });
@@ -369,7 +389,16 @@ export default (store) => {
   /** One line of night info written out, as a player would say it. */
   const lineText = (line) => {
     const info = ASKS.includes(line.phrase) ? { ...line, phrase: null } : line;
+    // about the players they chose: a yes or no (Fortune Teller,
+    // Seamstress), a number (Chambermaid) or characters (Dreamer)
+    const about =
+      !info.phrase &&
+      line.about &&
+      line.about.length &&
+      !info.players.length &&
+      (info.answer || info.number !== null || info.roles.length);
     const onlyNumber =
+      !about &&
       !info.phrase &&
       info.number !== null &&
       !info.players.length &&
@@ -379,10 +408,7 @@ export default (store) => {
       ? i18n.t("practice.say.number", { n: info.number })
       : describePart(info, (key) => i18n.t(key), roleName);
     if (!text) return "";
-    // a yes or no about the players they chose (Fortune Teller)
-    return line.answer && line.about.length && !line.players.length
-      ? `${line.about.join(", ")}: ${text}`
-      : text;
+    return about ? `${line.about.join(", ")}: ${text}` : text;
   };
 
   /**
@@ -544,10 +570,12 @@ export default (store) => {
       !isEvil && mind.ownRole && me.role.id && mind.ownRole !== me.role.id;
     const first = !mind.claim || changed;
     // some good players keep their character to themselves on the first day
-    // (their personality's hides): they say so, and tell it all later
+    // (their personality's hides, more with a character the Demon would
+    // kill first): they say so, and tell it all later
     if (first && !isEvil && !changed && day() === 1 && !mind.hid) {
       mind.hid = true;
-      if (Math.random() < traits.hides) {
+      if (Math.random() < hidingChance(me.role.id, traits)) {
+        hidden.push(seat.name);
         say(seat.id, "hiding");
         return;
       }
@@ -567,6 +595,13 @@ export default (store) => {
     if (!isEvil) told = newsOf(person);
     else if (mind.faked !== day()) {
       mind.faked = day();
+      // executed yesterday: died by day after being nominated that day
+      const nominees = store.state.session.voteHistory
+        .filter((entry) => entry.day === day() - 1)
+        .map(({ nominee }) => nominee);
+      const executed = executions.filter(
+        ({ name, day: when }) => when === day() - 1 && nominees.includes(name),
+      );
       const lines =
         fakeInfo(me, mind.claim, {
           players: store.state.players.players,
@@ -574,8 +609,13 @@ export default (store) => {
           opinion,
           scriptRoles: scriptRoles(),
           day: day(),
+          votes: dayVotes(),
+          executed: executed.length ? executed[executed.length - 1].name : null,
+          wakes,
+          told: mind.fakedFor === mind.claim,
           traits,
         }) || [];
+      if (lines.length) mind.fakedFor = mind.claim;
       told = { lines, text: lines.map(lineText).filter(Boolean).join("; ") };
     }
     if (told.lines.length) {
@@ -595,6 +635,22 @@ export default (store) => {
           info: news,
         }),
       );
+    // a careful good player who may be poisoned or drunk says so, once a day
+    if (
+      news &&
+      !isEvil &&
+      person.doubt >= DOUBT_SAID &&
+      mind.doubted !== day()
+    ) {
+      mind.doubted = day();
+      parts.push(
+        i18n.t(
+          person.why === "clash"
+            ? "practice.say.infoClashes"
+            : "practice.say.mayBePoisoned",
+        ),
+      );
+    }
     // nothing new: who they doubt most, if anyone (the evil, a good player)
     if (!news) {
       const alive = aliveNames(people);
@@ -845,6 +901,14 @@ export default (store) => {
             at: Date.now(),
             isDead: !!payload.value,
           });
+        }
+        if (
+          payload &&
+          payload.property === "isDead" &&
+          payload.value &&
+          !state.grimoire.isNight
+        ) {
+          executions.push({ name: payload.player.name, day: day() });
         }
         // someone died by day (executed): a Moonchild chooses at once
         if (
