@@ -22,7 +22,8 @@
  * when that is known (`scores`, `opinion`, `claims` in the context), the
  * ones hunting the Demon (Exorcist, Sailor, Chambermaid) go for whoever
  * they doubt most, those who protect choose whoever they trust most, and
- * the evil kill whoever the town trusts.
+ * the evil kill whoever the town trusts, a claimed character that hurts
+ * them (a Fortune Teller, an Empath) first.
  *
  * Sects & Violets: the Snake Charmer and the Dreamer also go for whoever
  * they doubt most, the Seamstress checks one they trust against one they
@@ -36,7 +37,7 @@
  */
 
 import { CHOICES, SEATS_TO_CHOOSE, alignmentOf, partsOf } from "./cards";
-import { neighboursOf, pickOne } from "./practiceDay";
+import { THREATS, neighboursOf, pickOne } from "./practiceDay";
 import { PERSONALITIES } from "./practicePersonality";
 
 // evil characters whose choice protects instead of hurting
@@ -387,10 +388,22 @@ export const chooseSeats = (
     const spared = demon ? without(everyone, safe) : everyone;
     const targets = spared.length ? spared : everyone;
     if (opinion) {
+      // a claimed character that hurts them (a Fortune Teller, an Empath)
+      // goes first, the more they think it through (their logic), if the
+      // town believes the claim; the Demon leaves a Ravenkeeper or a Sage
+      // alone (see THREATS)
+      const aim = {};
+      targets.forEach((name) => {
+        const threat = THREATS[claims[name]] || 0;
+        const believed = Math.min(Math.max(1.5 - (opinion[name] || 0), 0), 1);
+        const counts = demon ? threat : Math.max(threat, 0);
+        aim[name] =
+          (opinion[name] || 0) - counts * believed * (0.2 + 0.6 * traits.logic);
+      });
       const seats = firstOf(
         [
-          ...ranked(without(targets, last), opinion, random, true, EVIL_JITTER),
-          ...ranked(targets, opinion, random, true, EVIL_JITTER),
+          ...ranked(without(targets, last), aim, random, true, EVIL_JITTER),
+          ...ranked(targets, aim, random, true, EVIL_JITTER),
           ...without(alive, [me.name]),
         ],
         count,
